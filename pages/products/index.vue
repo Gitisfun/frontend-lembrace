@@ -88,7 +88,7 @@ const selectedCategories = ref([]);
 const selectedMaterials = ref([]);
 const showDiscounted = ref(false);
 const currentPage = ref(1);
-const itemsPerPage = 6;
+const itemsPerPage = 12;
 
 // Fetch filter options
 const { data: categories } = await find('categories');
