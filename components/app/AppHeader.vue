@@ -131,7 +131,7 @@ const closeMenu = () => {
   font-size: 1.3rem;
   font-family: 'Playfair Display', 'Cinzel', serif;
   color: black;
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   text-align: center;
