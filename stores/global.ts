@@ -55,4 +55,5 @@ export const useGlobalStore = defineStore('global', {
       this.cart = [];
     },
   },
+  persist: true,
 });
