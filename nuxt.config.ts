@@ -2,7 +2,8 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@nuxtjs/strapi', '@nuxt/image'],
+  modules: ['@nuxtjs/strapi', '@nuxt/image', '@pinia/nuxt'],
+  css: ['~/assets/css/main.css'],
   strapi: {
     url: process.env.STRAPI_URL || 'https://backend-lembrace-production.up.railway.app',
     token: process.env.STRAPI_TOKEN || undefined,
