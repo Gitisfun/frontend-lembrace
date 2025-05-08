@@ -32,7 +32,7 @@
           <span>Totaal</span>
           <span>€{{ total.toFixed(2) }}</span>
         </div>
-        <button class="checkout-btn">Verder naar betalen</button>
+        <button class="checkout-btn" @click="handleCheckout">Verder naar betalen</button>
       </div>
     </div>
   </div>
@@ -77,6 +77,10 @@ const updateItemQuantity = (item, newQuantity) => {
 
 const removeFromCart = (item) => {
   globalStore.removeFromCart(item.id, item.selectedMaterials);
+};
+
+const handleCheckout = () => {
+  navigateTo('/payment');
 };
 </script>
 
