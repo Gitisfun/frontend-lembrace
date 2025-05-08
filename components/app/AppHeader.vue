@@ -13,7 +13,15 @@
         <NuxtLink to="/products" class="nav-item" @click="closeMenu" :class="{ active: $route.path === '/products' }">Products</NuxtLink>
         <NuxtLink to="/about" class="nav-item" @click="closeMenu" :class="{ active: $route.path === '/about' }">About</NuxtLink>
       </nav>
-      <div class="center-text">L'embrace</div>
+      <NuxtLink to="/" class="logo-link">
+        <div class="logo-block">
+          <div class="center-text">L'EMBRACE</div>
+          <div class="logo-line"></div>
+          <!--
+          <div class="logo-subtitle">Handgemaakte sieraden en accessoires</div>
+          -->
+        </div>
+      </NuxtLink>
       <div class="nav-right">
         <NuxtLink to="/cart" class="cart-icon">
           <div class="cart-icon-wrapper">
@@ -111,16 +119,52 @@ const closeMenu = () => {
   border-radius: 2px;
 }
 
+.logo-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
 .center-text {
-  font-size: 1.8rem;
-  font-weight: bold;
-  font-family: var(--font-primary);
+  font-size: 1.3rem;
+  font-family: 'Playfair Display', 'Cinzel', serif;
+  color: black;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 0.1em;
+  line-height: 1.1;
   white-space: nowrap;
-  font-family: 'Alex Brush';
-  background: linear-gradient(to right, #fceabb, #f8b500);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo-line {
+  width: 100%;
+  max-width: 120px;
+  height: 1px;
+  background: #bbb;
+  margin: 0.1em 0 0.3em 0;
+  opacity: 0.6;
+}
+
+.logo-subtitle {
+  font-size: 0.75rem;
+  color: #aaa;
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-align: center;
+  margin-top: 0;
+  white-space: nowrap;
+}
+
+.logo-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 .cart-icon {
