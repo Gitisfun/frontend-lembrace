@@ -2,9 +2,9 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@nuxtjs/strapi'],
+  modules: ['@nuxtjs/strapi', '@nuxt/image'],
   strapi: {
     url: process.env.STRAPI_URL || 'http://localhost:1337',
-    //token: process.env.STRAPI_TOKEN || undefined,
+    token: process.env.STRAPI_TOKEN || undefined,
   },
 });
