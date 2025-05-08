@@ -4,7 +4,17 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxtjs/strapi', '@nuxt/image'],
   strapi: {
-    url: process.env.STRAPI_URL || 'http://localhost:1337',
+    url: process.env.STRAPI_URL || 'https://backend-lembrace-production.up.railway.app',
     token: process.env.STRAPI_TOKEN || undefined,
+  },
+  image: {
+    providers: {
+      strapi: {
+        provider: 'strapi',
+        options: {
+          baseURL: 'https://backend-lembrace-production.up.railway.app',
+        },
+      },
+    },
   },
 });
