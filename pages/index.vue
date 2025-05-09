@@ -6,8 +6,8 @@
         <NuxtImg :src="pageContent?.data?.introduction?.image?.url" alt="L'embrace hero image" width="600" height="400" format="webp" class="image" provider="strapi" />
       </div>
       <div class="hero-content">
-        <h1 class="title">Welcome to L'embrace</h1>
-        <p class="subtitle">Discover our collection of elegant and timeless pieces</p>
+        <h1 class="title">{{ pageContent?.data?.introduction?.header }}</h1>
+        <p class="subtitle">{{ pageContent?.data?.introduction?.description }}</p>
         <div>
           <p class="accent-text">handcrafted for you</p>
           <div class="flourish">
@@ -23,7 +23,7 @@
           </div>
         </div>
         <NuxtLink to="/products" class="cta-button">
-          <span>Shop Now</span>
+          <span>{{ pageContent?.data?.introduction?.buttonLabel }}</span>
         </NuxtLink>
       </div>
     </div>
