@@ -13,10 +13,15 @@
             <div class="title-decoration"></div>
           </h3>
           <div class="filter-options">
-            <label v-for="category in categories" :key="category.id" class="filter-option">
-              <input type="checkbox" :value="category.id" v-model="selectedCategories" class="filter-checkbox" />
-              <span class="filter-label">{{ category.label }}</span>
-            </label>
+            <div v-for="category in categories" :key="category.id" class="category-section">
+              <div class="category-header">{{ category.label }}</div>
+              <div class="subcategory-list">
+                <label v-for="subcategory in category.subcategories" :key="subcategory.id" class="filter-option subcategory-option">
+                  <input type="checkbox" :value="subcategory.id" v-model="selectedSubcategories" class="filter-checkbox" />
+                  <span class="filter-label">{{ subcategory.label }}</span>
+                </label>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -56,7 +61,7 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  initialSelectedCategories: {
+  initialSelectedSubcategories: {
     type: Array,
     default: () => [],
   },
@@ -70,13 +75,13 @@ const emit = defineEmits(['close', 'apply', 'clear']);
 
 // Local state
 const searchQuery = ref(props.initialSearchQuery);
-const selectedCategories = ref([...props.initialSelectedCategories]);
+const selectedSubcategories = ref([...props.initialSelectedSubcategories]);
 const showDiscounted = ref(props.initialShowDiscounted);
 
 // Methods
 const clearFilters = () => {
   searchQuery.value = '';
-  selectedCategories.value = [];
+  selectedSubcategories.value = [];
   showDiscounted.value = false;
   emit('clear');
 };
@@ -84,16 +89,7 @@ const clearFilters = () => {
 const applyFilters = () => {
   emit('apply', {
     searchQuery: searchQuery.value,
-    selectedCategories: selectedCategories.value,
-    showDiscounted: showDiscounted.value,
-  });
-};
-
-const handleSearch = () => {
-  // Debounce search if needed
-  emit('apply', {
-    searchQuery: searchQuery.value,
-    selectedCategories: selectedCategories.value,
+    selectedSubcategories: selectedSubcategories.value,
     showDiscounted: showDiscounted.value,
   });
 };
@@ -238,7 +234,38 @@ const handleSearch = () => {
 .filter-options {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
+}
+
+.category-section {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 1rem;
+}
+
+.category-section:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.category-header {
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: 0.8rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.subcategory-list {
+  display: flex;
+  flex-direction: column;
   gap: 0.8rem;
+  padding-left: 1rem;
+}
+
+.subcategory-option {
+  margin-left: 0;
 }
 
 .filter-option {

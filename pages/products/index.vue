@@ -20,9 +20,9 @@
       <!-- Active Filters -->
       <ProductActiveFilters
         :categories="categories"
-        :selected-categories="selectedCategories"
+        :selected-subcategories="selectedSubcategories"
         :show-discounted="showDiscounted"
-        @remove-category="removeCategory"
+        @remove-subcategory="removeSubcategory"
         @remove-discounted="
           () => {
             showDiscounted = false;
@@ -33,10 +33,10 @@
       />
 
       <!-- Filter Modal -->
-      <ModalFilter :is-open="isFilterOpen" :categories="categories" :initial-search-query="searchQuery" :initial-selected-categories="selectedCategories" :initial-show-discounted="showDiscounted" @close="isFilterOpen = false" @apply="handleFilterApply" @clear="clearFilters" />
+      <ModalFilter :is-open="isFilterOpen" :categories="categories" :initial-search-query="searchQuery" :initial-selected-subcategories="selectedSubcategories" :initial-show-discounted="showDiscounted" @close="isFilterOpen = false" @apply="handleFilterApply" @clear="clearFilters" />
 
       <!-- Desktop Filters -->
-      <ProductFilter class="desktop-only" :categories="categories" :initial-search-query="searchQuery" :initial-selected-categories="selectedCategories" :initial-show-discounted="showDiscounted" @filter-change="handleFilterChange" />
+      <ProductFilter class="desktop-only" :categories="categories" :initial-search-query="searchQuery" :initial-selected-subcategories="selectedSubcategories" :initial-show-discounted="showDiscounted" @filter-change="handleFilterChange" />
 
       <div v-if="status === 'pending'" class="loading">Loading products...</div>
       <div v-else-if="error" class="error">Error loading products: {{ error.message }}</div>
@@ -61,20 +61,25 @@ const { find } = useStrapi();
 
 // Filter states
 const searchQuery = ref('');
-const selectedCategories = ref([]);
+const selectedSubcategories = ref([]);
 const showDiscounted = ref(false);
 const currentPage = ref(1);
 const itemsPerPage = 12;
 
 // Fetch filter options
-const { data: categories } = await find('categories');
+const { data: categories } = await find('categories', {
+  populate: ['subcategories'],
+});
+
+console.log('categories');
+console.log(categories);
 
 // Mobile filter state
 const isFilterOpen = ref(false);
 
 // Active filter count
 const activeFilterCount = computed(() => {
-  return selectedCategories.value.length + (showDiscounted.value ? 1 : 0);
+  return selectedSubcategories.value.length + (showDiscounted.value ? 1 : 0);
 });
 
 // Build filters object
@@ -83,8 +88,8 @@ const buildFilters = () => {
     $or: [{ name: { $containsi: searchQuery.value } }, { description: { $containsi: searchQuery.value } }],
   };
 
-  if (selectedCategories.value.length) {
-    filters.category = { id: { $in: selectedCategories.value } };
+  if (selectedSubcategories.value.length) {
+    filters.subcategory = { id: { $in: selectedSubcategories.value } };
   }
 
   if (showDiscounted.value) {
@@ -102,7 +107,7 @@ const {
   refresh,
 } = await useAsyncData('products', () =>
   find('products', {
-    populate: ['image', 'image_background'],
+    populate: ['image', 'image_background', 'subcategory'],
     filters: buildFilters(),
     pagination: {
       page: currentPage.value,
@@ -122,7 +127,7 @@ const handleSearch = () => {
   searchTimeout = setTimeout(() => {
     handleFilterChange({
       searchQuery: searchQuery.value,
-      selectedCategories: selectedCategories.value,
+      selectedSubcategories: selectedSubcategories.value,
       showDiscounted: showDiscounted.value,
     });
   }, 300);
@@ -137,7 +142,7 @@ const handlePageChange = async (page) => {
 // Handle filter changes
 const handleFilterChange = async (filters) => {
   searchQuery.value = filters.searchQuery;
-  selectedCategories.value = filters.selectedCategories;
+  selectedSubcategories.value = filters.selectedSubcategories;
   showDiscounted.value = filters.showDiscounted;
   currentPage.value = 1;
   await refresh();
@@ -146,21 +151,21 @@ const handleFilterChange = async (filters) => {
 // Handle filter apply from modal
 const handleFilterApply = (filters) => {
   searchQuery.value = filters.searchQuery;
-  selectedCategories.value = filters.selectedCategories;
+  selectedSubcategories.value = filters.selectedSubcategories;
   showDiscounted.value = filters.showDiscounted;
   isFilterOpen.value = false;
   handleFilterChange(filters);
 };
 
-const removeCategory = (id) => {
-  selectedCategories.value = selectedCategories.value.filter((c) => c !== id);
+const removeSubcategory = (id) => {
+  selectedSubcategories.value = selectedSubcategories.value.filter((c) => c !== id);
   currentPage.value = 1;
   refresh();
 };
 
 const clearFilters = () => {
   searchQuery.value = '';
-  selectedCategories.value = [];
+  selectedSubcategories.value = [];
   showDiscounted.value = false;
   handleFilterChange();
 };

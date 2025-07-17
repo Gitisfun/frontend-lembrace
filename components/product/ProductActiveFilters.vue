@@ -1,11 +1,11 @@
 <template>
   <!-- Results Count -->
   <div v-if="activeFilterCount > 0" class="active-filters">
-    <div v-if="selectedCategories.length" class="active-filter-group">
-      <span class="active-filter-label">Categories:</span>
-      <span v-for="categoryId in selectedCategories" :key="categoryId" class="active-filter-tag">
-        {{ getCategoryName(categoryId) }}
-        <button @click="removeCategory(categoryId)" class="remove-filter">×</button>
+    <div v-if="selectedSubcategories.length" class="active-filter-group">
+      <span class="active-filter-label">Subcategories:</span>
+      <span v-for="subcategoryId in selectedSubcategories" :key="subcategoryId" class="active-filter-tag">
+        {{ getSubcategoryName(subcategoryId) }}
+        <button @click="removeSubcategory(subcategoryId)" class="remove-filter">×</button>
       </span>
     </div>
 
@@ -25,7 +25,7 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  selectedCategories: {
+  selectedSubcategories: {
     type: Array,
     required: true,
   },
@@ -35,18 +35,26 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['remove-category', 'remove-discounted']);
+const emit = defineEmits(['remove-subcategory', 'remove-discounted']);
 
 const activeFilterCount = computed(() => {
-  return props.selectedCategories.length + (props.showDiscounted ? 1 : 0);
+  return props.selectedSubcategories.length + (props.showDiscounted ? 1 : 0);
 });
 
-const getCategoryName = (id) => {
-  return props.categories.find((c) => c.id === id)?.label || '';
+const getSubcategoryName = (id) => {
+  for (const category of props.categories) {
+    const subcategory = category.subcategories?.find((s) => s.id === id);
+    console.log('subcategory');
+    console.log(subcategory);
+    if (subcategory) {
+      return subcategory.label;
+    }
+  }
+  return '';
 };
 
-const removeCategory = (id) => {
-  emit('remove-category', id);
+const removeSubcategory = (id) => {
+  emit('remove-subcategory', id);
 };
 
 const removeDiscounted = () => {
