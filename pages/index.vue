@@ -5,7 +5,7 @@
       <div class="images-row">
         <div v-for="(image, index) in pageContent?.data?.collection?.images" :key="index" class="image-container">
           <NuxtImg :src="image?.src?.url" :alt="`L'embrace image ${index + 1}`" width="600" height="400" format="webp" class="image" provider="strapi" />
-          <button v-if="index === 1" class="center-overlay-btn">Shop all</button>
+          <NuxtLink v-if="index === 1" to="/products" class="center-overlay-btn">Shop all</NuxtLink>
         </div>
       </div>
       <!--
@@ -245,6 +245,7 @@ isLoading.value = false;
 
 .center-overlay-btn {
   position: absolute;
+  text-decoration: none;
   top: 90%;
   left: 50%;
   transform: translate(-50%, -50%);

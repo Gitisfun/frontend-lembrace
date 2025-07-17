@@ -114,7 +114,7 @@ const handleFilterChange = () => {
 .filters-section {
   background: white;
   padding: 2.5rem;
-  border-radius: 16px;
+  border-radius: 4px;
   box-shadow: var(--shadow-soft);
   height: fit-content;
   position: sticky;
@@ -147,7 +147,7 @@ const handleFilterChange = () => {
   max-width: 100%;
   padding: 1rem 1.2rem 1rem 2.8rem;
   border: 1px solid var(--color-border);
-  border-radius: 10px;
+  border-radius: 2px;
   font-family: var(--font-body);
   font-size: 1rem;
   transition: all 0.3s ease;
@@ -241,7 +241,7 @@ const handleFilterChange = () => {
   gap: 1rem;
   cursor: pointer;
   padding: 0.5rem;
-  border-radius: 8px;
+  border-radius: 2px;
   transition: all 0.3s ease;
 }
 
@@ -265,7 +265,7 @@ const handleFilterChange = () => {
   transform: translate(-50%, -50%);
   width: 1.4rem;
   height: 1.4rem;
-  border-radius: 4px;
+  border-radius: 2px;
   border: 1px solid var(--color-border);
   transition: all 0.3s ease;
 }
@@ -276,9 +276,13 @@ const handleFilterChange = () => {
 
 .filter-label {
   font-family: var(--font-body);
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--color-text);
   transition: color 0.3s ease;
+}
+
+.subcategory-option .filter-label {
+  font-size: 0.85rem;
 }
 
 .filter-option:hover .filter-label {
