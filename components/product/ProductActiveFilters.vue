@@ -8,13 +8,7 @@
         <button @click="removeCategory(categoryId)" class="remove-filter">×</button>
       </span>
     </div>
-    <div v-if="selectedMaterials.length" class="active-filter-group">
-      <span class="active-filter-label">Materials:</span>
-      <span v-for="materialId in selectedMaterials" :key="materialId" class="active-filter-tag">
-        {{ getMaterialName(materialId) }}
-        <button @click="removeMaterial(materialId)" class="remove-filter">×</button>
-      </span>
-    </div>
+
     <div v-if="showDiscounted" class="active-filter-group">
       <span class="active-filter-label">Others:</span>
       <span class="active-filter-tag">
@@ -31,15 +25,7 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  materials: {
-    type: Array,
-    required: true,
-  },
   selectedCategories: {
-    type: Array,
-    required: true,
-  },
-  selectedMaterials: {
     type: Array,
     required: true,
   },
@@ -49,26 +35,18 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['remove-category', 'remove-material', 'remove-discounted']);
+const emit = defineEmits(['remove-category', 'remove-discounted']);
 
 const activeFilterCount = computed(() => {
-  return props.selectedCategories.length + props.selectedMaterials.length + (props.showDiscounted ? 1 : 0);
+  return props.selectedCategories.length + (props.showDiscounted ? 1 : 0);
 });
 
 const getCategoryName = (id) => {
   return props.categories.find((c) => c.id === id)?.label || '';
 };
 
-const getMaterialName = (id) => {
-  return props.materials.find((m) => m.id === id)?.label || '';
-};
-
 const removeCategory = (id) => {
   emit('remove-category', id);
-};
-
-const removeMaterial = (id) => {
-  emit('remove-material', id);
 };
 
 const removeDiscounted = () => {

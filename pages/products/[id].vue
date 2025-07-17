@@ -27,11 +27,6 @@
             <span class="meta-label">Available:</span>
             <span class="meta-value">{{ product.amount }} in stock</span>
           </div>
-
-          <!-- Materials Dropdown -->
-          <div v-if="product?.materials?.length" class="meta-item">
-            <InputDropdown :items="product.materials" v-model="selectedMaterials" label="Materials" placeholder="Select materials" />
-          </div>
         </div>
 
         <div class="product-actions">
@@ -45,7 +40,7 @@
 
 <script setup>
 import { formatPrice } from '~/logic/utils';
-import InputDropdown from '~/components/input/InputDropdown.vue';
+
 import InputCounter from '~/components/input/InputCounter.vue';
 import { useGlobalStore } from '~/stores/global';
 
@@ -58,25 +53,11 @@ const error = ref(null);
 const product = ref(null);
 const formattedPrice = ref('');
 
-const selectedMaterials = ref([]);
 const quantity = ref(1);
-
-// Initialize values when product is loaded
-watch(
-  () => product.value,
-  (newProduct) => {
-    if (newProduct?.materials?.length) {
-      selectedMaterials.value = [newProduct.materials[0].id];
-    } else {
-      selectedMaterials.value = [];
-    }
-  },
-  { immediate: true }
-);
 
 try {
   const { data: response } = await findOne('products', route.params.id, {
-    populate: ['image', 'materials', 'category'],
+    populate: ['image', 'category'],
   });
   product.value = response;
   formattedPrice.value = product.value?.price ? formatPrice(product.value.price) : '';
@@ -88,9 +69,7 @@ try {
 
 const addToCart = () => {
   if (!product.value) return;
-  console.log('selectedMaterials.value');
-  console.log(selectedMaterials.value);
-  globalStore.addToCart(product.value, quantity.value, selectedMaterials.value);
+  globalStore.addToCart(product.value, quantity.value);
 };
 </script>
 

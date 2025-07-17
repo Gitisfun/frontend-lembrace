@@ -5,11 +5,6 @@
     </div>
     <div class="item-details">
       <h3 class="item-name">{{ item.name }}</h3>
-      <div v-if="item.selectedMaterials?.length" class="item-materials">
-        <span v-for="materialId in item.selectedMaterials" :key="materialId" class="material-tag">
-          {{ getMaterialLabel(materialId) }}
-        </span>
-      </div>
     </div>
     <div class="item-quantity">
       <button @click="updateQuantity(item.quantity - 1)" class="quantity-btn" :disabled="item.quantity <= 1">−</button>
@@ -32,10 +27,6 @@ const props = defineProps({
     type: Object,
     required: true,
   },
-  materials: {
-    type: Array,
-    required: true,
-  },
 });
 
 const emit = defineEmits(['update:quantity', 'remove']);
@@ -43,11 +34,6 @@ const emit = defineEmits(['update:quantity', 'remove']);
 const updateQuantity = (newQuantity) => {
   if (newQuantity < 1) return;
   emit('update:quantity', newQuantity);
-};
-
-const getMaterialLabel = (materialId) => {
-  const material = props.materials.find((material) => material.id === materialId);
-  return material ? material.label : materialId;
 };
 </script>
 
@@ -86,19 +72,6 @@ const getMaterialLabel = (materialId) => {
 .item-name {
   font-family: var(--font-primary);
   font-size: 1.2rem;
-  color: var(--color-text);
-}
-
-.item-materials {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.material-tag {
-  background: #fcf8f3;
-  padding: 0.3rem 0.8rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
   color: var(--color-text);
 }
 

@@ -20,12 +20,9 @@
       <!-- Active Filters -->
       <ProductActiveFilters
         :categories="categories"
-        :materials="materials"
         :selected-categories="selectedCategories"
-        :selected-materials="selectedMaterials"
         :show-discounted="showDiscounted"
         @remove-category="removeCategory"
-        @remove-material="removeMaterial"
         @remove-discounted="
           () => {
             showDiscounted = false;
@@ -36,30 +33,10 @@
       />
 
       <!-- Filter Modal -->
-      <ModalFilter
-        :is-open="isFilterOpen"
-        :categories="categories"
-        :materials="materials"
-        :initial-search-query="searchQuery"
-        :initial-selected-categories="selectedCategories"
-        :initial-selected-materials="selectedMaterials"
-        :initial-show-discounted="showDiscounted"
-        @close="isFilterOpen = false"
-        @apply="handleFilterApply"
-        @clear="clearFilters"
-      />
+      <ModalFilter :is-open="isFilterOpen" :categories="categories" :initial-search-query="searchQuery" :initial-selected-categories="selectedCategories" :initial-show-discounted="showDiscounted" @close="isFilterOpen = false" @apply="handleFilterApply" @clear="clearFilters" />
 
       <!-- Desktop Filters -->
-      <ProductFilter
-        class="desktop-only"
-        :categories="categories"
-        :materials="materials"
-        :initial-search-query="searchQuery"
-        :initial-selected-categories="selectedCategories"
-        :initial-selected-materials="selectedMaterials"
-        :initial-show-discounted="showDiscounted"
-        @filter-change="handleFilterChange"
-      />
+      <ProductFilter class="desktop-only" :categories="categories" :initial-search-query="searchQuery" :initial-selected-categories="selectedCategories" :initial-show-discounted="showDiscounted" @filter-change="handleFilterChange" />
 
       <div v-if="status === 'pending'" class="loading">Loading products...</div>
       <div v-else-if="error" class="error">Error loading products: {{ error.message }}</div>
@@ -85,21 +62,19 @@ const { find } = useStrapi();
 // Filter states
 const searchQuery = ref('');
 const selectedCategories = ref([]);
-const selectedMaterials = ref([]);
 const showDiscounted = ref(false);
 const currentPage = ref(1);
 const itemsPerPage = 12;
 
 // Fetch filter options
 const { data: categories } = await find('categories');
-const { data: materials } = await find('materials');
 
 // Mobile filter state
 const isFilterOpen = ref(false);
 
 // Active filter count
 const activeFilterCount = computed(() => {
-  return selectedCategories.value.length + selectedMaterials.value.length + (showDiscounted.value ? 1 : 0);
+  return selectedCategories.value.length + (showDiscounted.value ? 1 : 0);
 });
 
 // Build filters object
@@ -110,10 +85,6 @@ const buildFilters = () => {
 
   if (selectedCategories.value.length) {
     filters.category = { id: { $in: selectedCategories.value } };
-  }
-
-  if (selectedMaterials.value.length) {
-    filters.materials = { id: { $in: selectedMaterials.value } };
   }
 
   if (showDiscounted.value) {
@@ -152,7 +123,6 @@ const handleSearch = () => {
     handleFilterChange({
       searchQuery: searchQuery.value,
       selectedCategories: selectedCategories.value,
-      selectedMaterials: selectedMaterials.value,
       showDiscounted: showDiscounted.value,
     });
   }, 300);
@@ -168,7 +138,6 @@ const handlePageChange = async (page) => {
 const handleFilterChange = async (filters) => {
   searchQuery.value = filters.searchQuery;
   selectedCategories.value = filters.selectedCategories;
-  selectedMaterials.value = filters.selectedMaterials;
   showDiscounted.value = filters.showDiscounted;
   currentPage.value = 1;
   await refresh();
@@ -178,20 +147,9 @@ const handleFilterChange = async (filters) => {
 const handleFilterApply = (filters) => {
   searchQuery.value = filters.searchQuery;
   selectedCategories.value = filters.selectedCategories;
-  selectedMaterials.value = filters.selectedMaterials;
   showDiscounted.value = filters.showDiscounted;
   isFilterOpen.value = false;
   handleFilterChange(filters);
-};
-
-// Helper functions
-const getCategoryName = (id) => {
-  console.log(categories);
-  return categories?.find((c) => c.id === id)?.label || '';
-};
-
-const getMaterialName = (id) => {
-  return materials?.find((m) => m.id === id)?.label || '';
 };
 
 const removeCategory = (id) => {
@@ -200,16 +158,9 @@ const removeCategory = (id) => {
   refresh();
 };
 
-const removeMaterial = (id) => {
-  selectedMaterials.value = selectedMaterials.value.filter((m) => m !== id);
-  currentPage.value = 1;
-  refresh();
-};
-
 const clearFilters = () => {
   searchQuery.value = '';
   selectedCategories.value = [];
-  selectedMaterials.value = [];
   showDiscounted.value = false;
   handleFilterChange();
 };

@@ -22,19 +22,6 @@
 
         <div class="filter-group">
           <h3 class="filter-title">
-            <span class="title-text">Materials</span>
-            <div class="title-decoration"></div>
-          </h3>
-          <div class="filter-options">
-            <label v-for="material in materials" :key="material.id" class="filter-option">
-              <input type="checkbox" :value="material.id" v-model="selectedMaterials" class="filter-checkbox" />
-              <span class="filter-label">{{ material.label }}</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="filter-group">
-          <h3 class="filter-title">
             <span class="title-text">Other</span>
             <div class="title-decoration"></div>
           </h3>
@@ -65,19 +52,11 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  materials: {
-    type: Array,
-    required: true,
-  },
   initialSearchQuery: {
     type: String,
     default: '',
   },
   initialSelectedCategories: {
-    type: Array,
-    default: () => [],
-  },
-  initialSelectedMaterials: {
     type: Array,
     default: () => [],
   },
@@ -92,14 +71,12 @@ const emit = defineEmits(['close', 'apply', 'clear']);
 // Local state
 const searchQuery = ref(props.initialSearchQuery);
 const selectedCategories = ref([...props.initialSelectedCategories]);
-const selectedMaterials = ref([...props.initialSelectedMaterials]);
 const showDiscounted = ref(props.initialShowDiscounted);
 
 // Methods
 const clearFilters = () => {
   searchQuery.value = '';
   selectedCategories.value = [];
-  selectedMaterials.value = [];
   showDiscounted.value = false;
   emit('clear');
 };
@@ -108,7 +85,6 @@ const applyFilters = () => {
   emit('apply', {
     searchQuery: searchQuery.value,
     selectedCategories: selectedCategories.value,
-    selectedMaterials: selectedMaterials.value,
     showDiscounted: showDiscounted.value,
   });
 };
@@ -118,7 +94,6 @@ const handleSearch = () => {
   emit('apply', {
     searchQuery: searchQuery.value,
     selectedCategories: selectedCategories.value,
-    selectedMaterials: selectedMaterials.value,
     showDiscounted: showDiscounted.value,
   });
 };

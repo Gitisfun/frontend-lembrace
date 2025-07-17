@@ -90,10 +90,11 @@ o Home pagina:
     [X] Socials van onder (instagram, tiktok & pinterest)
 
 o Producten pagina: 
-    [ ] Geen witte achtergrond, wat minimalistischer
-    [ ] Naam van product klein
-    [ ] Prijs in het zwart en groot
-    [ ] Hover aanpassen voor 2e foto die toont
+    [X] Geen witte achtergrond, wat minimalistischer
+    [X] Naam van product klein
+    [X] Prijs in het zwart en groot
+    [X] Hover aanpassen voor 2e foto die toont
+    [ ] Filter aanpassen, enkel op subcategorie
     [ ] Meerdere foto's op basis van kleur
 
 o Product 

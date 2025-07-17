@@ -158,7 +158,6 @@ const handleSubmit = async () => {
         name: item.name,
         quantity: item.quantity,
         price: item.price,
-        selectedMaterials: item.selectedMaterials,
       })),
     };
 

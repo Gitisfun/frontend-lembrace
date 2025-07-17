@@ -10,10 +10,10 @@
       <div class="cart-items">
         <h2>Mijn bestelling</h2>
         <template v-if="!isMobile">
-          <CartItem v-for="item in cartItems" :key="item.id" :item="item" :materials="materials" @update:quantity="(quantity) => updateItemQuantity(item, quantity)" @remove="removeFromCart(item)" />
+          <CartItem v-for="item in cartItems" :key="item.id" :item="item" @update:quantity="(quantity) => updateItemQuantity(item, quantity)" @remove="removeFromCart(item)" />
         </template>
         <template v-else>
-          <CartItemMobile v-for="item in cartItems" :key="item.id" :item="item" :materials="materials" @update:quantity="(quantity) => updateItemQuantity(item, quantity)" @remove="removeFromCart(item)" />
+          <CartItemMobile v-for="item in cartItems" :key="item.id" :item="item" @update:quantity="(quantity) => updateItemQuantity(item, quantity)" @remove="removeFromCart(item)" />
         </template>
       </div>
 
@@ -45,10 +45,6 @@ import CartItem from '~/components/cart/CartItem.vue';
 import CartItemMobile from '~/components/cart/CartItemMobile.vue';
 
 const globalStore = useGlobalStore();
-const { find } = useStrapi();
-const materials = ref([]);
-const responseMaterials = await find('materials');
-materials.value = responseMaterials.data;
 const cartItems = computed(() => globalStore.cartItems);
 
 const shippingCost = 2.5;
@@ -72,11 +68,11 @@ onUnmounted(() => {
 
 const updateItemQuantity = (item, newQuantity) => {
   if (newQuantity < 1) return;
-  globalStore.updateQuantity(item.id, newQuantity, item.selectedMaterials);
+  globalStore.updateQuantity(item.id, newQuantity);
 };
 
 const removeFromCart = (item) => {
-  globalStore.removeFromCart(item.id, item.selectedMaterials);
+  globalStore.removeFromCart(item.id);
 };
 
 const handleCheckout = () => {
