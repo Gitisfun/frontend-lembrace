@@ -19,9 +19,11 @@ interface Product {
 export const useGlobalStore = defineStore('global', {
   state: () => ({
     cart: [] as CartItem[],
+    test: [] as string[],
   }),
   getters: {
     cartItems: (state) => state.cart,
+    testItems: (state) => state.test,
     cartTotal: (state) => state.cart.reduce((total, item) => total + item.price * item.quantity, 0),
     cartItemCount: (state) => state.cart.reduce((count, item) => count + item.quantity, 0),
   },
@@ -53,6 +55,15 @@ export const useGlobalStore = defineStore('global', {
     },
     clearCart() {
       this.cart = [];
+    },
+    addToTest(item: string) {
+      this.test.push(item);
+    },
+    removeFromTest(item: string) {
+      this.test = this.test.filter((item) => item !== item);
+    },
+    clearTest() {
+      this.test = [];
     },
   },
   persist: true,

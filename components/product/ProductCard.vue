@@ -1,16 +1,10 @@
 <template>
   <NuxtLink :to="`/products/${product.documentId}`" class="product-card">
-    <!-- Optional Badge -->
-    <div v-if="product?.isNew" class="product-badge">NEW</div>
-    <!-- NEW -->
-
     <div class="product-image">
-      <NuxtImg :src="product?.image?.formats?.medium?.url" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image" />
-      <div class="image-overlay">
-        <span class="view-details">View Details</span>
-      </div>
+      <NuxtImg :src="product?.image?.formats?.medium?.url" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image main-image" />
+      <NuxtImg :src="product?.image_background?.formats?.medium?.url ?? product?.image?.formats?.medium?.url" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image hover-image" />
+      <div v-if="product?.amount === 4" class="soldout-badge">Sold out</div>
     </div>
-
     <div class="product-info">
       <h3 class="product-name">{{ product?.name }}</h3>
       <p class="product-price">{{ formattedPrice }}</p>
@@ -33,109 +27,91 @@ const formattedPrice = props?.product?.price ? formatPrice(props?.product?.price
 
 <style scoped>
 .product-card {
-  background: white;
-  border: 1px solid #e8d8b4; /* NEW gold-toned border */
-  border-radius: 20px;
-  overflow: hidden;
-  transition: all 0.4s ease;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   text-decoration: none;
   display: block;
   cursor: pointer;
   position: relative;
-}
-
-.product-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-}
-
-/* NEW Badge */
-.product-badge {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  background: #d4af37;
-  color: white;
-  font-size: 0.75rem;
-  font-weight: bold;
-  padding: 0.3rem 0.7rem;
-  border-radius: 12px;
-  letter-spacing: 0.5px;
-  z-index: 2;
+  transition: none;
 }
 
 .product-image {
-  position: relative;
+  background: #fff;
   aspect-ratio: 1;
   overflow: hidden;
-  border-bottom: 1px solid #f0ead6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  position: relative;
 }
 
 .image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform 0.8s ease;
+  object-fit: contain;
+  background: #fff;
+  display: block;
+  transition: opacity 0.3s ease;
 }
 
-.image-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.view-details {
-  color: white;
-  font-family: var(--font-primary);
-  font-size: 1rem;
-  font-weight: 500;
-  padding: 0.6rem 1.2rem;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 24px;
-  backdrop-filter: blur(3px);
-  transform: translateY(20px);
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-.product-card:hover .image {
-  transform: scale(1.05);
-}
-
-.product-card:hover .image-overlay {
+.main-image {
   opacity: 1;
 }
 
-.product-card:hover .view-details {
-  transform: translateY(0);
+.hover-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+
+.product-card:hover .main-image {
+  opacity: 0;
+}
+
+.product-card:hover .hover-image {
+  opacity: 1;
+}
+
+.soldout-badge {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  padding: 0.3rem 1.2rem;
+  background: #23262a;
+  color: #fff;
+  font-size: 0.9rem;
+  border-radius: 0.5rem;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  z-index: 1;
 }
 
 .product-info {
-  padding: 1.5rem;
-  text-align: center;
+  padding: 1.2rem 0 0.2rem 0.2rem;
+  text-align: left;
 }
 
 .product-name {
-  font-family: 'Playfair Display', serif; /* NEW */
-  font-size: 1.25rem;
-  color: var(--color-text);
-  margin-bottom: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.3px;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #23262a;
+  font-weight: 400;
+  letter-spacing: 0.01em;
 }
 
 .product-price {
-  font-size: 1.2rem;
-  background: linear-gradient(90deg, #d4af37, #b88b2a); /* NEW */
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+  font-size: 1.25rem;
+  color: #23262a;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  margin: 0;
 }
 </style>

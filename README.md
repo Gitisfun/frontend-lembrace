@@ -73,3 +73,42 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+
+
+# TODO
+
+Voorbeeld: https://www.jules-co.be/
+
+o Algemeen:
+    [ ] Logo aanpassen
+    [X] Contact pagina toevoegen
+
+o Home pagina:
+    [X] Home pagina met 3 fotos en een button in het midden
+    [ ] Email kunnen verzenden
+    [X] Socials van onder (instagram, tiktok & pinterest)
+
+o Producten pagina: 
+    [ ] Geen witte achtergrond, wat minimalistischer
+    [ ] Naam van product klein
+    [ ] Prijs in het zwart en groot
+    [ ] Hover aanpassen voor 2e foto die toont
+    [ ] Meerdere foto's op basis van kleur
+
+o Product 
+    [ ] Zie voorbeeld jules & co voor stijl
+    [ ] Kortingcodes op categorien, subcategorien en producten, voeg veldje toe voor kortingscode
+    [ ] Slideshow, meerdere fotos op product
+
+o Contact
+    [ ] Naam
+    [ ] Email
+    [ ] Telefoon
+    [ ] Bericht
+    [ ] Verzendknop
+
+
+--> mogelijkheid om een account aan te maken
+
+wachtwoord: L@embrace2012

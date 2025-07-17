@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/strapi', '@nuxt/image', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt'],
   css: ['~/assets/css/main.css'],
   strapi: {
-    url: process.env.STRAPI_URL || 'https://backend-lembrace-production.up.railway.app',
+    url: process.env.STRAPI_URL || 'http://localhost:1337',
     token: process.env.STRAPI_TOKEN || undefined,
   },
   image: {
@@ -13,7 +13,7 @@ export default defineNuxtConfig({
       strapi: {
         provider: 'strapi',
         options: {
-          baseURL: 'https://backend-lembrace-production.up.railway.app',
+          baseURL: 'http://localhost:1337',
         },
       },
     },

@@ -131,7 +131,7 @@ const {
   refresh,
 } = await useAsyncData('products', () =>
   find('products', {
-    populate: ['image'],
+    populate: ['image', 'image_background'],
     filters: buildFilters(),
     pagination: {
       page: currentPage.value,

@@ -2,9 +2,13 @@
   <div>
     <div v-if="isLoading">Is loading...</div>
     <div v-if="!isLoading" class="hero">
-      <div class="hero-image">
-        <NuxtImg :src="pageContent?.data?.introduction?.image?.url" alt="L'embrace hero image" width="600" height="400" format="webp" class="image" provider="strapi" />
+      <div class="images-row">
+        <div v-for="(image, index) in pageContent?.data?.collection?.images" :key="index" class="image-container">
+          <NuxtImg :src="image?.src?.url" :alt="`L'embrace image ${index + 1}`" width="600" height="400" format="webp" class="image" provider="strapi" />
+          <button v-if="index === 1" class="center-overlay-btn">Shop all</button>
+        </div>
       </div>
+      <!--
       <div class="hero-content">
         <h1 class="title">{{ pageContent?.data?.introduction?.header }}</h1>
         <p class="subtitle">{{ pageContent?.data?.introduction?.description }}</p>
@@ -26,6 +30,7 @@
           <span>{{ pageContent?.data?.introduction?.buttonLabel }}</span>
         </NuxtLink>
       </div>
+      -->
     </div>
   </div>
 </template>
@@ -51,9 +56,6 @@ const isLoading = ref(true);
 
 const pageContent = await find('homepage', {
   populate: {
-    introduction: {
-      populate: ['image'],
-    },
     collection: {
       populate: {
         images: {
@@ -63,8 +65,8 @@ const pageContent = await find('homepage', {
     },
   },
 });
-console.log('pageContent');
-console.log(pageContent);
+
+console.log(pageContent.data.collection.images);
 
 isLoading.value = false;
 </script>
@@ -72,10 +74,10 @@ isLoading.value = false;
 <style scoped>
 .hero {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  gap: 6rem;
-  padding: 4rem 2rem;
+  gap: 0;
+  padding: 0;
   position: relative;
   background-blend-mode: overlay;
   opacity: 0.95;
@@ -92,24 +94,42 @@ isLoading.value = false;
   opacity: 0.2;
 }
 
-.hero-image {
-  flex: 1;
+.images-row {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0 3vw;
+  gap: 1.5vw;
+}
+
+.image-container {
+  flex: 1 1 0;
+  aspect-ratio: 1/1.1;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
   justify-content: center;
-  max-width: 450px;
-  align-self: center;
   position: relative;
 }
 
 .image {
   width: 100%;
-  max-width: 450px;
-  height: auto;
-  border-radius: 20px;
-  box-shadow: var(--shadow-soft);
-  transition: all 0.5s ease;
-  animation: fadeInUp 0.8s ease forwards;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+  box-shadow: none;
+  transition: none;
+  animation: none;
+  display: block;
+}
+
+.image:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-gold);
 }
 
 .ornament {
@@ -223,27 +243,38 @@ isLoading.value = false;
   z-index: 2;
 }
 
-@media (max-width: 768px) {
-  .hero {
+.center-overlay-btn {
+  position: absolute;
+  top: 90%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #fff;
+  color: #fff;
+  font-size: 1.2rem;
+  padding: 0.7em 2.2em;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.03em;
+  transition: background 0.2s, color 0.2s;
+  z-index: 2;
+}
+.center-overlay-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+@media (max-width: 1024px) {
+  .images-row {
     flex-direction: column;
-    padding: 2rem 1rem;
-    gap: 3rem;
+    gap: 2vw;
+    width: 100vw;
+    max-width: 100vw;
+    padding: 0 2vw;
   }
-
-  .hero-image {
-    width: 100%;
-  }
-
-  .title {
-    font-size: 2.5rem;
-  }
-
-  .subtitle {
-    font-size: 1rem;
-  }
-
-  .accent-text {
-    font-size: 1.5rem;
+  .image-container {
+    aspect-ratio: 1/1;
+    min-height: 200px;
   }
 }
 </style>

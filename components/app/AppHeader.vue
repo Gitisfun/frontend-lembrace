@@ -12,6 +12,7 @@
         <NuxtLink to="/" class="nav-item" @click="closeMenu" :class="{ active: $route.path === '/' }">Home</NuxtLink>
         <NuxtLink to="/products" class="nav-item" @click="closeMenu" :class="{ active: $route.path === '/products' }">Products</NuxtLink>
         <NuxtLink to="/about" class="nav-item" @click="closeMenu" :class="{ active: $route.path === '/about' }">About</NuxtLink>
+        <NuxtLink to="/contact" class="nav-item" @click="closeMenu" :class="{ active: $route.path === '/contact' }">Contact</NuxtLink>
       </nav>
       <NuxtLink to="/" class="logo-link">
         <div class="logo-block">
