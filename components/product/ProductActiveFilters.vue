@@ -42,10 +42,18 @@ const activeFilterCount = computed(() => {
 });
 
 const getSubcategoryName = (id) => {
+  const idStr = String(id);
+
+  // Handle "all" virtual subcategories
+  if (idStr.startsWith('all_')) {
+    const categoryId = idStr.replace('all_', '');
+    const category = props.categories.find((cat) => cat.id == categoryId);
+    return category ? `All ${category.label}` : 'All';
+  }
+
+  // Handle regular subcategories
   for (const category of props.categories) {
-    const subcategory = category.subcategories?.find((s) => s.id === id);
-    console.log('subcategory');
-    console.log(subcategory);
+    const subcategory = category.subcategories?.find((s) => s.id == id);
     if (subcategory) {
       return subcategory.label;
     }

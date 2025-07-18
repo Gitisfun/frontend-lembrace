@@ -19,7 +19,7 @@
 
       <!-- Active Filters -->
       <ProductActiveFilters
-        :categories="categories"
+        :categories="processedCategories"
         :selected-subcategories="selectedSubcategories"
         :show-discounted="showDiscounted"
         @remove-subcategory="removeSubcategory"
@@ -33,10 +33,10 @@
       />
 
       <!-- Filter Modal -->
-      <ModalFilter :is-open="isFilterOpen" :categories="categories" :initial-search-query="searchQuery" :initial-selected-subcategories="selectedSubcategories" :initial-show-discounted="showDiscounted" @close="isFilterOpen = false" @apply="handleFilterApply" @clear="clearFilters" />
+      <ModalFilter :is-open="isFilterOpen" :categories="processedCategories" :initial-search-query="searchQuery" :initial-selected-subcategories="selectedSubcategories" :initial-show-discounted="showDiscounted" @close="isFilterOpen = false" @apply="handleFilterApply" @clear="clearFilters" />
 
       <!-- Desktop Filters -->
-      <ProductFilter class="desktop-only" :categories="categories" :initial-search-query="searchQuery" :initial-selected-subcategories="selectedSubcategories" :initial-show-discounted="showDiscounted" @filter-change="handleFilterChange" />
+      <ProductFilter class="desktop-only" :categories="processedCategories" :initial-search-query="searchQuery" :initial-selected-subcategories="selectedSubcategories" :initial-show-discounted="showDiscounted" @filter-change="handleFilterChange" />
 
       <div v-if="status === 'pending'" class="loading">Loading products...</div>
       <div v-else-if="error" class="error">Error loading products: {{ error.message }}</div>
@@ -71,15 +71,43 @@ const { data: categories } = await find('categories', {
   populate: ['subcategories'],
 });
 
-console.log('categories');
-console.log(categories);
-
 // Mobile filter state
 const isFilterOpen = ref(false);
 
 // Active filter count
 const activeFilterCount = computed(() => {
   return selectedSubcategories.value.length + (showDiscounted.value ? 1 : 0);
+});
+
+// Function to inject virtual "all" options into categories
+const injectAllOptions = (categories) => {
+  return (
+    categories?.map((category) => ({
+      ...category,
+      subcategories: [{ id: `all_${category.id}`, name: 'all', label: 'All', category: category.id }, ...category.subcategories],
+    })) || []
+  );
+};
+
+// Function to get category ID from subcategory ID (for "all" handling)
+const getCategoryFromSubcategory = (subcategoryId, categories) => {
+  const subcategoryIdStr = String(subcategoryId);
+  if (subcategoryIdStr.startsWith('all_')) {
+    return subcategoryIdStr.replace('all_', '');
+  }
+
+  for (const category of categories) {
+    const subcategory = category.subcategories?.find((sub) => sub.id === subcategoryId);
+    if (subcategory) {
+      return category.id;
+    }
+  }
+  return null;
+};
+
+// Process categories with virtual "all" options
+const processedCategories = computed(() => {
+  return injectAllOptions(categories);
 });
 
 // Build filters object
@@ -89,7 +117,41 @@ const buildFilters = () => {
   };
 
   if (selectedSubcategories.value.length) {
-    filters.subcategory = { id: { $in: selectedSubcategories.value } };
+    // Separate "all" selections from regular subcategory selections
+    const allSelections = selectedSubcategories.value.filter((id) => String(id).startsWith('all_'));
+    const regularSelections = selectedSubcategories.value.filter((id) => !String(id).startsWith('all_'));
+
+    const categoryFilters = [];
+
+    // Handle "all" selections - filter by category
+    if (allSelections.length > 0) {
+      const categoryIds = allSelections.map((id) => String(id).replace('all_', ''));
+      categoryFilters.push({
+        subcategory: {
+          category: {
+            id: { $in: categoryIds },
+          },
+        },
+      });
+    }
+
+    // Handle regular subcategory selections
+    if (regularSelections.length > 0) {
+      categoryFilters.push({
+        subcategory: {
+          id: { $in: regularSelections },
+        },
+      });
+    }
+
+    // Combine category filters with OR logic
+    if (categoryFilters.length > 0) {
+      if (categoryFilters.length === 1) {
+        filters.$and = categoryFilters;
+      } else {
+        filters.$or = [...filters.$or, ...categoryFilters];
+      }
+    }
   }
 
   if (showDiscounted.value) {

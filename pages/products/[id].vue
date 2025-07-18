@@ -65,7 +65,6 @@
 
             <!-- Divider -->
             <div class="action-divider"></div>
-
             <button class="add-to-cart" @click="addToCart">Add to Cart</button>
             <NuxtLink to="/cart" class="checkout-btn">Proceed to Checkout</NuxtLink>
           </template>
