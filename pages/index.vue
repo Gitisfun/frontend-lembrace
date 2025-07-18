@@ -8,29 +8,6 @@
           <NuxtLink v-if="index === 1" to="/products" class="center-overlay-btn">Shop all</NuxtLink>
         </div>
       </div>
-      <!--
-      <div class="hero-content">
-        <h1 class="title">{{ pageContent?.data?.introduction?.header }}</h1>
-        <p class="subtitle">{{ pageContent?.data?.introduction?.description }}</p>
-        <div>
-          <p class="accent-text">handcrafted for you</p>
-          <div class="flourish">
-            <svg width="100" height="20" viewBox="0 0 100 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M5,10 C20,0 80,20 95,10" stroke="url(#goldGradient)" stroke-width="2" fill="none" />
-              <defs>
-                <linearGradient id="goldGradient" x1="0" y1="0" x2="100" y2="0" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#f7c471" />
-                  <stop offset="1" stop-color="#e3a439" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-        </div>
-        <NuxtLink to="/products" class="cta-button">
-          <span>{{ pageContent?.data?.introduction?.buttonLabel }}</span>
-        </NuxtLink>
-      </div>
-      -->
     </div>
   </div>
 </template>

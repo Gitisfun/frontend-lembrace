@@ -82,6 +82,8 @@ Voorbeeld: https://www.jules-co.be/
 
 o Algemeen:
     [ ] Logo aanpassen
+    [ ] Prijs vanboven toevoegen
+    [ ] Favorieten toevoegen en pagina ervoor
     [X] Contact pagina toevoegen
 
 o Home pagina:

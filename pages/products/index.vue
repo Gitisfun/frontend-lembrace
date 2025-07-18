@@ -85,7 +85,7 @@ const activeFilterCount = computed(() => {
 // Build filters object
 const buildFilters = () => {
   const filters = {
-    $or: [{ name: { $containsi: searchQuery.value } }, { description: { $containsi: searchQuery.value } }],
+    $or: [{ name: { $containsi: searchQuery.value } }, { description_detailed: { $containsi: searchQuery.value } }],
   };
 
   if (selectedSubcategories.value.length) {

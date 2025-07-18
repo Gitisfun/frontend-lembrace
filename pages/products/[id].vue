@@ -46,8 +46,7 @@
 
         <!-- Product Description -->
         <div class="product-description">
-          <RichcontentViewer v-if="product?.content" :content="product.content" />
-          <p v-else>{{ product?.description }}</p>
+          <RichcontentViewer v-if="product?.description_detailed" :content="product.description_detailed" />
         </div>
 
         <!-- Product Meta -->
