@@ -13,7 +13,7 @@ export default defineNuxtConfig({
       strapi: {
         provider: 'strapi',
         options: {
-          baseURL: 'http://localhost:1337',
+          baseURL: process.env.STRAPI_URL || 'http://localhost:1337',
         },
       },
     },
