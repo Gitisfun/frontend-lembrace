@@ -94,13 +94,21 @@ o Producten pagina:
     [X] Naam van product klein
     [X] Prijs in het zwart en groot
     [X] Hover aanpassen voor 2e foto die toont
-    [ ] Filter aanpassen, enkel op subcategorie
+    [X] Filter aanpassen, enkel op subcategorie
     [ ] Meerdere foto's op basis van kleur
-    [ ] Korting moet nog getoond worden
+    [X] Korting moet nog getoond worden
 
 o Product 
-    [ ] Zie voorbeeld jules & co voor stijl
-    [ ] Korting tonen
+    [X] Zie voorbeeld jules & co voor stijl
+        - Name product
+        - Prijs product
+        - Beschrijving
+        - Korting
+        - Hartje voor favoriet
+        - Promotie code
+        - Afreken knop
+    [X] Sectie met suggesties vanonder
+    [X] Korting tonen
     [ ] Kortingcodes op categorien, subcategorien en producten, voeg veldje toe voor kortingscode
     [X] Slideshow, meerdere fotos op product
 

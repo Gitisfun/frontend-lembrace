@@ -19,12 +19,15 @@ export const useGlobalStore = defineStore('global', {
   state: () => ({
     cart: [] as CartItem[],
     test: [] as string[],
+    favorites: [] as string[],
   }),
   getters: {
     cartItems: (state) => state.cart,
     testItems: (state) => state.test,
     cartTotal: (state) => state.cart.reduce((total, item) => total + item.price * item.quantity, 0),
     cartItemCount: (state) => state.cart.reduce((count, item) => count + item.quantity, 0),
+    favoriteItems: (state) => state.favorites,
+    isFavorite: (state) => (productId: string | number) => state.favorites.includes(String(productId)),
   },
   actions: {
     addToCart(product: Product, quantity = 1) {
@@ -53,6 +56,29 @@ export const useGlobalStore = defineStore('global', {
     },
     clearCart() {
       this.cart = [];
+    },
+    toggleFavorite(productId: string | number) {
+      const productIdString = String(productId);
+      const index = this.favorites.indexOf(productIdString);
+
+      if (index > -1) {
+        this.favorites.splice(index, 1);
+      } else {
+        this.favorites.push(productIdString);
+      }
+    },
+    addToFavorites(productId: string | number) {
+      const productIdString = String(productId);
+      if (!this.favorites.includes(productIdString)) {
+        this.favorites.push(productIdString);
+      }
+    },
+    removeFromFavorites(productId: string | number) {
+      const productIdString = String(productId);
+      this.favorites = this.favorites.filter((id) => id !== productIdString);
+    },
+    clearFavorites() {
+      this.favorites = [];
     },
     addToTest(item: string) {
       this.test.push(item);
