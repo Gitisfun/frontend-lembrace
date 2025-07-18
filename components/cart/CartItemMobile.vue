@@ -2,11 +2,11 @@
   <div class="cart-item-mobile">
     <div class="item-header">
       <div class="item-image">
-        <NuxtImg :src="item.image?.formats?.thumbnail?.url" :alt="item.name" width="80" height="80" format="webp" provider="strapi" class="product-image" />
+        <NuxtImg :src="item.image" :alt="item.name" width="80" height="80" format="webp" provider="strapi" class="product-image" />
       </div>
       <div class="item-main-info">
         <h3 class="item-name">{{ item.name }}</h3>
-        <div class="item-price">€{{ (item.price * item.quantity).toFixed(2) }}</div>
+        <div class="item-price">€{{ item.calculatedPrice.toFixed(2) }}</div>
       </div>
       <button @click="$emit('remove')" class="remove-btn" aria-label="Remove item">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -21,9 +21,9 @@
         <div class="quantity-controls">
           <span class="quantity-label">Quantity:</span>
           <div class="item-quantity">
-            <button @click="updateQuantity(item.quantity - 1)" class="quantity-btn" :disabled="item.quantity <= 1" aria-label="Decrease quantity">−</button>
-            <span class="quantity-value">{{ item.quantity }}</span>
-            <button @click="updateQuantity(item.quantity + 1)" class="quantity-btn" aria-label="Increase quantity">+</button>
+            <button @click="updateQuantity(item.amount - 1)" class="quantity-btn" :disabled="item.amount <= 1" aria-label="Decrease quantity">−</button>
+            <span class="quantity-value">{{ item.amount }}</span>
+            <button @click="updateQuantity(item.amount + 1)" class="quantity-btn" aria-label="Increase quantity">+</button>
           </div>
         </div>
       </div>

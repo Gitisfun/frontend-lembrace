@@ -1,17 +1,15 @@
 <template>
   <div class="cart-item">
-    <div class="item-image">
-      <NuxtImg :src="item.image?.formats?.thumbnail?.url" :alt="item.name" width="120" height="120" format="webp" provider="strapi" class="product-image" />
-    </div>
+    <NuxtImg :src="item.image" :alt="item.name" width="120" height="120" format="webp" provider="strapi" class="product-image" />
     <div class="item-details">
       <h3 class="item-name">{{ item.name }}</h3>
     </div>
     <div class="item-quantity">
-      <button @click="updateQuantity(item.quantity - 1)" class="quantity-btn" :disabled="item.quantity <= 1">−</button>
-      <span class="quantity-value">{{ item.quantity }}</span>
-      <button @click="updateQuantity(item.quantity + 1)" class="quantity-btn">+</button>
+      <button @click="updateQuantity(item.amount - 1)" class="quantity-btn" :disabled="item.amount <= 1">−</button>
+      <span class="quantity-value">{{ item.amount }}</span>
+      <button @click="updateQuantity(item.amount + 1)" class="quantity-btn">+</button>
     </div>
-    <div class="item-price">€{{ (item.price * item.quantity).toFixed(2) }}</div>
+    <div class="item-price">€{{ item.calculatedPrice.toFixed(2) }}</div>
     <button @click="$emit('remove')" class="remove-btn">
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -28,6 +26,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+console.log('item', props.item);
 
 const emit = defineEmits(['update:quantity', 'remove']);
 
@@ -52,12 +52,12 @@ const updateQuantity = (newQuantity) => {
 }
 
 .item-image {
-  border-radius: 8px;
   overflow: hidden;
   background: #f8f8f8;
 }
 
 .product-image {
+  border-radius: 8px;
   width: 100%;
   height: 100%;
   object-fit: cover;

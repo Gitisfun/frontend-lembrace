@@ -4,15 +4,19 @@ interface CartItem {
   id: string | number;
   name: string;
   price: number;
+  discount: number;
+  amount: number;
+  calculatedPrice: number;
   image: string;
-  quantity: number;
 }
 
 interface Product {
   id: string | number;
+  documentId?: string | number;
   name: string;
   price: number;
-  image: string;
+  discount?: number;
+  image: string | any;
 }
 
 export const useGlobalStore = defineStore('global', {
@@ -24,34 +28,63 @@ export const useGlobalStore = defineStore('global', {
   getters: {
     cartItems: (state) => state.cart,
     testItems: (state) => state.test,
-    cartTotal: (state) => state.cart.reduce((total, item) => total + item.price * item.quantity, 0),
-    cartItemCount: (state) => state.cart.reduce((count, item) => count + item.quantity, 0),
+    cartTotal: (state) => state.cart.reduce((total, item) => total + item.calculatedPrice, 0),
+    cartItemCount: (state) => state.cart.reduce((count, item) => count + item.amount, 0),
     favoriteItems: (state) => state.favorites,
     isFavorite: (state) => (productId: string | number) => state.favorites.includes(String(productId)),
   },
   actions: {
-    addToCart(product: Product, quantity = 1) {
-      const existingItem = this.cart.find((item) => item.id === product.id);
+    addToCart(product: Product, amount = 1) {
+      console.log('Adding to cart:', product);
+      console.log('Product documentId:', product.documentId);
+      console.log('Product id:', product.id);
+
+      const existingItem = this.cart.find((item) => item.id === product.documentId);
 
       if (existingItem) {
-        existingItem.quantity += quantity;
+        existingItem.amount += amount;
+        // Recalculate the calculatedPrice
+        existingItem.calculatedPrice = Math.round((existingItem.price - existingItem.price * (existingItem.discount / 100)) * existingItem.amount * 100) / 100;
       } else {
+        // Extract the smallest available image
+        let imageUrl = '';
+        if (product.image && Array.isArray(product.image) && product.image.length > 0) {
+          // If it's an array of images, use the first one
+          const firstImage = product.image[0];
+          imageUrl = firstImage.formats?.thumbnail?.url || firstImage.formats?.small?.url || firstImage.url || '';
+        } else if (product.image && typeof product.image === 'object') {
+          // If it's a single image object
+          imageUrl = product.image.formats?.thumbnail?.url || product.image.formats?.small?.url || product.image.url || '';
+        } else if (typeof product.image === 'string') {
+          // If it's already a string URL
+          imageUrl = product.image;
+        }
+
+        console.log('Image URL:', imageUrl);
+
+        const discount = product.discount || 0;
+        const calculatedPrice = Math.round((product.price - product.price * (discount / 100)) * amount * 100) / 100;
+
         this.cart.push({
-          id: product.id,
+          id: product.documentId || product.id,
           name: product.name,
           price: product.price,
-          image: product.image,
-          quantity,
+          discount,
+          amount,
+          calculatedPrice,
+          image: imageUrl,
         });
       }
     },
     removeFromCart(productId: string | number) {
       this.cart = this.cart.filter((item) => item.id !== productId);
     },
-    updateQuantity(productId: string | number, quantity: number) {
+    updateQuantity(productId: string | number, amount: number) {
       const item = this.cart.find((item) => item.id === productId);
       if (item) {
-        item.quantity = quantity;
+        item.amount = amount;
+        // Recalculate the calculatedPrice
+        item.calculatedPrice = Math.round((item.price - item.price * (item.discount / 100)) * amount * 100) / 100;
       }
     },
     clearCart() {
@@ -90,5 +123,7 @@ export const useGlobalStore = defineStore('global', {
       this.test = [];
     },
   },
-  persist: true,
+  persist: {
+    storage: process.client ? localStorage : undefined,
+  },
 });
