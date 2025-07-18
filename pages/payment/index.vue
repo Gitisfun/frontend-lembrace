@@ -8,9 +8,9 @@
           <div v-for="item in cartItems" :key="item.id" class="summary-item">
             <div class="item-info">
               <span class="item-name">{{ item.name }}</span>
-              <span class="item-quantity">x{{ item.quantity }}</span>
+              <span class="item-quantity">x{{ item.amount }}</span>
             </div>
-            <span class="item-price">€{{ (item.price * item.quantity).toFixed(2) }}</span>
+            <span class="item-price">€{{ item.calculatedPrice.toFixed(2) }}</span>
           </div>
         </div>
         <div class="summary-totals">
@@ -67,6 +67,10 @@
               <input id="houseNumber" v-model="form.houseNumber" type="text" required placeholder="Huisnummer" />
             </div>
             <div class="form-group">
+              <label for="boxNumber">Busnummer</label>
+              <input id="boxNumber" v-model="form.boxNumber" type="text" placeholder="Busnummer (optioneel)" />
+            </div>
+            <div class="form-group">
               <label for="postalCode">Postcode *</label>
               <input id="postalCode" v-model="form.postalCode" type="text" required placeholder="Postcode" />
             </div>
@@ -110,6 +114,7 @@ import { computed, ref } from 'vue';
 import { useGlobalStore } from '~/stores/global';
 import { useRouter } from 'vue-router';
 
+const { create } = useStrapi();
 const router = useRouter();
 const globalStore = useGlobalStore();
 const isLoading = ref(false);
@@ -129,6 +134,7 @@ const form = ref({
   // Delivery Address
   street: '',
   houseNumber: '',
+  boxNumber: '',
   postalCode: '',
   city: '',
 
@@ -152,24 +158,45 @@ const handleSubmit = async () => {
   try {
     const orderData = {
       orderNumber: generateOrderNumber(),
-      ...form.value,
+      orderStatus: 'pending',
+      totalPrice: total.value,
+      shippingCost: shippingCost,
+      customerInfo: {
+        firstname: form.value.firstName,
+        lastname: form.value.lastName,
+        email: form.value.email,
+        phone: form.value.phone,
+      },
+      address: {
+        street: form.value.street,
+        number: form.value.houseNumber,
+        box: form.value.boxNumber || null,
+        postalcode: form.value.postalCode,
+        city: form.value.city,
+        country: 'Nederland',
+      },
       items: cartItems.value.map((item) => ({
-        id: item.id,
+        productId: item.documentId || item.id,
         name: item.name,
-        quantity: item.quantity,
+        amount: item.amount,
         price: item.price,
+        discount: item.discount || 0,
+        calculatedPrice: item.calculatedPrice,
       })),
     };
 
-    console.log('orderData');
-    console.log(orderData);
+    console.log('Sending order data to Strapi:', orderData);
 
-    // Redirect to Mollie checkout
+    // Send to Strapi API using useStrapi
+    const result = await create('orders', orderData);
+    console.log('Order created successfully:', result);
+
+    // Redirect to Mollie checkout or success page
     //window.location.href = response.url;
   } catch (error) {
     console.error('Payment failed:', error);
     // Show error message to user
-    alert('Er is een fout opgetreden bij het verwerken van je betaling. Probeer het later opnieuw.');
+    alert('Er is een fout opgetreden bij het verwerken van je bestelling. Probeer het later opnieuw.');
   } finally {
     isLoading.value = false;
   }

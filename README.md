@@ -125,3 +125,23 @@ o Contact
 --> mogelijkheid om een account aan te maken
 
 wachtwoord: L@embrace2012
+
+
+
+Dus de opdeling is dan: 
+- Earrings 
+- ⁠- all
+- ⁠- hoops
+- ⁠- studs
+- ⁠- statement earrings 
+- ⁠Necklaces
+- ⁠- all
+- ⁠- Create your own 
+- ⁠Rings 
+- ⁠Bracelets
+- ⁠- all
+- ⁠- Create your own
+- ⁠Accessoires
+- ⁠- Key chains
+- ⁠- bags and pouches 
+- ⁠- hair accessories
