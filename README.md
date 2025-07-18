@@ -96,18 +96,20 @@ o Producten pagina:
     [X] Hover aanpassen voor 2e foto die toont
     [ ] Filter aanpassen, enkel op subcategorie
     [ ] Meerdere foto's op basis van kleur
+    [ ] Korting moet nog getoond worden
 
 o Product 
     [ ] Zie voorbeeld jules & co voor stijl
+    [ ] Korting tonen
     [ ] Kortingcodes op categorien, subcategorien en producten, voeg veldje toe voor kortingscode
-    [ ] Slideshow, meerdere fotos op product
+    [X] Slideshow, meerdere fotos op product
 
 o Contact
-    [ ] Naam
-    [ ] Email
-    [ ] Telefoon
-    [ ] Bericht
-    [ ] Verzendknop
+    [X] Naam
+    [X] Email
+    [X] Telefoon
+    [X] Bericht
+    [ ] Verzendknop implementeren
 
 
 --> mogelijkheid om een account aan te maken

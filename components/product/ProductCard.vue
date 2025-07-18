@@ -1,13 +1,17 @@
 <template>
   <NuxtLink :to="`/products/${product.documentId}`" class="product-card">
     <div class="product-image">
-      <NuxtImg :src="product?.image?.formats?.medium?.url" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image main-image" />
-      <NuxtImg :src="product?.image_background?.formats?.medium?.url ?? product?.image?.formats?.medium?.url" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image hover-image" />
+      <NuxtImg :src="product?.image[0]?.formats?.medium?.url" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image main-image" />
+      <NuxtImg :src="product?.image_background?.formats?.medium?.url ?? product?.image[0]?.formats?.medium?.url" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image hover-image" />
       <div v-if="product?.amount === 4" class="soldout-badge">Sold out</div>
+      <div v-if="hasDiscount" class="discount-badge">- {{ discountPercentage }}%</div>
     </div>
     <div class="product-info">
       <h3 class="product-name">{{ product?.name }}</h3>
-      <p class="product-price">{{ formattedPrice }}</p>
+      <div class="price-container">
+        <span v-if="hasDiscount" class="original-price">{{ formattedOriginalPrice }}</span>
+        <span class="product-price">{{ formattedPrice }}</span>
+      </div>
     </div>
   </NuxtLink>
 </template>
@@ -22,7 +26,29 @@ const props = defineProps({
   },
 });
 
-const formattedPrice = props?.product?.price ? formatPrice(props?.product?.price) : '';
+const discountedPrice = computed(() => {
+  if (props?.product?.discount && props?.product?.price) {
+    return props.product.price * (1 - props.product.discount / 100);
+  }
+  return props?.product?.price;
+});
+
+const formattedPrice = computed(() => {
+  return discountedPrice.value ? formatPrice(discountedPrice.value) : '';
+});
+
+const formattedOriginalPrice = computed(() => {
+  return props?.product?.price ? formatPrice(props?.product?.price) : '';
+});
+
+const hasDiscount = computed(() => {
+  return props?.product?.discount && props?.product?.discount > 0;
+});
+
+const discountPercentage = computed(() => {
+  if (!hasDiscount.value) return 0;
+  return Math.round(props.product.discount);
+});
 </script>
 
 <style scoped>
@@ -94,6 +120,21 @@ const formattedPrice = props?.product?.price ? formatPrice(props?.product?.price
   z-index: 1;
 }
 
+.discount-badge {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.3rem 0.8rem;
+  background: #e74c3c;
+  color: #fff;
+  font-size: 0.8rem;
+  border-radius: 0.5rem;
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  z-index: 1;
+}
+
 .product-info {
   padding: 1.2rem 0 0.2rem 0.2rem;
   text-align: left;
@@ -105,6 +146,20 @@ const formattedPrice = props?.product?.price ? formatPrice(props?.product?.price
   color: #23262a;
   font-weight: 400;
   letter-spacing: 0.01em;
+}
+
+.price-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.original-price {
+  font-size: 1rem;
+  color: #e74c3c;
+  text-decoration: line-through;
+  font-weight: 400;
 }
 
 .product-price {

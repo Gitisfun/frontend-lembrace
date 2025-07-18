@@ -277,5 +277,9 @@ isLoading.value = false;
     aspect-ratio: 1/1;
     min-height: 200px;
   }
+  .center-overlay-btn {
+    font-size: 1rem;
+    top: 50%;
+  }
 }
 </style>
