@@ -4,9 +4,19 @@
     <div v-else-if="error" class="error">Error loading product: {{ error }}</div>
     <div v-else-if="!product" class="error">Product not found</div>
     <div v-else class="product-container">
-      <!-- Product Image -->
-      <div class="product-image">
-        <NuxtImg :src="product?.image?.formats?.large?.url" :alt="product?.name" width="800" height="800" format="webp" provider="strapi" class="image" />
+      <!-- Product Image Gallery -->
+      <div class="product-gallery">
+        <!-- Main Image -->
+        <div class="product-image">
+          <NuxtImg :src="selectedImage?.formats?.large?.url || product?.image?.[0]?.formats?.large?.url" :alt="product?.name" width="800" height="800" format="webp" provider="strapi" class="image" />
+        </div>
+
+        <!-- Thumbnail Gallery -->
+        <div v-if="product?.image && product.image.length > 1" class="image-thumbnails">
+          <div v-for="(image, index) in product.image" :key="index" class="thumbnail" :class="{ active: selectedImage === image }" @click="selectImage(image)">
+            <NuxtImg :src="image.formats?.thumbnail?.url || image.formats?.small?.url" :alt="`${product?.name} - Image ${index + 1}`" width="100" height="100" format="webp" provider="strapi" class="thumbnail-image" />
+          </div>
+        </div>
       </div>
 
       <!-- Product Info -->
@@ -21,7 +31,8 @@
 
         <div class="product-meta">
           <div class="product-description">
-            <p>{{ product?.description }}</p>
+            <div v-if="product?.beschrijving" v-html="compiledMarkdown"></div>
+            <p v-else>{{ product?.description }}</p>
           </div>
           <div v-if="product?.amount" class="meta-item">
             <span class="meta-label">Available:</span>
@@ -40,7 +51,7 @@
 
 <script setup>
 import { formatPrice } from '~/logic/utils';
-
+import { marked } from 'marked';
 import InputCounter from '~/components/input/InputCounter.vue';
 import { useGlobalStore } from '~/stores/global';
 
@@ -52,25 +63,46 @@ const loading = ref(true);
 const error = ref(null);
 const product = ref(null);
 const formattedPrice = ref('');
+const selectedImage = ref(null);
 
 const quantity = ref(1);
 
 try {
   const { data: response } = await findOne('products', route.params.id, {
-    populate: ['image', 'category'],
+    populate: ['image', 'subcategory'],
   });
   product.value = response;
   formattedPrice.value = product.value?.price ? formatPrice(product.value.price) : '';
+
+  // Set the first image as selected if images exist
+  if (product.value?.image && product.value.image.length > 0) {
+    selectedImage.value = product.value.image[0];
+  }
 } catch (e) {
   error.value = e.message;
 } finally {
   loading.value = false;
 }
 
+const selectImage = (image) => {
+  selectedImage.value = image;
+};
+
 const addToCart = () => {
   if (!product.value) return;
   globalStore.addToCart(product.value, quantity.value);
 };
+
+const getMarkdown = (content) => {
+  try {
+    return marked.parse(content);
+  } catch (e) {
+    console.error(e);
+    return content;
+  }
+};
+
+const compiledMarkdown = getMarkdown(product.value?.beschrijving);
 </script>
 
 <style scoped>
@@ -88,6 +120,12 @@ const addToCart = () => {
   align-items: start;
 }
 
+.product-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .product-image {
   position: relative;
   aspect-ratio: 1;
@@ -98,6 +136,40 @@ const addToCart = () => {
 }
 
 .image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-thumbnails {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.thumbnail {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.thumbnail:hover {
+  border-color: var(--color-gold);
+  transform: scale(1.05);
+}
+
+.thumbnail.active {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 2px rgba(184, 139, 42, 0.3);
+}
+
+.thumbnail-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -212,7 +284,7 @@ const addToCart = () => {
     gap: 2rem;
   }
 
-  .product-image {
+  .product-gallery {
     max-width: 600px;
     margin: 0 auto;
   }
@@ -229,6 +301,15 @@ const addToCart = () => {
 
   .product-price {
     font-size: 1.5rem;
+  }
+
+  .thumbnail {
+    width: 60px;
+    height: 60px;
+  }
+
+  .image-thumbnails {
+    gap: 0.25rem;
   }
 }
 
