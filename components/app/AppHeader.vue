@@ -66,8 +66,8 @@ const closeMenu = () => {
 }
 
 .header-content {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   padding: 1rem 2rem;
   position: relative;
@@ -87,6 +87,7 @@ const closeMenu = () => {
 .nav-left {
   display: flex;
   gap: 2rem;
+  justify-self: start;
 }
 
 .nav-item {
@@ -123,7 +124,7 @@ const closeMenu = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1;
+  justify-self: center;
   min-width: 0;
 }
 
@@ -172,6 +173,10 @@ const closeMenu = () => {
   display: flex;
   align-items: center;
   height: 100%;
+}
+
+.nav-right {
+  justify-self: end;
 }
 
 .cart-icon {
