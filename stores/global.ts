@@ -16,6 +16,7 @@ interface Product {
   name: string;
   price: number;
   discount?: number;
+  amount?: number;
   image: string | any;
 }
 
@@ -40,6 +41,22 @@ export const useGlobalStore = defineStore('global', {
       console.log('Product id:', product.id);
 
       const existingItem = this.cart.find((item) => item.id === product.documentId);
+      const productId = product.documentId || product.id;
+
+      // Check if we have enough stock
+      const currentInCart = existingItem ? existingItem.amount : 0;
+      const availableStock = product.amount || 0;
+
+      if (currentInCart + amount > availableStock) {
+        // Instead of failing, add the maximum available amount
+        const maxCanAdd = availableStock - currentInCart;
+        if (maxCanAdd <= 0) {
+          console.warn('No more items available to add');
+          return false;
+        }
+        console.log(`Adjusting quantity from ${amount} to ${maxCanAdd} due to stock limit`);
+        amount = maxCanAdd;
+      }
 
       if (existingItem) {
         existingItem.amount += amount;
@@ -75,6 +92,8 @@ export const useGlobalStore = defineStore('global', {
           image: imageUrl,
         });
       }
+
+      return true; // Return true to indicate success
     },
     removeFromCart(productId: string | number) {
       this.cart = this.cart.filter((item) => item.id !== productId);

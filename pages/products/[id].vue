@@ -55,7 +55,13 @@
         <div class="product-actions">
           <div v-if="product?.amount === 0" class="soldout-alert">Sorry, this item is currently sold out</div>
           <template v-else>
-            <InputCounter v-if="product?.amount" v-model="quantity" :max="product.amount" />
+            <InputCounter v-if="product?.amount" v-model="quantity" :max="product.amount" :product-id="product.documentId || product.id" />
+
+            <!-- Max Items Message -->
+            <div v-if="showMaxItemsMessage" class="max-items-message">You have already added the maximum available quantity to your cart</div>
+
+            <!-- Quantity Adjusted Message -->
+            <div v-if="showQuantityAdjustedMessage" class="quantity-adjusted-message">Quantity adjusted to maximum available stock</div>
 
             <!-- Promocode Input -->
             <div class="promocode-section">
@@ -66,6 +72,7 @@
             <!-- Divider -->
             <div class="action-divider"></div>
             <button class="add-to-cart" @click="addToCart">Add to Cart</button>
+            <button v-if="isInCart" class="remove-from-cart" @click="removeFromCart">Remove from Cart</button>
             <NuxtLink to="/cart" class="checkout-btn">Proceed to Checkout</NuxtLink>
           </template>
         </div>
@@ -101,6 +108,8 @@ const relatedProducts = ref([]);
 const promocode = ref('');
 
 const quantity = ref(1);
+const showMaxItemsMessage = ref(false);
+const showQuantityAdjustedMessage = ref(false);
 
 // Discount calculations
 const discountedPrice = computed(() => {
@@ -125,6 +134,12 @@ const hasDiscount = computed(() => {
 const discountPercentage = computed(() => {
   if (!hasDiscount.value) return 0;
   return Math.round(product.value.discount);
+});
+
+const isInCart = computed(() => {
+  if (!product.value) return false;
+  const productId = product.value.documentId || product.value.id;
+  return globalStore.cartItems.some((item) => item.id === productId);
 });
 
 const isFavorite = computed(() => {
@@ -178,7 +193,29 @@ const selectImage = (image) => {
 
 const addToCart = () => {
   if (!product.value) return;
-  globalStore.addToCart(product.value, quantity.value);
+  const success = globalStore.addToCart(product.value, quantity.value);
+  if (!success) {
+    showMaxItemsMessage.value = true;
+    // Hide the message after 5 seconds
+    setTimeout(() => {
+      showMaxItemsMessage.value = false;
+    }, 5000);
+  } else {
+    // Check if quantity was adjusted
+    const cartItem = globalStore.cartItems.find((item) => item.id === (product.value.documentId || product.value.id));
+    if (cartItem && cartItem.amount !== quantity.value) {
+      showQuantityAdjustedMessage.value = true;
+      // Hide the message after 5 seconds
+      setTimeout(() => {
+        showQuantityAdjustedMessage.value = false;
+      }, 5000);
+    }
+  }
+};
+
+const removeFromCart = () => {
+  if (!product.value) return;
+  globalStore.removeFromCart(product.value.documentId || product.value.id);
 };
 
 const applyPromocode = () => {
@@ -463,6 +500,38 @@ const applyPromocode = () => {
   box-sizing: border-box;
 }
 
+.max-items-message {
+  padding: 1rem 1.5rem;
+  background: #fef3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.quantity-adjusted-message {
+  padding: 1rem 1.5rem;
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
 .add-to-cart {
   width: 100%;
   padding: 1rem 2rem;
@@ -479,6 +548,26 @@ const applyPromocode = () => {
 
 .add-to-cart:hover {
   background: #b88b2a;
+  transform: translateY(-2px);
+}
+
+.remove-from-cart {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.remove-from-cart:hover {
+  background: #b91c1c;
   transform: translateY(-2px);
 }
 
@@ -616,6 +705,17 @@ const applyPromocode = () => {
   .related-products-grid {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 </style>

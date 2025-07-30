@@ -2,11 +2,15 @@
   <div class="counter-wrapper">
     <button class="counter-btn" @click="decrement" :disabled="modelValue <= 1">-</button>
     <span class="counter-value">{{ modelValue }}</span>
-    <button class="counter-btn" @click="increment" :disabled="modelValue >= max">+</button>
+    <button class="counter-btn" @click="increment" :disabled="availableStock <= 0">+</button>
   </div>
 </template>
 
 <script setup>
+import { useGlobalStore } from '~/stores/global';
+
+const globalStore = useGlobalStore();
+
 const props = defineProps({
   modelValue: {
     type: Number,
@@ -16,14 +20,29 @@ const props = defineProps({
     type: Number,
     default: 1,
   },
+  productId: {
+    type: [String, Number],
+    required: true,
+  },
 });
 const emit = defineEmits(['update:modelValue']);
+
+// Calculate available stock considering what's already in cart
+const availableStock = computed(() => {
+  const cartItem = globalStore.cartItems.find((item) => item.id === props.productId);
+  const alreadyInCart = cartItem ? cartItem.amount : 0;
+  return props.max - alreadyInCart;
+});
 
 const decrement = () => {
   if (props.modelValue > 1) emit('update:modelValue', props.modelValue - 1);
 };
 const increment = () => {
-  if (props.modelValue < props.max) emit('update:modelValue', props.modelValue + 1);
+  if (props.modelValue < availableStock.value) {
+    // If the increment would exceed available stock, set to max available
+    const newValue = Math.min(props.modelValue + 1, availableStock.value);
+    emit('update:modelValue', newValue);
+  }
 };
 </script>
 
