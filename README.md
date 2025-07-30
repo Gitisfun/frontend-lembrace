@@ -124,7 +124,7 @@ o Contact
 
 --> mogelijkheid om een account aan te maken
 
-wachtwoord: L@embrace2012
+L@embrace2012
 
 
 
