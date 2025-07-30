@@ -16,8 +16,7 @@
       </nav>
       <NuxtLink to="/" class="logo-link">
         <div class="logo-block">
-          <div class="center-text">L'EMBRACE</div>
-          <div class="logo-line"></div>
+          <img src="/logo-lembrace.png" alt="L'embrace" class="logo-image" />
           <!--
           <div class="logo-subtitle">Handgemaakte sieraden en accessoires</div>
           -->
@@ -159,6 +158,13 @@ const closeMenu = () => {
   text-align: center;
   margin-top: 0;
   white-space: nowrap;
+}
+
+.logo-image {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  max-width: 200px;
 }
 
 .logo-link {
