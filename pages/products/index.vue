@@ -40,6 +40,18 @@
 
       <div v-if="status === 'pending'" class="loading">Loading products...</div>
       <div v-else-if="error" class="error">Error loading products: {{ error.message }}</div>
+      <div v-else-if="productList && productList.length === 0" class="no-products">
+        <div class="no-products-content">
+          <div class="no-products-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          <h2 class="no-products-title">No products found</h2>
+          <p class="no-products-description">We couldn't find any products matching your search criteria. Try adjusting your search terms or filters to find what you're looking for.</p>
+        </div>
+      </div>
       <div v-else class="products-grid">
         <ProductCard v-for="product in productList" :key="product.id" :product="product" />
       </div>
@@ -264,6 +276,55 @@ const clearFilters = () => {
 
 .error {
   color: var(--color-error);
+}
+
+.no-products {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  padding: 3rem 2rem;
+  background: #fafafa;
+  border-radius: 12px;
+  margin: 2rem 0;
+  border: 1px solid #e0e0e0;
+}
+
+.no-products-content {
+  text-align: center;
+  max-width: 450px;
+}
+
+.no-products-icon {
+  margin-bottom: 1.5rem;
+  color: #ccc;
+}
+
+.no-products-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  color: #333;
+  margin: 0 0 1rem 0;
+  font-weight: 500;
+}
+
+.no-products-description {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.5;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .no-products {
+    min-height: 300px;
+    padding: 2rem 1rem;
+  }
+
+  .no-products-title {
+    font-size: 1.6rem;
+  }
 }
 
 .mobile-search {

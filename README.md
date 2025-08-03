@@ -81,7 +81,7 @@ Check out the [deployment documentation](https://nuxt.com/docs/getting-started/d
 Voorbeeld: https://www.jules-co.be/
 
 o Algemeen:
-    [ ] Logo aanpassen
+    [X] Logo aanpassen
     [ ] Prijs vanboven toevoegen
     [ ] Favorieten toevoegen en pagina ervoor
     [X] Contact pagina toevoegen
@@ -113,6 +113,13 @@ o Product
     [X] Korting tonen
     [ ] Kortingcodes op categorien, subcategorien en producten, voeg veldje toe voor kortingscode
     [X] Slideshow, meerdere fotos op product
+
+o Betalen
+    [ ] Verifieer gegevens voor verzending
+    [ ] Betalen implementeren
+    [ ] Bestelling plaatsen
+    [ ] Order nummer autoincrement
+    [ ] Email verzenden
 
 o Contact
     [X] Naam

@@ -25,6 +25,14 @@
         </div>
       </NuxtLink>
       <div class="nav-right">
+        <NuxtLink to="/favorites" class="favorites-icon">
+          <div class="favorites-icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+            <span class="favorites-counter" v-if="favoritesCount > 0">{{ favoritesCount }}</span>
+          </div>
+        </NuxtLink>
         <NuxtLink to="/cart" class="cart-icon">
           <div class="cart-icon-wrapper">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -35,6 +43,9 @@
             <span class="cart-counter" v-if="cartCount > 0">{{ cartCount }}</span>
           </div>
         </NuxtLink>
+        <div v-if="cartCount > 0" class="cart-total">
+          {{ formattedCartTotal }}
+        </div>
       </div>
     </div>
   </header>
@@ -42,10 +53,13 @@
 
 <script setup>
 import { useGlobalStore } from '~/stores/global';
+import { formatPrice } from '~/logic/utils';
 
 const isMenuOpen = ref(false);
 const globalStore = useGlobalStore();
 const cartCount = computed(() => globalStore.cartItemCount);
+const favoritesCount = computed(() => globalStore.favoriteItems.length);
+const formattedCartTotal = computed(() => formatPrice(globalStore.cartTotal));
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -179,6 +193,9 @@ const closeMenu = () => {
 
 .nav-right {
   justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .cart-icon {
@@ -221,6 +238,58 @@ const closeMenu = () => {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.favorites-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.favorites-icon:hover {
+  color: #e74c3c;
+  transform: translateY(-2px);
+}
+
+.favorites-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.favorites-counter {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  min-width: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cart-total {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background: #f8f8f8;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  white-space: nowrap;
+}
+
 @media (max-width: 768px) {
   .header-content {
     padding: 1rem;
@@ -261,6 +330,14 @@ const closeMenu = () => {
 
   .nav-item:last-child {
     border-bottom: none;
+  }
+
+  .favorites-icon {
+    display: none;
+  }
+
+  .cart-total {
+    display: none;
   }
 }
 
