@@ -187,12 +187,31 @@ const handleSubmit = async () => {
 
     console.log('Sending order data to Strapi:', orderData);
 
-    // Send to Strapi API using useStrapi
+    // First create the order in Strapi
     const result = await create('orders', orderData);
     console.log('Order created successfully:', result);
 
-    // Redirect to Mollie checkout or success page
-    //window.location.href = response.url;
+    // Add the Strapi order ID to the order data for Mollie
+    const orderDataWithId = {
+      ...orderData,
+      orderId: result.data.id,
+    };
+
+    // Create Mollie payment
+    const mollieResponse = await $fetch('/api/mollie/create-payment', {
+      method: 'POST',
+      body: { orderData: orderDataWithId },
+    });
+
+    if (mollieResponse.success && mollieResponse.checkoutUrl) {
+      // Clear cart after successful order creation
+      globalStore.clearCart();
+
+      // Redirect to Mollie checkout
+      window.location.href = mollieResponse.checkoutUrl;
+    } else {
+      throw new Error('Failed to create Mollie payment');
+    }
   } catch (error) {
     console.error('Payment failed:', error);
     // Show error message to user

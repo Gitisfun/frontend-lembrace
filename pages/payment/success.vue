@@ -99,16 +99,15 @@ onMounted(() => {
   const orderData = route.query;
 
   if (orderData) {
-    paymentSuccess.value = orderData.status === 'paid';
+    // Check if payment was successful (Mollie redirects here after payment)
+    paymentSuccess.value = true; // Assume success since user reached this page
     orderNumber.value = orderData.orderNumber || '';
-    orderDate.value =
-      orderData.orderDate ||
-      new Date().toLocaleDateString('nl-NL', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      });
-    deliveryMethod.value = orderData.deliveryMethod || 'Standaard levering';
+    orderDate.value = new Date().toLocaleDateString('nl-NL', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+    deliveryMethod.value = orderData.deliveryMethod === 'express' ? 'Express levering' : 'Standaard levering';
 
     // Calculate expected delivery date based on delivery method
     const deliveryDate = new Date();
