@@ -46,23 +46,23 @@ export default defineEventHandler(async (event) => {
       const strapiUrl = process.env.STRAPI_URL || 'http://localhost:1337';
       const strapiToken = process.env.STRAPI_TOKEN;
 
-      if (strapiToken) {
-        await $fetch(`${strapiUrl}/api/orders/${orderId}`, {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${strapiToken}`,
-            'Content-Type': 'application/json',
+      //if (strapiToken) {
+      await $fetch(`${strapiUrl}/api/orders/${orderId}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${strapiToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: {
+          data: {
+            orderStatus: orderStatus,
+            molliePaymentId: id,
+            paymentStatus: payment.status,
+            paidAt: payment.status === 'paid' ? new Date().toISOString() : null,
           },
-          body: {
-            data: {
-              orderStatus: orderStatus,
-              molliePaymentId: id,
-              paymentStatus: payment.status,
-              paidAt: payment.status === 'paid' ? new Date().toISOString() : null,
-            },
-          },
-        });
-      }
+        },
+      });
+      //}
 
       console.log(`Order ${orderNumber} updated to status: ${orderStatus}`);
     }
