@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     });
 
     // Prepare webhook URL only if we have a valid public URL
-    const siteUrl = process.env.NUXT_PUBLIC_SITE_URL;
+    const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || 'https://www.lembrace.be';
     console.log('Site URL:', siteUrl);
 
     const webhookUrl = siteUrl && !siteUrl.includes('localhost') && !siteUrl.includes('127.0.0.1') ? `${siteUrl}/api/mollie/webhook` : undefined;
