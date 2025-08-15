@@ -14,24 +14,37 @@ export default defineEventHandler(async (event) => {
       apiKey: process.env.MOLLIE_API_KEY || 'test_rqn9NtT4qEDrfj4cfNg5KGvG7NyVAr',
     });
 
-    // Create payment with Mollie
-    const payment = await mollieClient.payments.create({
+    // Prepare webhook URL only if we have a valid public URL
+    const siteUrl = process.env.NUXT_PUBLIC_SITE_URL;
+    console.log('Site URL:', siteUrl);
+
+    const webhookUrl = siteUrl && !siteUrl.includes('localhost') && !siteUrl.includes('127.0.0.1') ? `${siteUrl}/api/mollie/webhook` : undefined;
+
+    console.log('Webhook URL:', webhookUrl);
+    console.log('Will include webhook:', !!webhookUrl);
+
+    // Build payment object conditionally
+    const paymentData: any = {
       amount: {
         currency: 'EUR',
         value: orderData.totalPrice.toFixed(2), // Mollie expects amount in cents
       },
       description: `Bestelling ${orderData.orderNumber}`,
-      redirectUrl: `${process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/payment/success?orderNumber=${orderData.orderNumber}&deliveryMethod=${orderData.deliveryMethod}`,
-      // Only add webhook URL if we're in production or have a public URL
-      ...(process.env.NODE_ENV === 'production' && {
-        webhookUrl: `${process.env.NUXT_PUBLIC_SITE_URL}/api/mollie/webhook`,
-      }),
+      redirectUrl: `${siteUrl || 'http://localhost:3000'}/payment/success?orderNumber=${orderData.orderNumber}&deliveryMethod=${orderData.deliveryMethod}`,
       metadata: {
         orderNumber: orderData.orderNumber,
         orderId: orderData.orderId, // Strapi order ID
         deliveryMethod: orderData.deliveryMethod,
       },
-    });
+    };
+
+    // Only add webhook URL if we have a valid public URL
+    if (webhookUrl) {
+      paymentData.webhookUrl = webhookUrl;
+    }
+
+    // Create payment with Mollie
+    const payment = await mollieClient.payments.create(paymentData);
 
     // Return the payment URL for redirect
     return {
