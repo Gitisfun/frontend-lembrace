@@ -42,9 +42,19 @@ export default defineEventHandler(async (event) => {
     };
   } catch (error) {
     console.error('Mollie payment creation error:', error);
+
+    // Return more detailed error information
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorDetails = error instanceof Error ? error.stack : undefined;
+
     throw createError({
       statusCode: 500,
-      statusMessage: 'Failed to create payment. Please try again.',
+      statusMessage: `Failed to create payment: ${errorMessage}`,
+      data: {
+        originalError: errorMessage,
+        stack: errorDetails,
+        timestamp: new Date().toISOString(),
+      },
     });
   }
 });
