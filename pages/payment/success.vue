@@ -90,11 +90,13 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 const paymentSuccess = ref(true);
 const orderNumber = ref('');
+const uniqueOrderNumber = ref('');
 const orderDate = ref('');
 const deliveryMethod = ref('');
 const expectedDelivery = ref('');
+const emailSent = ref(false);
 
-onMounted(() => {
+onMounted(async () => {
   // Get order data from route query parameters
   const orderData = route.query;
 
@@ -102,6 +104,7 @@ onMounted(() => {
     // Check if payment was successful (Mollie redirects here after payment)
     paymentSuccess.value = true; // Assume success since user reached this page
     orderNumber.value = orderData.orderNumber || '';
+    uniqueOrderNumber.value = orderData.uniqueOrderNumber || '';
     orderDate.value = new Date().toLocaleDateString('nl-NL', {
       day: 'numeric',
       month: 'long',
@@ -122,8 +125,133 @@ onMounted(() => {
       month: 'long',
       year: 'numeric',
     });
+
+    // Try to send confirmation email as backup (in case webhook didn't work)
+    if (uniqueOrderNumber.value && !emailSent.value) {
+      await sendConfirmationEmail();
+    }
   }
 });
+
+const sendConfirmationEmail = async () => {
+  try {
+    // Get order details from Strapi using the unique_order_number
+    const { find } = useStrapi();
+    const orders = await find('orders', {
+      filters: {
+        unique_order_number: uniqueOrderNumber.value,
+      },
+      populate: ['customerInfo', 'address', 'items'],
+    });
+
+    const order = orders?.data?.[0];
+
+    if (order && order.customerInfo?.email) {
+      const customerEmail = order.customerInfo.email;
+
+      // Generate email content
+      const emailContent = generateOrderConfirmationEmail(order, orderNumber.value);
+
+      // Send email
+      await $fetch('http://localhost:1337/api/email/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: {
+          email: customerEmail,
+          name: order.customerInfo.firstname || 'Klant',
+          subject: `Bestelling bevestiging - ${orderNumber.value}`,
+          to: customerEmail,
+          text: emailContent,
+        },
+      });
+
+      emailSent.value = true;
+      console.log('Order confirmation email sent successfully');
+    }
+  } catch (error) {
+    console.error('Failed to send confirmation email:', error);
+    // Don't show error to user as this is a backup mechanism
+  }
+};
+
+const generateOrderConfirmationEmail = (orderData, orderNumber) => {
+  const deliveryDate = new Date();
+  const isExpress = orderData.deliveryMethod === 'express';
+  if (isExpress) {
+    deliveryDate.setDate(deliveryDate.getDate() + 1);
+  } else {
+    deliveryDate.setDate(deliveryDate.getDate() + 3);
+  }
+
+  const expectedDelivery = deliveryDate.toLocaleDateString('nl-NL', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  return `<h2>Bestelling Bevestiging - ${orderNumber}</h2>
+
+<p>Beste ${orderData.customerInfo?.firstname || 'Klant'},</p>
+
+<p>Bedankt voor je bestelling! Je betaling is succesvol verwerkt en je bestelling wordt nu voorbereid.</p>
+
+<h3>Bestelling Details:</h3>
+<ul>
+  <li><strong>Bestelnummer:</strong> ${orderNumber}</li>
+  <li><strong>Datum:</strong> ${new Date().toLocaleDateString('nl-NL', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })}</li>
+  <li><strong>Verzendmethode:</strong> ${isExpress ? 'Express levering' : 'Standaard levering'}</li>
+  <li><strong>Verwachte levering:</strong> ${expectedDelivery}</li>
+</ul>
+
+<h3>Verzendadres:</h3>
+<p>
+  ${orderData.customerInfo?.firstname} ${orderData.customerInfo?.lastname}<br>
+  ${orderData.address?.street} ${orderData.address?.number}${orderData.address?.box ? ` bus ${orderData.address.box}` : ''}<br>
+  ${orderData.address?.postalcode} ${orderData.address?.city}<br>
+  ${orderData.address?.country}
+</p>
+
+<h3>Bestelde Items:</h3>
+<ul>
+  ${
+    orderData.items
+      ?.map(
+        (item) => `
+    <li>${item.name} x${item.amount} - €${item.calculatedPrice.toFixed(2)}</li>
+  `
+      )
+      .join('') || '<li>Geen items gevonden</li>'
+  }
+</ul>
+
+<h3>Prijs Overzicht:</h3>
+<ul>
+  <li><strong>Subtotaal:</strong> €${(orderData.totalPrice - orderData.shippingCost).toFixed(2)}</li>
+  <li><strong>Verzendkosten:</strong> €${orderData.shippingCost.toFixed(2)}</li>
+  <li><strong>Totaal:</strong> €${orderData.totalPrice.toFixed(2)}</li>
+</ul>
+
+<h3>Volgende Stappen:</h3>
+<ol>
+  <li>We verwerken je bestelling en bereiden deze voor op verzending</li>
+  <li>Je ontvangt een e-mail zodra je pakket is verzonden met tracking informatie</li>
+  <li>Je pakket wordt geleverd op het opgegeven adres</li>
+</ol>
+
+<p>Heb je vragen over je bestelling? Neem gerust contact met ons op!</p>
+
+<p>Met vriendelijke groet,<br>
+Het LemBrace Team</p>
+
+<hr>
+<p><em>Deze e-mail is automatisch gegenereerd. Reageer niet op dit e-mailadres.</em></p>`;
+};
 
 const printOrder = () => {
   window.print();

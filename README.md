@@ -82,8 +82,8 @@ Voorbeeld: https://www.jules-co.be/
 
 o Algemeen:
     [X] Logo aanpassen
-    [ ] Prijs vanboven toevoegen
-    [ ] Favorieten toevoegen en pagina ervoor
+    [X] Prijs vanboven toevoegen
+    [X] Favorieten toevoegen en pagina ervoor
     [X] Contact pagina toevoegen
 
 o Home pagina:
@@ -115,6 +115,8 @@ o Product
     [X] Slideshow, meerdere fotos op product
 
 o Betalen
+    [ ] Veld voor land toevoegen (country)
+    [ ] Alleen doorklikken na validatie
     [ ] Verifieer gegevens voor verzending
     [ ] Betalen implementeren
     [ ] Bestelling plaatsen

@@ -193,8 +193,8 @@ const validateField = (fieldName) => {
       break;
 
     case 'phone':
-      if (value && !/^[\+]?[1-9][\d\s\-\(\)]{7,15}$/.test(value)) {
-        errors.phone = 'Please enter a valid phone number (e.g., +1 555-123-4567)';
+      if (value && !/^[\+]?[1-9]\d{7,15}$/.test(value)) {
+        errors.phone = 'Please enter a valid phone number';
       } else {
         errors.phone = '';
       }
@@ -239,11 +239,37 @@ const handleSubmit = async () => {
   submitStatus.value = null;
 
   try {
-    // Simulate API call - replace with actual endpoint
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    // Call the actual email endpoint
+    const response = await fetch('http://localhost:1337/api/email/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: formData.email,
+        name: formData.name,
+        subject: `New Contact Form Message from ${formData.name}`,
+        to: 'christianvandenputtelaar@gmail.com',
+        text: `<h2>Contact Form Submission</h2>
 
-    // Here you would typically send the data to your backend
-    console.log('Form data:', formData);
+<h3>Contact Details:</h3>
+<ul>
+  <li><strong>Name:</strong> ${formData.name}</li>
+  <li><strong>Email:</strong> ${formData.email}</li>
+  <li><strong>Phone:</strong> ${formData.phone || 'Not provided'}</li>
+</ul>
+
+<h3>Message:</h3>
+<p>${formData.message}</p>
+
+<hr>
+<p><em>Sent from LemBrace Contact Form</em></p>`,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
     submitStatus.value = {
       type: 'success',
@@ -255,6 +281,7 @@ const handleSubmit = async () => {
       formData[key] = '';
     });
   } catch (error) {
+    console.error('Error sending email:', error);
     submitStatus.value = {
       type: 'error',
       message: 'Sorry, there was an error sending your message. Please try again.',

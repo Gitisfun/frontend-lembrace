@@ -143,12 +143,8 @@ const form = ref({
 });
 
 const generateOrderNumber = () => {
-  return (
-    'ORD-' +
-    Math.floor(Math.random() * 1000000)
-      .toString()
-      .padStart(6, '0')
-  );
+  // Generate a UUID v4
+  return 'ORD-' + crypto.randomUUID();
 };
 
 const handleSubmit = async () => {
@@ -158,6 +154,7 @@ const handleSubmit = async () => {
   try {
     const orderData = {
       orderNumber: generateOrderNumber(),
+      unique_order_number: crypto.randomUUID(),
       orderStatus: 'pending',
       totalPrice: total.value,
       shippingCost: shippingCost,

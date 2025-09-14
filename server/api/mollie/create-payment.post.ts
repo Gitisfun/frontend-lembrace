@@ -14,10 +14,11 @@ export default defineEventHandler(async (event) => {
       apiKey: process.env.MOLLIE_API_KEY || 'test_rqn9NtT4qEDrfj4cfNg5KGvG7NyVAr',
     });
 
-    // Prepare webhook URL only if we have a valid public URL
-    const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || 'https://www.lembrace.be';
+    // Determine the correct site URL for redirects
+    const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     console.log('Site URL:', siteUrl);
 
+    // Prepare webhook URL only if we have a valid public URL (not localhost)
     const webhookUrl = siteUrl && !siteUrl.includes('localhost') && !siteUrl.includes('127.0.0.1') ? `${siteUrl}/api/mollie/webhook` : undefined;
 
     console.log('Webhook URL:', webhookUrl);
@@ -30,10 +31,11 @@ export default defineEventHandler(async (event) => {
         value: orderData.totalPrice.toFixed(2), // Mollie expects amount in cents
       },
       description: `Bestelling ${orderData.orderNumber}`,
-      redirectUrl: `${siteUrl || 'http://localhost:3000'}/payment/success?orderNumber=${orderData.orderNumber}&deliveryMethod=${orderData.deliveryMethod}`,
+      redirectUrl: `${siteUrl}/payment/success?orderNumber=${orderData.orderNumber}&uniqueOrderNumber=${orderData.unique_order_number}&deliveryMethod=${orderData.deliveryMethod}`,
       metadata: {
         orderNumber: orderData.orderNumber,
         orderId: orderData.orderId, // Strapi order ID
+        uniqueOrderNumber: orderData.unique_order_number, // Unique UUID
         deliveryMethod: orderData.deliveryMethod,
       },
     };
