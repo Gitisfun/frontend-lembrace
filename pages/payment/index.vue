@@ -78,6 +78,18 @@
               <label for="city">Plaats *</label>
               <input id="city" v-model="form.city" type="text" required placeholder="Plaats" />
             </div>
+            <div class="form-group">
+              <label for="country">Land *</label>
+              <select id="country" v-model="form.country" required>
+                <option value="">Selecteer land</option>
+                <option value="Nederland">Nederland</option>
+                <option value="België">België</option>
+                <option value="Duitsland">Duitsland</option>
+                <option value="Frankrijk">Frankrijk</option>
+                <option value="Verenigd Koninkrijk">Verenigd Koninkrijk</option>
+                <option value="andere">Andere</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -137,6 +149,7 @@ const form = ref({
   boxNumber: '',
   postalCode: '',
   city: '',
+  country: '',
 
   // Delivery Method
   deliveryMethod: 'standard',
@@ -170,7 +183,7 @@ const handleSubmit = async () => {
         box: form.value.boxNumber || null,
         postalcode: form.value.postalCode,
         city: form.value.city,
-        country: 'Nederland',
+        country: form.value.country,
       },
       items: cartItems.value.map((item) => ({
         productId: item.documentId || item.id,
@@ -342,15 +355,18 @@ const handleSubmit = async () => {
   color: var(--color-text);
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
   padding: 0.75rem;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.3s ease;
+  background: white;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: var(--color-gold);
 }
