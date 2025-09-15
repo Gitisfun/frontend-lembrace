@@ -195,7 +195,7 @@ const sendSellerNotificationEmail = async () => {
       const emailContent = generateSellerNotificationEmail(order, orderNumber.value);
 
       // Send email to seller (you can configure the seller email address)
-      const sellerEmail = 'info@lembrace.com'; // Replace with actual seller email
+      const sellerEmail = 'info@lembrace.be'; // Replace with actual seller email
 
       await $fetch('http://localhost:1337/api/email/send', {
         method: 'POST',

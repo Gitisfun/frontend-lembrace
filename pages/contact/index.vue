@@ -249,7 +249,7 @@ const handleSubmit = async () => {
         email: formData.email,
         name: formData.name,
         subject: `New Contact Form Message from ${formData.name}`,
-        to: 'info@lembrace.com',
+        to: 'info@lembrace.be',
         text: `<h2>Contact Form Submission</h2>
 
 <h3>Contact Details:</h3>
