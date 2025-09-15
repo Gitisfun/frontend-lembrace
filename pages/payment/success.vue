@@ -129,6 +129,7 @@ onMounted(async () => {
     // Try to send confirmation email as backup (in case webhook didn't work)
     if (uniqueOrderNumber.value && !emailSent.value) {
       await sendConfirmationEmail();
+      await sendSellerNotificationEmail();
     }
   }
 });
@@ -173,6 +174,48 @@ const sendConfirmationEmail = async () => {
   } catch (error) {
     console.error('Failed to send confirmation email:', error);
     // Don't show error to user as this is a backup mechanism
+  }
+};
+
+const sendSellerNotificationEmail = async () => {
+  try {
+    // Get order details from Strapi using the unique_order_number
+    const { find } = useStrapi();
+    const orders = await find('orders', {
+      filters: {
+        unique_order_number: uniqueOrderNumber.value,
+      },
+      populate: ['customerInfo', 'address', 'items'],
+    });
+
+    const order = orders?.data?.[0];
+
+    if (order) {
+      // Generate seller notification email content
+      const emailContent = generateSellerNotificationEmail(order, orderNumber.value);
+
+      // Send email to seller (you can configure the seller email address)
+      const sellerEmail = 'info@lembrace.com'; // Replace with actual seller email
+
+      await $fetch('http://localhost:1337/api/email/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: {
+          email: sellerEmail,
+          name: 'LemBrace Team',
+          subject: `Nieuwe bestelling ontvangen - ${orderNumber.value}`,
+          to: sellerEmail,
+          text: emailContent,
+        },
+      });
+
+      console.log('Seller notification email sent successfully');
+    }
+  } catch (error) {
+    console.error('Failed to send seller notification email:', error);
+    // Don't show error to user as this is a notification mechanism
   }
 };
 
@@ -251,6 +294,90 @@ Het LemBrace Team</p>
 
 <hr>
 <p><em>Deze e-mail is automatisch gegenereerd. Reageer niet op dit e-mailadres.</em></p>`;
+};
+
+const generateSellerNotificationEmail = (orderData, orderNumber) => {
+  const deliveryDate = new Date();
+  const isExpress = orderData.deliveryMethod === 'express';
+  if (isExpress) {
+    deliveryDate.setDate(deliveryDate.getDate() + 1);
+  } else {
+    deliveryDate.setDate(deliveryDate.getDate() + 3);
+  }
+
+  const expectedDelivery = deliveryDate.toLocaleDateString('nl-NL', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  return `<h2>🚨 Nieuwe Bestelling Ontvangen - ${orderNumber}</h2>
+
+<p>Er is een nieuwe bestelling binnengekomen die directe aandacht vereist!</p>
+
+<h3>📋 Bestelling Details:</h3>
+<ul>
+  <li><strong>Bestelnummer:</strong> ${orderNumber}</li>
+  <li><strong>Datum:</strong> ${new Date().toLocaleDateString('nl-NL', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })}</li>
+  <li><strong>Tijd:</strong> ${new Date().toLocaleTimeString('nl-NL', {
+    hour: '2-digit',
+    minute: '2-digit',
+  })}</li>
+  <li><strong>Verzendmethode:</strong> ${isExpress ? 'Express levering' : 'Standaard levering'}</li>
+  <li><strong>Verwachte levering:</strong> ${expectedDelivery}</li>
+</ul>
+
+<h3>👤 Klant Informatie:</h3>
+<p>
+  <strong>Naam:</strong> ${orderData.customerInfo?.firstname} ${orderData.customerInfo?.lastname}<br>
+  <strong>E-mail:</strong> ${orderData.customerInfo?.email}<br>
+  <strong>Telefoon:</strong> ${orderData.customerInfo?.phone || 'Niet opgegeven'}
+</p>
+
+<h3>📍 Verzendadres:</h3>
+<p>
+  ${orderData.customerInfo?.firstname} ${orderData.customerInfo?.lastname}<br>
+  ${orderData.address?.street} ${orderData.address?.number}${orderData.address?.box ? ` bus ${orderData.address.box}` : ''}<br>
+  ${orderData.address?.postalcode} ${orderData.address?.city}<br>
+  ${orderData.address?.country}
+</p>
+
+<h3>🛍️ Bestelde Items:</h3>
+<ul>
+  ${
+    orderData.items
+      ?.map(
+        (item) => `
+    <li><strong>${item.name}</strong> x${item.amount} - €${item.calculatedPrice.toFixed(2)}</li>
+  `
+      )
+      .join('') || '<li>Geen items gevonden</li>'
+  }
+</ul>
+
+<h3>💰 Prijs Overzicht:</h3>
+<ul>
+  <li><strong>Subtotaal:</strong> €${(orderData.totalPrice - orderData.shippingCost).toFixed(2)}</li>
+  <li><strong>Verzendkosten:</strong> €${orderData.shippingCost.toFixed(2)}</li>
+  <li><strong>Totaal:</strong> €${orderData.totalPrice.toFixed(2)}</li>
+</ul>
+
+<h3>⚡ Actie Vereist:</h3>
+<ol>
+  <li>Controleer de bestelling in het admin panel</li>
+  <li>Bereid de items voor op verzending</li>
+  <li>Verstuur tracking informatie naar de klant zodra verzonden</li>
+  <li>Update de bestelling status indien nodig</li>
+</ol>
+
+<p><strong>⚠️ Let op:</strong> Deze bestelling vereist directe verwerking om de verwachte leverdatum te halen.</p>
+
+<hr>
+<p><em>Deze notificatie is automatisch gegenereerd door het LemBrace systeem.</em></p>`;
 };
 
 const printOrder = () => {
