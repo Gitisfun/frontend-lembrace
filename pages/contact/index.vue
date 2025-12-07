@@ -40,15 +40,10 @@
           @update:model-value="handleFieldInput('message')"
         />
 
-        <button type="submit" class="submit-btn" :disabled="isSubmitting">
-          <span v-if="!isSubmitting">{{ $t('contact.form.submit') }}</span>
-          <span v-else class="loading-text">{{ $t('contact.form.submitting') }}</span>
-        </button>
+        <UiButtonSubmit :loading="isSubmitting" :text="$t('contact.form.submit')" :loading-text="$t('contact.form.submitting')" />
       </form>
 
-      <div v-if="submitStatus" class="submit-status" :class="submitStatus.type">
-        {{ submitStatus.message }}
-      </div>
+      <UiAlertMessage v-if="submitStatus" :type="submitStatus.type" :message="submitStatus.message" class="submit-status" />
     </div>
   </div>
 </template>
@@ -57,6 +52,8 @@
 import { ref, reactive } from 'vue';
 import { useFormValidation, validators } from '~/composables/useFormValidation';
 import { useToast } from '~/composables/useToast';
+import { useSubmitStatus } from '~/composables/useSubmitStatus';
+import { buildContactEmailPayload } from '~/logic/utils';
 
 const { t } = useI18n();
 const { success: toastSuccess, error: toastError } = useToast();
@@ -89,8 +86,7 @@ const { errors, validateField, clearError, validateAll, resetErrors } = useFormV
   },
 });
 
-const isSubmitting = ref(false);
-const submitStatus = ref(null);
+const { isSubmitting, status: submitStatus, setSuccess, setError, startSubmitting, stopSubmitting } = useSubmitStatus();
 const forceValidation = ref(false);
 
 // Handle field input - clear error and reset force validation for that field
@@ -109,8 +105,7 @@ const handleSubmit = async () => {
     return;
   }
 
-  isSubmitting.value = true;
-  submitStatus.value = null;
+  startSubmitting();
 
   try {
     // Call the actual email endpoint
@@ -119,36 +114,14 @@ const handleSubmit = async () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        email: formData.email,
-        name: formData.name,
-        subject: `New Contact Form Message from ${formData.name}`,
-        to: 'info@lembrace.be',
-        text: `<h2>Contact Form Submission</h2>
-
-<h3>Contact Details:</h3>
-<ul>
-  <li><strong>Name:</strong> ${formData.name}</li>
-  <li><strong>Email:</strong> ${formData.email}</li>
-  <li><strong>Phone:</strong> ${formData.phone || 'Not provided'}</li>
-</ul>
-
-<h3>Message:</h3>
-<p>${formData.message}</p>
-
-<hr>
-<p><em>Sent from LemBrace Contact Form</em></p>`,
-      }),
+      body: JSON.stringify(buildContactEmailPayload(formData)),
     });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    submitStatus.value = {
-      type: 'success',
-      message: t('contact.success'),
-    };
+    setSuccess(t('contact.success'));
     toastSuccess(t('toast.contact.success'));
 
     // Reset form
@@ -159,13 +132,10 @@ const handleSubmit = async () => {
     forceValidation.value = false;
   } catch (error) {
     console.error('Error sending email:', error);
-    submitStatus.value = {
-      type: 'error',
-      message: t('contact.error'),
-    };
+    setError(t('contact.error'));
     toastError(t('toast.contact.apiError'));
   } finally {
-    isSubmitting.value = false;
+    stopSubmitting();
   }
 };
 </script>
@@ -217,78 +187,13 @@ const handleSubmit = async () => {
   gap: 1.5rem;
 }
 
-.submit-btn {
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 600;
-  padding: 1rem 2rem;
-  background: var(--gradient-gold);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.contact-form :deep(.submit-btn) {
   margin-top: 1rem;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.submit-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-gold);
-}
-
-.submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.loading-text {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.loading-text::after {
-  content: '';
-  width: 16px;
-  height: 16px;
-  border: 2px solid transparent;
-  border-top: 2px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  width: 100%;
 }
 
 .submit-status {
   margin-top: 1.5rem;
-  padding: 1rem;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  text-align: center;
-}
-
-.submit-status.success {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.submit-status.error {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
 }
 
 @media (max-width: 768px) {
@@ -303,16 +208,6 @@ const handleSubmit = async () => {
 
   .contact-subtitle {
     font-size: 1rem;
-  }
-
-  .form-input,
-  .form-textarea {
-    padding: 0.75rem 0.875rem;
-  }
-
-  .submit-btn {
-    padding: 0.875rem 1.5rem;
-    font-size: 0.95rem;
   }
 }
 
