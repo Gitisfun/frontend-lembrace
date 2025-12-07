@@ -8,10 +8,8 @@
 
       <!-- Mobile Filter Button -->
       <button class="mobile-filter-button" @click="isFilterOpen = true">
-        <svg class="filter-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-        </svg>
-        Filters
+        <IconFilter :size="20" class="filter-icon" />
+        {{ $t('products.filters.button') }}
         <span v-if="activeFilterCount > 0" class="active-filter-count">
           {{ activeFilterCount }}
         </span>
@@ -38,18 +36,22 @@
       <!-- Desktop Filters -->
       <ProductFilter class="desktop-only" :categories="processedCategories" :initial-search-query="searchQuery" :initial-selected-subcategories="selectedSubcategories" :initial-show-discounted="showDiscounted" @filter-change="handleFilterChange" />
 
-      <div v-if="status === 'pending'" class="loading">Loading products...</div>
-      <div v-else-if="error" class="error">Error loading products: {{ error.message }}</div>
+      <!-- Loading State -->
+      <div v-if="status === 'pending'" class="loading-grid">
+        <UiSkeletonProductCard v-for="i in 8" :key="i" />
+      </div>
+
+      <!-- Error State -->
+      <UiErrorState v-else-if="error" variant="inline" :title="$t('errors.products.title')" :message="$t('errors.products.message')" :retry-text="$t('common.retry')" @retry="refresh" />
+
+      <!-- Empty State -->
       <div v-else-if="productList && productList.length === 0" class="no-products">
         <div class="no-products-content">
           <div class="no-products-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
+            <IconSearch :size="64" />
           </div>
-          <h2 class="no-products-title">No products found</h2>
-          <p class="no-products-description">We couldn't find any products matching your search criteria. Try adjusting your search terms or filters to find what you're looking for.</p>
+          <h2 class="no-products-title">{{ $t('products.noProducts.title') }}</h2>
+          <p class="no-products-description">{{ $t('products.noProducts.description') }}</p>
         </div>
       </div>
       <div v-else class="products-grid">
@@ -69,7 +71,20 @@ import ProductFilter from '~/components/product/ProductFilter.vue';
 import ProductActiveFilters from '~/components/product/ProductActiveFilters.vue';
 import ProductsPagination from '~/components/product/ProductsPagination.vue';
 import InputSearch from '~/components/input/InputSearch.vue';
+
+const { t } = useI18n();
 const { find } = useStrapi();
+
+// SEO Meta
+useSeoMeta({
+  title: () => t('seo.products.title'),
+  description: () => t('seo.products.description'),
+  ogTitle: () => t('seo.products.title'),
+  ogDescription: () => t('seo.products.description'),
+  ogImage: '/logo-lembrace.png',
+  twitterTitle: () => t('seo.products.title'),
+  twitterDescription: () => t('seo.products.description'),
+});
 
 // Filter states
 const searchQuery = ref('');
@@ -265,17 +280,23 @@ const clearFilters = () => {
   gap: 1.5rem;
 }
 
-.loading,
-.error {
-  text-align: center;
-  font-family: var(--font-body);
-  font-size: 1.2rem;
-  color: var(--color-text);
-  padding: 2rem;
+.loading-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
 }
 
-.error {
-  color: var(--color-error);
+@media (max-width: 768px) {
+  .loading-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .loading-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .no-products {

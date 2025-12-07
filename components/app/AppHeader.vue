@@ -2,44 +2,32 @@
   <header class="header">
     <div class="header-content">
       <div class="mobile-menu-toggle" @click="toggleMenu">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
+        <IconMenu :size="24" />
       </div>
       <nav class="nav-left" :class="{ 'mobile-menu-open': isMenuOpen }">
-        <NuxtLink to="/" class="nav-item" @click="closeMenu" :class="{ active: $route.path === '/' }">Home</NuxtLink>
-        <NuxtLink to="/products" class="nav-item" @click="closeMenu" :class="{ active: $route.path === '/products' }">Products</NuxtLink>
+        <NuxtLink :to="localePath('/')" class="nav-item" @click="closeMenu" :class="{ active: $route.path === '/' || $route.path === localePath('/') }">{{ $t('nav.home') }}</NuxtLink>
+        <NuxtLink :to="localePath('/products')" class="nav-item" @click="closeMenu" :class="{ active: $route.path.includes('/products') }">{{ $t('nav.products') }}</NuxtLink>
         <!--
-          <NuxtLink to="/about" class="nav-item" @click="closeMenu" :class="{ active: $route.path === '/about' }">About</NuxtLink>
+          <NuxtLink :to="localePath('/about')" class="nav-item" @click="closeMenu" :class="{ active: $route.path.includes('/about') }">{{ $t('nav.about') }}</NuxtLink>
         -->
-        <NuxtLink to="/contact" class="nav-item" @click="closeMenu" :class="{ active: $route.path === '/contact' }">Contact</NuxtLink>
+        <NuxtLink :to="localePath('/contact')" class="nav-item" @click="closeMenu" :class="{ active: $route.path.includes('/contact') }">{{ $t('nav.contact') }}</NuxtLink>
       </nav>
       <NuxtLink to="/" class="logo-link">
         <div class="logo-block">
           <img src="/logo-lembrace.png" alt="L'embrace" class="logo-image" />
-          <!--
-          <div class="logo-subtitle">Handgemaakte sieraden en accessoires</div>
-          -->
         </div>
       </NuxtLink>
       <div class="nav-right">
-        <NuxtLink to="/favorites" class="favorites-icon">
+        <UiLanguageSwitcher class="language-switcher-desktop" />
+        <NuxtLink :to="localePath('/favorites')" class="favorites-icon">
           <div class="favorites-icon-wrapper">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
+            <IconHeart :size="24" />
             <span class="favorites-counter" v-if="favoritesCount > 0">{{ favoritesCount }}</span>
           </div>
         </NuxtLink>
-        <NuxtLink to="/cart" class="cart-icon">
+        <NuxtLink :to="localePath('/cart')" class="cart-icon">
           <div class="cart-icon-wrapper">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="9" cy="21" r="1"></circle>
-              <circle cx="20" cy="21" r="1"></circle>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-            </svg>
+            <IconCart :size="24" />
             <span class="cart-counter" v-if="cartCount > 0">{{ cartCount }}</span>
           </div>
         </NuxtLink>
@@ -54,6 +42,9 @@
 <script setup>
 import { useGlobalStore } from '~/stores/global';
 import { formatPrice } from '~/logic/utils';
+
+const { t } = useI18n();
+const localePath = useLocalePath();
 
 const isMenuOpen = ref(false);
 const globalStore = useGlobalStore();
@@ -196,6 +187,10 @@ const closeMenu = () => {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+}
+
+.language-switcher-desktop {
+  margin-right: 0.5rem;
 }
 
 .cart-icon {

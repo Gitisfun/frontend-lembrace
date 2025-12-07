@@ -1,5 +1,21 @@
 import { defineStore } from 'pinia';
 
+interface ImageFormat {
+  url: string;
+  width?: number;
+  height?: number;
+}
+
+interface StrapiImage {
+  url: string;
+  formats?: {
+    thumbnail?: ImageFormat;
+    small?: ImageFormat;
+    medium?: ImageFormat;
+    large?: ImageFormat;
+  };
+}
+
 interface CartItem {
   id: string | number;
   name: string;
@@ -17,98 +33,100 @@ interface Product {
   price: number;
   discount?: number;
   amount?: number;
-  image: string | any;
+  image: StrapiImage[] | StrapiImage | string;
 }
+
+// Helper to extract image URL from various formats
+const extractImageUrl = (image: StrapiImage[] | StrapiImage | string): string => {
+  if (typeof image === 'string') {
+    return image;
+  }
+
+  if (Array.isArray(image)) {
+    if (image.length === 0) return '';
+    const firstImage = image[0];
+    return firstImage.formats?.thumbnail?.url || firstImage.formats?.small?.url || firstImage.url || '';
+  }
+
+  if (image && typeof image === 'object') {
+    return image.formats?.thumbnail?.url || image.formats?.small?.url || image.url || '';
+  }
+
+  return '';
+};
+
+// Helper to calculate price with discount
+const calculatePrice = (price: number, discount: number, amount: number): number => {
+  return Math.round((price - price * (discount / 100)) * amount * 100) / 100;
+};
 
 export const useGlobalStore = defineStore('global', {
   state: () => ({
     cart: [] as CartItem[],
-    test: [] as string[],
     favorites: [] as string[],
   }),
+
   getters: {
     cartItems: (state) => state.cart,
-    testItems: (state) => state.test,
     cartTotal: (state) => state.cart.reduce((total, item) => total + item.calculatedPrice, 0),
     cartItemCount: (state) => state.cart.reduce((count, item) => count + item.amount, 0),
     favoriteItems: (state) => state.favorites,
     isFavorite: (state) => (productId: string | number) => state.favorites.includes(String(productId)),
   },
+
   actions: {
-    addToCart(product: Product, amount = 1) {
-      console.log('Adding to cart:', product);
-      console.log('Product documentId:', product.documentId);
-      console.log('Product id:', product.id);
-
-      const existingItem = this.cart.find((item) => item.id === product.documentId);
+    addToCart(product: Product, amount = 1): boolean {
       const productId = product.documentId || product.id;
+      const existingItem = this.cart.find((item) => item.id === productId);
 
-      // Check if we have enough stock
+      // Check stock availability
       const currentInCart = existingItem ? existingItem.amount : 0;
       const availableStock = product.amount || 0;
 
       if (currentInCart + amount > availableStock) {
-        // Instead of failing, add the maximum available amount
         const maxCanAdd = availableStock - currentInCart;
         if (maxCanAdd <= 0) {
-          console.warn('No more items available to add');
           return false;
         }
-        console.log(`Adjusting quantity from ${amount} to ${maxCanAdd} due to stock limit`);
         amount = maxCanAdd;
       }
 
       if (existingItem) {
         existingItem.amount += amount;
-        // Recalculate the calculatedPrice
-        existingItem.calculatedPrice = Math.round((existingItem.price - existingItem.price * (existingItem.discount / 100)) * existingItem.amount * 100) / 100;
+        existingItem.calculatedPrice = calculatePrice(existingItem.price, existingItem.discount, existingItem.amount);
       } else {
-        // Extract the smallest available image
-        let imageUrl = '';
-        if (product.image && Array.isArray(product.image) && product.image.length > 0) {
-          // If it's an array of images, use the first one
-          const firstImage = product.image[0];
-          imageUrl = firstImage.formats?.thumbnail?.url || firstImage.formats?.small?.url || firstImage.url || '';
-        } else if (product.image && typeof product.image === 'object') {
-          // If it's a single image object
-          imageUrl = product.image.formats?.thumbnail?.url || product.image.formats?.small?.url || product.image.url || '';
-        } else if (typeof product.image === 'string') {
-          // If it's already a string URL
-          imageUrl = product.image;
-        }
-
-        console.log('Image URL:', imageUrl);
-
         const discount = product.discount || 0;
-        const calculatedPrice = Math.round((product.price - product.price * (discount / 100)) * amount * 100) / 100;
 
         this.cart.push({
-          id: product.documentId || product.id,
+          id: productId,
           name: product.name,
           price: product.price,
           discount,
           amount,
-          calculatedPrice,
-          image: imageUrl,
+          calculatedPrice: calculatePrice(product.price, discount, amount),
+          image: extractImageUrl(product.image),
         });
       }
 
-      return true; // Return true to indicate success
+      return true;
     },
+
     removeFromCart(productId: string | number) {
       this.cart = this.cart.filter((item) => item.id !== productId);
     },
+
     updateQuantity(productId: string | number, amount: number) {
       const item = this.cart.find((item) => item.id === productId);
       if (item) {
         item.amount = amount;
-        // Recalculate the calculatedPrice
-        item.calculatedPrice = Math.round((item.price - item.price * (item.discount / 100)) * amount * 100) / 100;
+        item.calculatedPrice = calculatePrice(item.price, item.discount, amount);
       }
     },
+
     clearCart() {
       this.cart = [];
     },
+
     toggleFavorite(productId: string | number) {
       const productIdString = String(productId);
       const index = this.favorites.indexOf(productIdString);
@@ -119,29 +137,24 @@ export const useGlobalStore = defineStore('global', {
         this.favorites.push(productIdString);
       }
     },
+
     addToFavorites(productId: string | number) {
       const productIdString = String(productId);
       if (!this.favorites.includes(productIdString)) {
         this.favorites.push(productIdString);
       }
     },
+
     removeFromFavorites(productId: string | number) {
       const productIdString = String(productId);
       this.favorites = this.favorites.filter((id) => id !== productIdString);
     },
+
     clearFavorites() {
       this.favorites = [];
     },
-    addToTest(item: string) {
-      this.test.push(item);
-    },
-    removeFromTest(item: string) {
-      this.test = this.test.filter((item) => item !== item);
-    },
-    clearTest() {
-      this.test = [];
-    },
   },
+
   persist: {
     storage: process.client ? localStorage : undefined,
   },

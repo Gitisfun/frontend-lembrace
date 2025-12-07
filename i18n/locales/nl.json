@@ -1,0 +1,266 @@
+{
+  "seo": {
+    "siteName": "L'embrace",
+    "home": {
+      "title": "L'embrace | Handgemaakte Sieraden & Accessoires",
+      "description": "Ontdek elegante handgemaakte sieraden en accessoires bij L'embrace. Unieke stukken gemaakt met liefde en aandacht voor detail. Shop onze exclusieve collectie."
+    },
+    "products": {
+      "title": "Shop Sieraden & Accessoires | L'embrace",
+      "description": "Bekijk onze collectie handgemaakte sieraden en accessoires. Vind unieke oorbellen, kettingen, armbanden en meer bij L'embrace."
+    },
+    "product": {
+      "titleSuffix": " - L'embrace"
+    },
+    "about": {
+      "title": "Over Ons | L'embrace",
+      "description": "Leer meer over L'embrace, onze passie voor handgemaakte sieraden en het verhaal achter onze unieke creaties. Elegantie in elk detail."
+    },
+    "contact": {
+      "title": "Contact | L'embrace",
+      "description": "Neem contact op met L'embrace. We horen graag van je. Stuur ons een bericht over onze handgemaakte sieraden en accessoires."
+    },
+    "cart": {
+      "title": "Winkelwagen | L'embrace",
+      "description": "Bekijk je winkelwagen bij L'embrace. Rond je bestelling af voor handgemaakte sieraden en accessoires."
+    },
+    "favorites": {
+      "title": "Mijn Favorieten | L'embrace",
+      "description": "Je opgeslagen favoriete items bij L'embrace. Bekijk en beheer je verlanglijst van handgemaakte sieraden en accessoires."
+    },
+    "payment": {
+      "title": "Afrekenen | L'embrace",
+      "description": "Rond je aankoop af bij L'embrace. Veilig afrekenen voor je handgemaakte sieraden en accessoires."
+    },
+    "paymentSuccess": {
+      "title": "Bestelling Bevestigd | L'embrace",
+      "description": "Bedankt voor je bestelling bij L'embrace. Je handgemaakte sieraden zijn onderweg."
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Producten",
+    "about": "Over ons",
+    "contact": "Contact"
+  },
+  "footer": {
+    "tagline": "Elegantie in elk detail – met de hand gemaakt voor jou."
+  },
+  "home": {
+    "shopAll": "Bekijk alles"
+  },
+  "cart": {
+    "title": "Mijn bestelling",
+    "empty": "Je winkelwagen is leeg",
+    "viewProducts": "Bekijk onze producten",
+    "summary": "Overzicht",
+    "subtotal": "Subtotaal",
+    "shipping": "Verzendkosten",
+    "total": "Totaal",
+    "checkout": "Verder naar betalen"
+  },
+  "favorites": {
+    "title": "Mijn favorieten",
+    "subtitle": "Je opgeslagen items",
+    "empty": {
+      "title": "Nog geen favorieten",
+      "description": "Begin met het bekijken van onze producten en voeg items toe aan je favorieten door op het hartje te klikken.",
+      "browseProducts": "Bekijk producten"
+    },
+    "loading": "Favorieten laden..."
+  },
+  "products": {
+    "title": "Producten",
+    "loading": "Producten laden...",
+    "error": "Fout bij het laden van producten",
+    "noProducts": {
+      "title": "Geen producten gevonden",
+      "description": "We konden geen producten vinden die aan je zoekcriteria voldoen. Probeer je zoektermen of filters aan te passen om te vinden wat je zoekt."
+    },
+    "filters": {
+      "title": "Filters",
+      "button": "Filters",
+      "categories": "Categorieën",
+      "other": "Overig",
+      "showDiscounted": "Toon alleen afgeprijsde items",
+      "discounted": "In de aanbieding",
+      "all": "Alles",
+      "clearAll": "Alles wissen",
+      "apply": "Filters toepassen"
+    },
+    "search": {
+      "placeholder": "Zoek producten..."
+    }
+  },
+  "product": {
+    "loading": "Productdetails laden...",
+    "notFound": "Product niet gevonden",
+    "error": "Fout bij het laden van product",
+    "soldOut": "Sorry, dit item is momenteel uitverkocht",
+    "maxItems": "Je hebt al het maximaal beschikbare aantal aan je winkelwagen toegevoegd",
+    "quantityAdjusted": "Aantal aangepast aan maximaal beschikbare voorraad",
+    "addToCart": "Toevoegen aan winkelwagen",
+    "removeFromCart": "Verwijderen uit winkelwagen",
+    "checkout": "Ga naar afrekenen",
+    "promocode": {
+      "placeholder": "Voer promotiecode in",
+      "apply": "Toepassen"
+    },
+    "relatedProducts": "Dit vind je misschien ook leuk"
+  },
+  "payment": {
+    "orderSummary": "Bestelling overzicht",
+    "personalInfo": "Persoonlijke gegevens",
+    "contactDetails": "Contactgegevens",
+    "shippingAddress": "Verzendadres",
+    "delivery": {
+      "title": "Levering",
+      "standard": "Standaard levering",
+      "standardTime": "2-3 werkdagen",
+      "express": "Express levering",
+      "expressTime": "1 werkdag"
+    },
+    "form": {
+      "firstName": "Voornaam",
+      "lastName": "Achternaam",
+      "email": "E-mailadres",
+      "phone": "Telefoonnummer",
+      "street": "Straatnaam",
+      "houseNumber": "Huisnummer",
+      "boxNumber": "Busnummer",
+      "boxNumberOptional": "Busnummer (optioneel)",
+      "postalCode": "Postcode",
+      "city": "Plaats",
+      "country": "Land",
+      "selectCountry": "Selecteer land",
+      "countries": {
+        "netherlands": "Nederland",
+        "belgium": "België",
+        "germany": "Duitsland",
+        "france": "Frankrijk",
+        "uk": "Verenigd Koninkrijk",
+        "other": "Andere"
+      }
+    },
+    "placeOrder": "Bestelling plaatsen",
+    "orderError": "Er is een fout opgetreden bij het verwerken van je bestelling. Probeer het later opnieuw.",
+    "continueShopping": "Verder winkelen",
+    "printOrder": "Bestelling afdrukken",
+    "success": {
+      "title": "Bedankt voor je bestelling!",
+      "message": "Je bestelling is succesvol ontvangen en wordt verwerkt.",
+      "orderDetails": "Bestelling details",
+      "orderNumber": "Bestelnummer",
+      "date": "Datum",
+      "deliveryMethod": "Verzendmethode",
+      "expectedDelivery": "Verwachte levering",
+      "nextSteps": "Volgende stappen",
+      "steps": {
+        "confirmation": {
+          "title": "Bevestigingsmail",
+          "description": "Je ontvangt binnen enkele minuten een bevestigingsmail met alle details van je bestelling."
+        },
+        "processing": {
+          "title": "Verwerking",
+          "description": "We verwerken je bestelling en bereiden deze voor op verzending."
+        },
+        "shipping": {
+          "title": "Verzending",
+          "description": "Je ontvangt een e-mail zodra je pakket is verzonden met tracking informatie."
+        }
+      }
+    },
+    "failed": {
+      "title": "Betaling mislukt",
+      "message": "Er is een probleem opgetreden bij het verwerken van je betaling."
+    }
+  },
+  "contact": {
+    "title": "Neem contact op",
+    "subtitle": "We horen graag van je. Stuur ons een bericht en we reageren zo snel mogelijk.",
+    "form": {
+      "name": "Naam",
+      "email": "E-mail",
+      "phone": "Telefoon",
+      "message": "Bericht",
+      "required": "*",
+      "optional": "(optioneel)",
+      "submit": "Verstuur bericht",
+      "submitting": "Versturen..."
+    },
+    "success": "Bedankt! Je bericht is succesvol verzonden. We nemen zo snel mogelijk contact met je op.",
+    "error": "Sorry, er is een fout opgetreden bij het verzenden van je bericht. Probeer het opnieuw."
+  },
+  "validation": {
+    "required": "Vul je {field} in",
+    "email": {
+      "required": "Vul je e-mailadres in",
+      "invalid": "Vul een geldig e-mailadres in (bijv. gebruiker{'@'}voorbeeld.com)",
+      "tooLong": "E-mailadres is te lang"
+    },
+    "phone": {
+      "invalid": "Vul een geldig telefoonnummer in"
+    },
+    "name": {
+      "required": "Vul je naam in",
+      "tooShort": "Naam moet minstens 2 tekens lang zijn",
+      "tooLong": "Naam moet minder dan 50 tekens zijn",
+      "invalid": "Naam mag alleen letters, spaties, koppeltekens en apostrofs bevatten"
+    },
+    "minLength": "{field} moet minstens {min} tekens lang zijn",
+    "maxLength": "{field} moet minder dan {max} tekens zijn"
+  },
+  "common": {
+    "loading": "Laden...",
+    "error": "Er is een fout opgetreden",
+    "retry": "Opnieuw proberen",
+    "goHome": "Naar homepagina"
+  },
+  "errors": {
+    "general": {
+      "title": "Er ging iets mis",
+      "message": "We ondervonden een onverwachte fout. Probeer het opnieuw."
+    },
+    "network": {
+      "title": "Verbindingsfout",
+      "message": "Kan geen verbinding maken met de server. Controleer je internetverbinding en probeer het opnieuw."
+    },
+    "notFound": {
+      "title": "Pagina niet gevonden",
+      "message": "De pagina die je zoekt bestaat niet of is verplaatst."
+    },
+    "products": {
+      "title": "Producten laden mislukt",
+      "message": "We konden de producten niet laden. Probeer het opnieuw."
+    },
+    "product": {
+      "title": "Product laden mislukt",
+      "message": "We konden dit product niet laden. Het is mogelijk verwijderd of tijdelijk niet beschikbaar."
+    },
+    "favorites": {
+      "title": "Favorieten laden mislukt",
+      "message": "We konden je favorieten niet laden. Probeer het opnieuw."
+    }
+  },
+  "toast": {
+    "addedToCart": "Toegevoegd aan winkelwagen",
+    "removedFromCart": "Verwijderd uit winkelwagen",
+    "cartUpdated": "Winkelwagen bijgewerkt",
+    "addedToFavorites": "Toegevoegd aan favorieten",
+    "removedFromFavorites": "Verwijderd uit favorieten",
+    "orderPlaced": "Bestelling succesvol geplaatst",
+    "messageSent": "Bericht succesvol verzonden! We nemen snel contact met je op.",
+    "validationError": "Corrigeer {count} veld(en) voor het verzenden",
+    "apiError": "Bericht verzenden mislukt. Probeer het opnieuw.",
+    "error": "Er ging iets mis",
+    "contact": {
+      "success": "Bedankt! Je bericht is verzonden.",
+      "validationError": "Vul alle verplichte velden correct in.",
+      "apiError": "Kon je bericht niet verzenden. Probeer het later opnieuw."
+    }
+  },
+  "language": {
+    "en": "English",
+    "nl": "Nederlands"
+  }
+}

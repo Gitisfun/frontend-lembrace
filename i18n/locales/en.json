@@ -1,0 +1,266 @@
+{
+  "seo": {
+    "siteName": "L'embrace",
+    "home": {
+      "title": "L'embrace | Handcrafted Jewelry & Accessories",
+      "description": "Discover elegant handcrafted jewelry and accessories at L'embrace. Unique pieces made with love and attention to detail. Shop our exclusive collection."
+    },
+    "products": {
+      "title": "Shop Jewelry & Accessories | L'embrace",
+      "description": "Browse our collection of handcrafted jewelry and accessories. Find unique earrings, necklaces, bracelets, and more at L'embrace."
+    },
+    "product": {
+      "titleSuffix": " - L'embrace"
+    },
+    "about": {
+      "title": "About Us | L'embrace",
+      "description": "Learn about L'embrace, our passion for handcrafted jewelry, and the story behind our unique creations. Elegance in every detail."
+    },
+    "contact": {
+      "title": "Contact Us | L'embrace",
+      "description": "Get in touch with L'embrace. We'd love to hear from you. Send us a message about our handcrafted jewelry and accessories."
+    },
+    "cart": {
+      "title": "Shopping Cart | L'embrace",
+      "description": "Review your shopping cart at L'embrace. Complete your order for handcrafted jewelry and accessories."
+    },
+    "favorites": {
+      "title": "My Favorites | L'embrace",
+      "description": "Your saved favorite items at L'embrace. View and manage your wishlist of handcrafted jewelry and accessories."
+    },
+    "payment": {
+      "title": "Checkout | L'embrace",
+      "description": "Complete your purchase at L'embrace. Secure checkout for your handcrafted jewelry and accessories."
+    },
+    "paymentSuccess": {
+      "title": "Order Confirmed | L'embrace",
+      "description": "Thank you for your order at L'embrace. Your handcrafted jewelry is on its way."
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "footer": {
+    "tagline": "Elegance in every detail – handcrafted for you."
+  },
+  "home": {
+    "shopAll": "Shop all"
+  },
+  "cart": {
+    "title": "My Order",
+    "empty": "Your shopping cart is empty",
+    "viewProducts": "View our products",
+    "summary": "Summary",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping costs",
+    "total": "Total",
+    "checkout": "Proceed to payment"
+  },
+  "favorites": {
+    "title": "My Favorites",
+    "subtitle": "Your saved items",
+    "empty": {
+      "title": "No favorites yet",
+      "description": "Start browsing our products and add items to your favorites by clicking the heart icon.",
+      "browseProducts": "Browse Products"
+    },
+    "loading": "Loading favorites..."
+  },
+  "products": {
+    "title": "Products",
+    "loading": "Loading products...",
+    "error": "Error loading products",
+    "noProducts": {
+      "title": "No products found",
+      "description": "We couldn't find any products matching your search criteria. Try adjusting your search terms or filters to find what you're looking for."
+    },
+    "filters": {
+      "title": "Filters",
+      "button": "Filters",
+      "categories": "Categories",
+      "other": "Other",
+      "showDiscounted": "Show discounted items only",
+      "discounted": "On Sale",
+      "all": "All",
+      "clearAll": "Clear all",
+      "apply": "Apply Filters"
+    },
+    "search": {
+      "placeholder": "Search products..."
+    }
+  },
+  "product": {
+    "loading": "Loading product details...",
+    "notFound": "Product not found",
+    "error": "Error loading product",
+    "soldOut": "Sorry, this item is currently sold out",
+    "maxItems": "You have already added the maximum available quantity to your cart",
+    "quantityAdjusted": "Quantity adjusted to maximum available stock",
+    "addToCart": "Add to Cart",
+    "removeFromCart": "Remove from Cart",
+    "checkout": "Proceed to Checkout",
+    "promocode": {
+      "placeholder": "Enter promocode",
+      "apply": "Apply"
+    },
+    "relatedProducts": "You might also like"
+  },
+  "payment": {
+    "orderSummary": "Order Summary",
+    "personalInfo": "Personal Information",
+    "contactDetails": "Contact Details",
+    "shippingAddress": "Shipping Address",
+    "delivery": {
+      "title": "Delivery",
+      "standard": "Standard delivery",
+      "standardTime": "2-3 business days",
+      "express": "Express delivery",
+      "expressTime": "1 business day"
+    },
+    "form": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email address",
+      "phone": "Phone number",
+      "street": "Street name",
+      "houseNumber": "House number",
+      "boxNumber": "Box number",
+      "boxNumberOptional": "Box number (optional)",
+      "postalCode": "Postal code",
+      "city": "City",
+      "country": "Country",
+      "selectCountry": "Select country",
+      "countries": {
+        "netherlands": "Netherlands",
+        "belgium": "Belgium",
+        "germany": "Germany",
+        "france": "France",
+        "uk": "United Kingdom",
+        "other": "Other"
+      }
+    },
+    "placeOrder": "Place Order",
+    "orderError": "An error occurred while processing your order. Please try again later.",
+    "continueShopping": "Continue Shopping",
+    "printOrder": "Print Order",
+    "success": {
+      "title": "Thank you for your order!",
+      "message": "Your order has been successfully received and is being processed.",
+      "orderDetails": "Order Details",
+      "orderNumber": "Order number",
+      "date": "Date",
+      "deliveryMethod": "Delivery method",
+      "expectedDelivery": "Expected delivery",
+      "nextSteps": "Next Steps",
+      "steps": {
+        "confirmation": {
+          "title": "Confirmation email",
+          "description": "You will receive a confirmation email within a few minutes with all the details of your order."
+        },
+        "processing": {
+          "title": "Processing",
+          "description": "We are processing your order and preparing it for shipment."
+        },
+        "shipping": {
+          "title": "Shipping",
+          "description": "You will receive an email once your package has been shipped with tracking information."
+        }
+      }
+    },
+    "failed": {
+      "title": "Payment Failed",
+      "message": "A problem occurred while processing your payment."
+    }
+  },
+  "contact": {
+    "title": "Get in Touch",
+    "subtitle": "We'd love to hear from you. Send us a message and we'll respond as soon as possible.",
+    "form": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "message": "Message",
+      "required": "*",
+      "optional": "(optional)",
+      "submit": "Send Message",
+      "submitting": "Sending..."
+    },
+    "success": "Thank you! Your message has been sent successfully. We'll get back to you soon.",
+    "error": "Sorry, there was an error sending your message. Please try again."
+  },
+  "validation": {
+    "required": "Please enter your {field}",
+    "email": {
+      "required": "Please enter your email address",
+      "invalid": "Please enter a valid email address (e.g., user{'@'}example.com)",
+      "tooLong": "Email address is too long"
+    },
+    "phone": {
+      "invalid": "Please enter a valid phone number"
+    },
+    "name": {
+      "required": "Please enter your name",
+      "tooShort": "Name must be at least 2 characters long",
+      "tooLong": "Name must be less than 50 characters",
+      "invalid": "Name can only contain letters, spaces, hyphens, and apostrophes"
+    },
+    "minLength": "{field} must be at least {min} characters long",
+    "maxLength": "{field} must be less than {max} characters"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Try again",
+    "goHome": "Go to homepage"
+  },
+  "errors": {
+    "general": {
+      "title": "Something went wrong",
+      "message": "We encountered an unexpected error. Please try again."
+    },
+    "network": {
+      "title": "Connection error",
+      "message": "Unable to connect to the server. Please check your internet connection and try again."
+    },
+    "notFound": {
+      "title": "Page not found",
+      "message": "The page you're looking for doesn't exist or has been moved."
+    },
+    "products": {
+      "title": "Unable to load products",
+      "message": "We couldn't load the products. Please try again."
+    },
+    "product": {
+      "title": "Unable to load product",
+      "message": "We couldn't load this product. It may have been removed or is temporarily unavailable."
+    },
+    "favorites": {
+      "title": "Unable to load favorites",
+      "message": "We couldn't load your favorites. Please try again."
+    }
+  },
+  "toast": {
+    "addedToCart": "Added to cart",
+    "removedFromCart": "Removed from cart",
+    "cartUpdated": "Cart updated",
+    "addedToFavorites": "Added to favorites",
+    "removedFromFavorites": "Removed from favorites",
+    "orderPlaced": "Order placed successfully",
+    "messageSent": "Message sent successfully! We'll get back to you soon.",
+    "validationError": "Please fix {count} field(s) before submitting",
+    "apiError": "Failed to send message. Please try again.",
+    "error": "Something went wrong",
+    "contact": {
+      "success": "Thank you! Your message has been sent.",
+      "validationError": "Please complete all required fields correctly.",
+      "apiError": "Could not send your message. Please try again later."
+    }
+  },
+  "language": {
+    "en": "English",
+    "nl": "Nederlands"
+  }
+}

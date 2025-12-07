@@ -1,2 +1,9 @@
+# L'embrace robots.txt
 User-Agent: *
-Disallow:
+Allow: /
+Disallow: /payment/
+Disallow: /cart/
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://lembrace.be/sitemap.xml

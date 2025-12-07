@@ -2,136 +2,47 @@
   <div class="contact-page">
     <div class="contact-container">
       <div class="contact-header">
-        <h1 class="contact-title">Get in Touch</h1>
-        <p class="contact-subtitle">We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+        <h1 class="contact-title">{{ $t('contact.title') }}</h1>
+        <p class="contact-subtitle">{{ $t('contact.subtitle') }}</p>
       </div>
 
-      <form @submit.prevent="handleSubmit" class="contact-form">
-        <div class="form-group" :class="{ 'has-error': errors.name }">
-          <label for="name" class="form-label">
-            Name
-            <span class="required-indicator">*</span>
-          </label>
-          <div class="input-wrapper">
-            <input id="name" v-model="formData.name" type="text" class="form-input" :class="{ error: errors.name, success: !errors.name && formData.name.trim() }" placeholder="Your full name" @blur="validateField('name')" @input="clearError('name')" required />
-            <div v-if="errors.name" class="error-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-                <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              </svg>
-            </div>
-            <div v-else-if="!errors.name && formData.name.trim()" class="success-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </div>
-          </div>
-          <div v-if="errors.name" class="error-message">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="error-icon-small">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-              <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            </svg>
-            {{ errors.name }}
-          </div>
-        </div>
+      <form @submit.prevent="handleSubmit" class="contact-form" novalidate>
+        <InputField id="name" v-model="formData.name" :label="$t('contact.form.name')" type="text" placeholder="Your full name" required show-success :error="errors.name" :force-validation="forceValidation" @blur="validateField('name')" @update:model-value="handleFieldInput('name')" />
 
-        <div class="form-group" :class="{ 'has-error': errors.email }">
-          <label for="email" class="form-label">
-            Email
-            <span class="required-indicator">*</span>
-          </label>
-          <div class="input-wrapper">
-            <input id="email" v-model="formData.email" type="email" class="form-input" :class="{ error: errors.email, success: !errors.email && formData.email.trim() }" placeholder="your.email@example.com" @blur="validateField('email')" @input="clearError('email')" required />
-            <div v-if="errors.email" class="error-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-                <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              </svg>
-            </div>
-            <div v-else-if="!errors.email && formData.email.trim()" class="success-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </div>
-          </div>
-          <div v-if="errors.email" class="error-message">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="error-icon-small">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-              <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            </svg>
-            {{ errors.email }}
-          </div>
-        </div>
+        <InputField
+          id="email"
+          v-model="formData.email"
+          :label="$t('contact.form.email')"
+          type="email"
+          placeholder="your.email@example.com"
+          required
+          show-success
+          :error="errors.email"
+          :force-validation="forceValidation"
+          @blur="validateField('email')"
+          @update:model-value="handleFieldInput('email')"
+        />
 
-        <div class="form-group" :class="{ 'has-error': errors.phone }">
-          <label for="phone" class="form-label">
-            Phone
-            <span class="optional-indicator">(optional)</span>
-          </label>
-          <div class="input-wrapper">
-            <input id="phone" v-model="formData.phone" type="tel" class="form-input" :class="{ error: errors.phone, success: !errors.phone && formData.phone.trim() }" placeholder="Your phone number" @blur="validateField('phone')" @input="clearError('phone')" />
-            <div v-if="errors.phone" class="error-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-                <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              </svg>
-            </div>
-            <div v-else-if="!errors.phone && formData.phone.trim()" class="success-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </div>
-          </div>
-          <div v-if="errors.phone" class="error-message">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="error-icon-small">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-              <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            </svg>
-            {{ errors.phone }}
-          </div>
-        </div>
+        <InputField id="phone" v-model="formData.phone" :label="$t('contact.form.phone')" type="tel" placeholder="Your phone number" show-optional show-success :error="errors.phone" :force-validation="forceValidation" @blur="validateField('phone')" @update:model-value="handleFieldInput('phone')" />
 
-        <div class="form-group" :class="{ 'has-error': errors.message }">
-          <label for="message" class="form-label">
-            Message
-            <span class="required-indicator">*</span>
-          </label>
-          <div class="input-wrapper">
-            <textarea
-              id="message"
-              v-model="formData.message"
-              class="form-textarea"
-              :class="{ error: errors.message, success: !errors.message && formData.message.trim() }"
-              placeholder="Tell us about your inquiry..."
-              rows="6"
-              @blur="validateField('message')"
-              @input="clearError('message')"
-              required
-            ></textarea>
-            <div v-if="errors.message" class="error-icon textarea-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-                <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-              </svg>
-            </div>
-            <div v-else-if="!errors.message && formData.message.trim()" class="success-icon textarea-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </div>
-          </div>
-          <div v-if="errors.message" class="error-message">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="error-icon-small">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-              <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            </svg>
-            {{ errors.message }}
-          </div>
-        </div>
+        <InputField
+          id="message"
+          v-model="formData.message"
+          :label="$t('contact.form.message')"
+          type="textarea"
+          placeholder="Tell us about your inquiry..."
+          :rows="6"
+          required
+          show-success
+          :error="errors.message"
+          :force-validation="forceValidation"
+          @blur="validateField('message')"
+          @update:model-value="handleFieldInput('message')"
+        />
 
         <button type="submit" class="submit-btn" :disabled="isSubmitting">
-          <span v-if="!isSubmitting">Send Message</span>
-          <span v-else class="loading-text">Sending...</span>
+          <span v-if="!isSubmitting">{{ $t('contact.form.submit') }}</span>
+          <span v-else class="loading-text">{{ $t('contact.form.submitting') }}</span>
         </button>
       </form>
 
@@ -144,6 +55,22 @@
 
 <script setup>
 import { ref, reactive } from 'vue';
+import { useFormValidation, validators } from '~/composables/useFormValidation';
+import { useToast } from '~/composables/useToast';
+
+const { t } = useI18n();
+const { success: toastSuccess, error: toastError } = useToast();
+
+// SEO Meta
+useSeoMeta({
+  title: () => t('seo.contact.title'),
+  description: () => t('seo.contact.description'),
+  ogTitle: () => t('seo.contact.title'),
+  ogDescription: () => t('seo.contact.description'),
+  ogImage: '/logo-lembrace.png',
+  twitterTitle: () => t('seo.contact.title'),
+  twitterDescription: () => t('seo.contact.description'),
+});
 
 const formData = reactive({
   name: '',
@@ -152,86 +79,33 @@ const formData = reactive({
   message: '',
 });
 
-const errors = reactive({
-  name: '',
-  email: '',
-  phone: '',
-  message: '',
+// Use the form validation composable
+const { errors, validateField, clearError, validateAll, resetErrors } = useFormValidation(formData, {
+  name: { rules: [validators.name()] },
+  email: { rules: [validators.email()] },
+  phone: { rules: [validators.phone()] },
+  message: {
+    rules: [validators.required('message'), validators.minLength(10, 'Message'), validators.maxLength(1000, 'Message')],
+  },
 });
 
 const isSubmitting = ref(false);
 const submitStatus = ref(null);
+const forceValidation = ref(false);
 
-const validateField = (fieldName) => {
-  const value = formData[fieldName].trim();
-
-  switch (fieldName) {
-    case 'name':
-      if (!value) {
-        errors.name = 'Please enter your name';
-      } else if (value.length < 2) {
-        errors.name = 'Name must be at least 2 characters long';
-      } else if (value.length > 50) {
-        errors.name = 'Name must be less than 50 characters';
-      } else if (!/^[a-zA-Z\s'-]+$/.test(value)) {
-        errors.name = 'Name can only contain letters, spaces, hyphens, and apostrophes';
-      } else {
-        errors.name = '';
-      }
-      break;
-
-    case 'email':
-      if (!value) {
-        errors.email = 'Please enter your email address';
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        errors.email = 'Please enter a valid email address (e.g., user@example.com)';
-      } else if (value.length > 100) {
-        errors.email = 'Email address is too long';
-      } else {
-        errors.email = '';
-      }
-      break;
-
-    case 'phone':
-      if (value && !/^[\+]?[1-9]\d{7,15}$/.test(value)) {
-        errors.phone = 'Please enter a valid phone number';
-      } else {
-        errors.phone = '';
-      }
-      break;
-
-    case 'message':
-      if (!value) {
-        errors.message = 'Please enter your message';
-      } else if (value.length < 10) {
-        errors.message = 'Message must be at least 10 characters long';
-      } else if (value.length > 1000) {
-        errors.message = 'Message must be less than 1000 characters';
-      } else {
-        errors.message = '';
-      }
-      break;
-  }
-};
-
-const clearError = (fieldName) => {
-  if (errors[fieldName]) {
-    errors[fieldName] = '';
-  }
-};
-
-const validateForm = () => {
-  // Validate all fields
-  ['name', 'email', 'phone', 'message'].forEach((field) => {
-    validateField(field);
-  });
-
-  // Check if any errors exist
-  return !Object.values(errors).some((error) => error !== '');
+// Handle field input - clear error and reset force validation for that field
+const handleFieldInput = (fieldName) => {
+  clearError(fieldName);
+  forceValidation.value = false;
 };
 
 const handleSubmit = async () => {
-  if (!validateForm()) {
+  // Force show validation on all fields
+  forceValidation.value = true;
+
+  if (!validateAll()) {
+    // Show validation error toast
+    toastError(t('toast.contact.validationError'));
     return;
   }
 
@@ -273,19 +147,23 @@ const handleSubmit = async () => {
 
     submitStatus.value = {
       type: 'success',
-      message: "Thank you! Your message has been sent successfully. We'll get back to you soon.",
+      message: t('contact.success'),
     };
+    toastSuccess(t('toast.contact.success'));
 
     // Reset form
     Object.keys(formData).forEach((key) => {
       formData[key] = '';
     });
+    resetErrors();
+    forceValidation.value = false;
   } catch (error) {
     console.error('Error sending email:', error);
     submitStatus.value = {
       type: 'error',
-      message: 'Sorry, there was an error sending your message. Please try again.',
+      message: t('contact.error'),
     };
+    toastError(t('toast.contact.apiError'));
   } finally {
     isSubmitting.value = false;
   }
@@ -337,154 +215,6 @@ const handleSubmit = async () => {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-label {
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--color-text);
-  margin-bottom: 0.25rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  position: relative;
-}
-
-.form-group.has-error .form-label {
-  color: #e74c3c;
-}
-
-.required-indicator {
-  color: #e74c3c;
-  font-weight: 600;
-  margin-left: 0.25rem;
-}
-
-.optional-indicator {
-  color: var(--color-text-light);
-  font-size: 0.85rem;
-  font-weight: 300;
-  margin-left: 0.25rem;
-}
-
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.form-input,
-.form-textarea {
-  font-family: var(--font-body);
-  font-size: 1rem;
-  padding: 0.875rem 1rem;
-  padding-right: 3rem;
-  border: 2px solid #e5e5e5;
-  border-radius: 8px;
-  background: white;
-  color: var(--color-text);
-  transition: all 0.3s ease;
-  outline: none;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.form-input:focus,
-.form-textarea:focus {
-  border-color: var(--color-gold);
-  box-shadow: 0 0 0 3px rgba(212, 167, 98, 0.1);
-}
-
-.form-input.error,
-.form-textarea.error {
-  border-color: #e74c3c;
-  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
-  background-color: #fdf2f2;
-}
-
-.form-input.success,
-.form-textarea.success {
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-  background-color: #f0fdf4;
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 120px;
-  font-family: var(--font-body);
-  line-height: 1.5;
-}
-
-.error-icon,
-.success-icon {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-}
-
-.error-icon {
-  color: #e74c3c;
-  background-color: #fdf2f2;
-}
-
-.success-icon {
-  color: #10b981;
-  background-color: #f0fdf4;
-}
-
-.textarea-icon {
-  top: 1rem;
-  transform: none;
-}
-
-.error-message {
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  color: #e74c3c;
-  margin-top: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  background-color: #fdf2f2;
-  border-radius: 6px;
-  border-left: 3px solid #e74c3c;
-  animation: slideIn 0.3s ease;
-}
-
-.error-icon-small {
-  color: #e74c3c;
-  flex-shrink: 0;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .submit-btn {

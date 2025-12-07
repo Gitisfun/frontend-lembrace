@@ -6,17 +6,13 @@
         <span class="selected-text">
           {{ selectedItemLabel || placeholder }}
         </span>
-        <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
+        <IconChevronDown :size="16" class="dropdown-icon" />
       </div>
       <div v-if="isOpen" class="dropdown-content">
         <div class="items-list">
           <div v-for="item in items" :key="item.id" class="item" :class="{ 'is-selected': modelValue === item.id }" @click.stop="selectItem(item.id)">
             <span class="item-name">{{ item.label }}</span>
-            <svg v-if="modelValue === item.id" class="check-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
+            <IconCheck v-if="modelValue === item.id" :size="16" class="check-icon" />
           </div>
         </div>
       </div>

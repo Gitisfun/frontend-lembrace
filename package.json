@@ -12,8 +12,10 @@
   "dependencies": {
     "@mollie/api-client": "^4.3.3",
     "@nuxt/image": "^1.10.0",
+    "@nuxtjs/i18n": "^10.2.1",
     "@nuxtjs/strapi": "^2.0.0",
     "@pinia/nuxt": "^0.11.0",
+    "@vueuse/core": "^14.1.0",
     "nuxt": "^3.17.1",
     "pinia": "^3.0.2",
     "pinia-plugin-persistedstate": "^4.2.0",

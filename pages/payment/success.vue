@@ -3,65 +3,58 @@
     <div class="success-container">
       <div class="success-header">
         <div class="success-icon" :class="{ 'success-icon--error': !paymentSuccess }">
-          <svg v-if="paymentSuccess" xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-          </svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="15" y1="9" x2="9" y2="15"></line>
-            <line x1="9" y1="9" x2="15" y2="15"></line>
-          </svg>
+          <IconCheckCircle v-if="paymentSuccess" :size="48" />
+          <IconXCircle v-else :size="48" />
         </div>
-        <h1>{{ paymentSuccess ? 'Bedankt voor je bestelling!' : 'Betaling mislukt' }}</h1>
-        <p class="success-message">{{ paymentSuccess ? 'Je bestelling is succesvol ontvangen en wordt verwerkt.' : 'Er is een probleem opgetreden bij het verwerken van je betaling.' }}</p>
+        <h1>{{ paymentSuccess ? $t('payment.success.title') : $t('payment.failed.title') }}</h1>
+        <p class="success-message">{{ paymentSuccess ? $t('payment.success.message') : $t('payment.failed.message') }}</p>
       </div>
 
       <template v-if="paymentSuccess">
         <div class="order-details">
-          <h2>Bestelling details</h2>
+          <h2>{{ $t('payment.success.orderDetails') }}</h2>
           <div class="details-grid">
             <div class="detail-item">
-              <span class="detail-label">Bestelnummer</span>
+              <span class="detail-label">{{ $t('payment.success.orderNumber') }}</span>
               <span class="detail-value">#{{ orderNumber }}</span>
             </div>
             <div class="detail-item">
-              <span class="detail-label">Datum</span>
+              <span class="detail-label">{{ $t('payment.success.date') }}</span>
               <span class="detail-value">{{ orderDate }}</span>
             </div>
             <div class="detail-item">
-              <span class="detail-label">Verzendmethode</span>
+              <span class="detail-label">{{ $t('payment.success.deliveryMethod') }}</span>
               <span class="detail-value">{{ deliveryMethod }}</span>
             </div>
             <div class="detail-item">
-              <span class="detail-label">Verwachte levering</span>
+              <span class="detail-label">{{ $t('payment.success.expectedDelivery') }}</span>
               <span class="detail-value">{{ expectedDelivery }}</span>
             </div>
           </div>
         </div>
 
         <div class="next-steps">
-          <h2>Volgende stappen</h2>
+          <h2>{{ $t('payment.success.nextSteps') }}</h2>
           <div class="steps-list">
             <div class="step-item">
               <div class="step-number">1</div>
               <div class="step-content">
-                <h3>Bevestigingsmail</h3>
-                <p>Je ontvangt binnen enkele minuten een bevestigingsmail met alle details van je bestelling.</p>
+                <h3>{{ $t('payment.success.steps.confirmation.title') }}</h3>
+                <p>{{ $t('payment.success.steps.confirmation.description') }}</p>
               </div>
             </div>
             <div class="step-item">
               <div class="step-number">2</div>
               <div class="step-content">
-                <h3>Verwerking</h3>
-                <p>We verwerken je bestelling en bereiden deze voor op verzending.</p>
+                <h3>{{ $t('payment.success.steps.processing.title') }}</h3>
+                <p>{{ $t('payment.success.steps.processing.description') }}</p>
               </div>
             </div>
             <div class="step-item">
               <div class="step-number">3</div>
               <div class="step-content">
-                <h3>Verzending</h3>
-                <p>Je ontvangt een e-mail zodra je pakket is verzonden met tracking informatie.</p>
+                <h3>{{ $t('payment.success.steps.shipping.title') }}</h3>
+                <p>{{ $t('payment.success.steps.shipping.description') }}</p>
               </div>
             </div>
           </div>
@@ -69,14 +62,10 @@
       </template>
 
       <div class="action-buttons">
-        <NuxtLink to="/products" class="continue-btn">Verder winkelen</NuxtLink>
+        <NuxtLink :to="localePath('/products')" class="continue-btn">{{ $t('payment.continueShopping') }}</NuxtLink>
         <button v-if="paymentSuccess" class="print-btn" @click="printOrder">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 6 2 18 2 18 9"></polyline>
-            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-            <rect x="6" y="14" width="12" height="8"></rect>
-          </svg>
-          Bestelling afdrukken
+          <IconPrint :size="20" />
+          {{ $t('payment.printOrder') }}
         </button>
       </div>
     </div>
@@ -86,6 +75,16 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+
+const { t } = useI18n();
+const localePath = useLocalePath();
+
+// SEO Meta
+useSeoMeta({
+  title: () => t('seo.paymentSuccess.title'),
+  description: () => t('seo.paymentSuccess.description'),
+  robots: 'noindex, nofollow',
+});
 
 const route = useRoute();
 const paymentSuccess = ref(true);

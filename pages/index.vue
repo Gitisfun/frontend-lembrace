@@ -1,11 +1,23 @@
 <template>
   <div>
-    <div v-if="isLoading">Is loading...</div>
-    <div v-if="!isLoading" class="hero">
+    <!-- Loading State -->
+    <div v-if="isLoading" class="hero-loading">
+      <div class="images-row">
+        <div v-for="i in 3" :key="i" class="image-container">
+          <UiSkeleton variant="rectangular" width="100%" height="100%" class="image-skeleton" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <UiErrorState v-else-if="hasError" variant="fullpage" :title="$t('errors.general.title')" :message="$t('errors.general.message')" :retry-text="$t('common.retry')" @retry="fetchContent" />
+
+    <!-- Content -->
+    <div v-else class="hero">
       <div class="images-row">
         <div v-for="(image, index) in pageContent?.data?.collection?.images" :key="index" class="image-container">
           <NuxtImg :src="image?.src?.url" :alt="`L'embrace image ${index + 1}`" width="600" height="400" format="webp" class="image" provider="strapi" />
-          <NuxtLink v-if="index === 1" to="/products" class="center-overlay-btn">Shop all</NuxtLink>
+          <NuxtLink v-if="index === 1" :to="localePath('/products')" class="center-overlay-btn">{{ $t('home.shopAll') }}</NuxtLink>
         </div>
       </div>
     </div>
@@ -14,6 +26,20 @@
 
 <script setup>
 import { onMounted } from 'vue';
+
+const { t } = useI18n();
+const localePath = useLocalePath();
+
+// SEO Meta
+useSeoMeta({
+  title: () => t('seo.home.title'),
+  description: () => t('seo.home.description'),
+  ogTitle: () => t('seo.home.title'),
+  ogDescription: () => t('seo.home.description'),
+  ogImage: '/logo-lembrace.png',
+  twitterTitle: () => t('seo.home.title'),
+  twitterDescription: () => t('seo.home.description'),
+});
 
 onMounted(() => {
   const elements = document.querySelectorAll('.title, .subtitle, .accent-text, .cta-button, .image, .flourish');
@@ -30,25 +56,78 @@ onMounted(() => {
 
 const { find } = useStrapi();
 const isLoading = ref(true);
+const hasError = ref(false);
+const pageContent = ref(null);
 
-const pageContent = await find('homepage', {
-  populate: {
-    collection: {
+const fetchContent = async () => {
+  try {
+    isLoading.value = true;
+    hasError.value = false;
+    const response = await find('homepage', {
       populate: {
-        images: {
-          populate: '*',
+        collection: {
+          populate: {
+            images: {
+              populate: '*',
+            },
+          },
         },
       },
-    },
-  },
-});
+    });
+    pageContent.value = response;
+  } catch (error) {
+    console.error('Failed to load homepage content:', error);
+    hasError.value = true;
+  } finally {
+    isLoading.value = false;
+  }
+};
 
-console.log(pageContent.data.collection.images);
-
-isLoading.value = false;
+await fetchContent();
 </script>
 
 <style scoped>
+.hero-loading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0;
+}
+
+.hero-loading .images-row {
+  display: flex;
+  flex-direction: row;
+  width: 100vw;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0 3vw;
+  gap: 1.5vw;
+}
+
+.hero-loading .image-container {
+  flex: 1 1 0;
+  aspect-ratio: 1/1.1;
+  overflow: hidden;
+}
+
+.image-skeleton {
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 1024px) {
+  .hero-loading .images-row {
+    flex-direction: column;
+    gap: 2vw;
+    padding: 0 2vw;
+  }
+
+  .hero-loading .image-container {
+    aspect-ratio: 1/1;
+    min-height: 200px;
+  }
+}
+
 .hero {
   display: flex;
   align-items: flex-start;

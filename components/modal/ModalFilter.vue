@@ -2,14 +2,14 @@
   <div class="filter-modal" :class="{ 'is-open': isOpen }">
     <div class="filter-modal-content">
       <div class="filter-modal-header">
-        <h2>Filters</h2>
+        <h2>{{ $t('products.filters.title') }}</h2>
         <button class="close-modal" @click="$emit('close')">×</button>
       </div>
 
       <div class="filter-modal-body">
         <div class="filter-group">
           <h3 class="filter-title">
-            <span class="title-text">Categories</span>
+            <span class="title-text">{{ $t('products.filters.categories') }}</span>
             <div class="title-decoration"></div>
           </h3>
           <div class="filter-options">
@@ -27,19 +27,19 @@
 
         <div class="filter-group">
           <h3 class="filter-title">
-            <span class="title-text">Other</span>
+            <span class="title-text">{{ $t('products.filters.other') }}</span>
             <div class="title-decoration"></div>
           </h3>
           <label class="filter-option">
             <input type="checkbox" v-model="showDiscounted" class="filter-checkbox" />
-            <span class="filter-label">Show discounted items only</span>
+            <span class="filter-label">{{ $t('products.filters.showDiscounted') }}</span>
           </label>
         </div>
       </div>
 
       <div class="filter-modal-footer">
-        <button class="clear-filters" @click="clearFilters">Clear Filters</button>
-        <button class="apply-filters" @click="applyFilters">Apply Filters</button>
+        <button class="clear-filters" @click="clearFilters">{{ $t('products.filters.clearAll') }}</button>
+        <button class="apply-filters" @click="applyFilters">{{ $t('products.filters.apply') }}</button>
       </div>
     </div>
   </div>

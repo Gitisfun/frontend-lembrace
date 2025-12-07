@@ -1,17 +1,16 @@
 <template>
   <div class="search-filter">
     <div class="search-input-wrapper">
-      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"></circle>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-      </svg>
-      <input v-model="searchValue" type="text" :placeholder="placeholder" class="search-input" @input="handleInput" />
+      <IconSearch :size="20" class="search-icon" />
+      <input v-model="searchValue" type="text" :placeholder="computedPlaceholder" class="search-input" @input="handleInput" />
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, watch } from 'vue';
+
+const { t } = useI18n();
 
 const props = defineProps({
   modelValue: {
@@ -20,9 +19,11 @@ const props = defineProps({
   },
   placeholder: {
     type: String,
-    default: 'Zoek een product',
+    default: null,
   },
 });
+
+const computedPlaceholder = computed(() => props.placeholder || t('products.search.placeholder'));
 
 const emit = defineEmits(['update:modelValue', 'search']);
 

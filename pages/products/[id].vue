@@ -1,22 +1,22 @@
 <template>
   <div class="product-details">
-    <div v-if="loading" class="loading">Loading product details...</div>
-    <div v-else-if="error" class="error">Error loading product: {{ error }}</div>
-    <div v-else-if="!product" class="error">Product not found</div>
+    <!-- Loading State -->
+    <UiSkeletonProductDetail v-if="loading" />
+
+    <!-- Error State -->
+    <UiErrorState v-else-if="error" variant="fullpage" :title="$t('errors.product.title')" :message="$t('errors.product.message')" :retry-text="$t('common.retry')" :home-text="$t('common.goHome')" show-home @retry="fetchProduct" />
+
+    <!-- Not Found State -->
+    <UiErrorState v-else-if="!product" variant="fullpage" :title="$t('product.notFound')" :message="$t('errors.product.message')" :home-text="$t('common.goHome')" :show-retry="false" show-home />
+
+    <!-- Product Content -->
     <div v-else class="product-container">
       <!-- Product Image Gallery -->
       <div class="product-gallery">
         <!-- Main Image -->
         <div class="product-image">
           <NuxtImg :src="selectedImage?.formats?.large?.url || product?.image?.[0]?.formats?.large?.url" :alt="product?.name" width="800" height="800" format="webp" provider="strapi" class="image" />
-          <button @click="toggleFavorite" class="favorite-btn" :class="{ active: isFavorite }">
-            <svg v-if="isFavorite" class="heart-icon filled" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
-            <svg v-else class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
-          </button>
+          <UiFavoriteButton :is-active="isFavorite" class="favorite-btn-position" @toggle="toggleFavorite" />
         </div>
 
         <!-- Thumbnail Gallery -->
@@ -53,27 +53,27 @@
 
         <!-- Action Buttons -->
         <div class="product-actions">
-          <div v-if="product?.amount === 0" class="soldout-alert">Sorry, this item is currently sold out</div>
+          <div v-if="product?.amount === 0" class="soldout-alert">{{ $t('product.soldOut') }}</div>
           <template v-else>
             <InputCounter v-if="product?.amount" v-model="quantity" :max="product.amount" :product-id="product.documentId || product.id" />
 
             <!-- Max Items Message -->
-            <div v-if="showMaxItemsMessage" class="max-items-message">You have already added the maximum available quantity to your cart</div>
+            <div v-if="showMaxItemsMessage" class="max-items-message">{{ $t('product.maxItems') }}</div>
 
             <!-- Quantity Adjusted Message -->
-            <div v-if="showQuantityAdjustedMessage" class="quantity-adjusted-message">Quantity adjusted to maximum available stock</div>
+            <div v-if="showQuantityAdjustedMessage" class="quantity-adjusted-message">{{ $t('product.quantityAdjusted') }}</div>
 
             <!-- Promocode Input -->
             <div class="promocode-section">
-              <input v-model="promocode" type="text" placeholder="Enter promocode" class="promocode-input" />
-              <button @click="applyPromocode" class="apply-promocode-btn">Apply</button>
+              <input v-model="promocode" type="text" :placeholder="$t('product.promocode.placeholder')" class="promocode-input" />
+              <button @click="applyPromocode" class="apply-promocode-btn">{{ $t('product.promocode.apply') }}</button>
             </div>
 
             <!-- Divider -->
             <div class="action-divider"></div>
-            <button class="add-to-cart" @click="addToCart">Add to Cart</button>
-            <button v-if="isInCart" class="remove-from-cart" @click="removeFromCart">Remove from Cart</button>
-            <NuxtLink to="/cart" class="checkout-btn">Proceed to Checkout</NuxtLink>
+            <button class="add-to-cart" @click="addToCart">{{ $t('product.addToCart') }}</button>
+            <button v-if="isInCart" class="remove-from-cart" @click="removeFromCart">{{ $t('product.removeFromCart') }}</button>
+            <NuxtLink :to="localePath('/cart')" class="checkout-btn">{{ $t('product.checkout') }}</NuxtLink>
           </template>
         </div>
       </div>
@@ -81,7 +81,7 @@
       <!-- You might also like section -->
     </div>
     <div v-if="relatedProducts.length > 0" class="related-products-section">
-      <h2 class="section-title">You might also like</h2>
+      <h2 class="section-title">{{ $t('product.relatedProducts') }}</h2>
       <div class="related-products-grid">
         <ProductCard v-for="product in relatedProducts" :key="product.id" :product="product" />
       </div>
@@ -90,18 +90,23 @@
 </template>
 
 <script setup>
-import { formatPrice } from '~/logic/utils';
+import { useProductPrice } from '~/composables/useProductPrice';
+import { useApiError } from '~/composables/useApiError';
 import InputCounter from '~/components/input/InputCounter.vue';
 import RichcontentViewer from '~/components/richcontent/RichcontentViewer.vue';
 import ProductCard from '~/components/product/ProductCard.vue';
 import { useGlobalStore } from '~/stores/global';
+
+const { t } = useI18n();
+const localePath = useLocalePath();
+const { success: toastSuccess, error: toastError } = useToast();
 
 const route = useRoute();
 const { findOne, find } = useStrapi();
 const globalStore = useGlobalStore();
 
 const loading = ref(true);
-const error = ref(null);
+const { error, handleError } = useApiError();
 const product = ref(null);
 const selectedImage = ref(null);
 const relatedProducts = ref([]);
@@ -111,30 +116,8 @@ const quantity = ref(1);
 const showMaxItemsMessage = ref(false);
 const showQuantityAdjustedMessage = ref(false);
 
-// Discount calculations
-const discountedPrice = computed(() => {
-  if (product.value?.discount && product.value?.price) {
-    return product.value.price * (1 - product.value.discount / 100);
-  }
-  return product.value?.price;
-});
-
-const formattedPrice = computed(() => {
-  return discountedPrice.value ? formatPrice(discountedPrice.value) : '';
-});
-
-const formattedOriginalPrice = computed(() => {
-  return product.value?.price ? formatPrice(product.value?.price) : '';
-});
-
-const hasDiscount = computed(() => {
-  return product.value?.discount && product.value?.discount > 0;
-});
-
-const discountPercentage = computed(() => {
-  if (!hasDiscount.value) return 0;
-  return Math.round(product.value.discount);
-});
+// Use composable for price calculations
+const { formattedPrice, formattedOriginalPrice, hasDiscount, discountPercentage } = useProductPrice(product);
 
 const isInCart = computed(() => {
   if (!product.value) return false;
@@ -147,7 +130,13 @@ const isFavorite = computed(() => {
 });
 
 const toggleFavorite = () => {
+  const wasFavorite = isFavorite.value;
   globalStore.toggleFavorite(product.value?.documentId);
+  if (wasFavorite) {
+    toastSuccess(t('toast.removedFromFavorites'));
+  } else {
+    toastSuccess(t('toast.addedToFavorites'));
+  }
 };
 
 const fetchRelatedProducts = async () => {
@@ -164,11 +153,15 @@ const fetchRelatedProducts = async () => {
     });
     relatedProducts.value = relatedResponse || [];
   } catch (e) {
-    console.error('Error fetching related products:', e);
+    // Silently fail for related products - not critical
   }
 };
 
+const fetchProduct = async () => {
 try {
+    loading.value = true;
+    error.value = null;
+
   const { data: response } = await findOne('products', route.params.id, {
     populate: ['image', 'subcategory'],
   });
@@ -182,10 +175,24 @@ try {
   // Fetch related products
   await fetchRelatedProducts();
 } catch (e) {
-  error.value = e.message;
+  handleError(e, 'Failed to load product');
 } finally {
   loading.value = false;
 }
+};
+
+await fetchProduct();
+
+// SEO Meta - dynamic based on product
+useSeoMeta({
+  title: () => (product.value?.name ? `${product.value.name}${t('seo.product.titleSuffix')}` : t('seo.products.title')),
+  description: () => product.value?.description_short || product.value?.name || t('seo.products.description'),
+  ogTitle: () => (product.value?.name ? `${product.value.name}${t('seo.product.titleSuffix')}` : t('seo.products.title')),
+  ogDescription: () => product.value?.description_short || product.value?.name || t('seo.products.description'),
+  ogImage: () => product.value?.image?.[0]?.formats?.large?.url || '/logo-lembrace.png',
+  twitterTitle: () => (product.value?.name ? `${product.value.name}${t('seo.product.titleSuffix')}` : t('seo.products.title')),
+  twitterDescription: () => product.value?.description_short || product.value?.name || t('seo.products.description'),
+});
 
 const selectImage = (image) => {
   selectedImage.value = image;
@@ -196,16 +203,15 @@ const addToCart = () => {
   const success = globalStore.addToCart(product.value, quantity.value);
   if (!success) {
     showMaxItemsMessage.value = true;
-    // Hide the message after 5 seconds
     setTimeout(() => {
       showMaxItemsMessage.value = false;
     }, 5000);
   } else {
+    toastSuccess(t('toast.addedToCart'));
     // Check if quantity was adjusted
     const cartItem = globalStore.cartItems.find((item) => item.id === (product.value.documentId || product.value.id));
     if (cartItem && cartItem.amount !== quantity.value) {
       showQuantityAdjustedMessage.value = true;
-      // Hide the message after 5 seconds
       setTimeout(() => {
         showQuantityAdjustedMessage.value = false;
       }, 5000);
@@ -216,6 +222,7 @@ const addToCart = () => {
 const removeFromCart = () => {
   if (!product.value) return;
   globalStore.removeFromCart(product.value.documentId || product.value.id);
+  toastSuccess(t('toast.removedFromCart'));
 };
 
 const applyPromocode = () => {
@@ -257,44 +264,11 @@ const applyPromocode = () => {
   border: 1px solid #e8d8b4;
 }
 
-.favorite-btn {
+.favorite-btn-position {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  border: none;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
   z-index: 2;
-}
-
-.favorite-btn:hover {
-  transform: scale(1.1);
-}
-
-.heart-icon {
-  width: 20px;
-  height: 20px;
-  color: black;
-  transition: all 0.3s ease;
-}
-
-.heart-icon.filled {
-  color: #e74c3c;
-}
-
-.favorite-btn:hover .heart-icon {
-  color: #e74c3c;
-}
-
-.favorite-btn.active .heart-icon {
-  color: #e74c3c;
 }
 
 .image {

@@ -5,14 +5,7 @@
         <NuxtImg :src="product?.image[0]?.formats?.medium?.url" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image main-image" />
         <NuxtImg :src="product?.image_background?.formats?.medium?.url ?? product?.image[0]?.formats?.medium?.url" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image hover-image" />
       </NuxtLink>
-      <button @click="toggleFavorite" class="favorite-btn" :class="{ active: isFavorite }">
-        <svg v-if="isFavorite" class="heart-icon filled" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-        </svg>
-        <svg v-else class="heart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-        </svg>
-      </button>
+      <UiFavoriteButton :is-active="isFavorite" class="favorite-btn-position" @toggle="toggleFavorite" />
       <div v-if="product?.amount === 0" class="soldout-badge">Sold out</div>
       <div v-if="hasDiscount" class="discount-badge">- {{ discountPercentage }}%</div>
     </div>
@@ -27,8 +20,12 @@
 </template>
 
 <script setup>
-import { formatPrice } from '~/logic/utils';
+import { useProductPrice } from '~/composables/useProductPrice';
 import { useGlobalStore } from '~/stores/global';
+import { useToast } from '~/composables/useToast';
+
+const { t } = useI18n();
+const { success: toastSuccess } = useToast();
 
 const props = defineProps({
   product: {
@@ -39,36 +36,21 @@ const props = defineProps({
 
 const globalStore = useGlobalStore();
 
-const discountedPrice = computed(() => {
-  if (props?.product?.discount && props?.product?.price) {
-    return props.product.price * (1 - props.product.discount / 100);
-  }
-  return props?.product?.price;
-});
-
-const formattedPrice = computed(() => {
-  return discountedPrice.value ? formatPrice(discountedPrice.value) : '';
-});
-
-const formattedOriginalPrice = computed(() => {
-  return props?.product?.price ? formatPrice(props?.product?.price) : '';
-});
-
-const hasDiscount = computed(() => {
-  return props?.product?.discount && props?.product?.discount > 0;
-});
-
-const discountPercentage = computed(() => {
-  if (!hasDiscount.value) return 0;
-  return Math.round(props.product.discount);
-});
+// Use composable for price calculations
+const { formattedPrice, formattedOriginalPrice, hasDiscount, discountPercentage } = useProductPrice(computed(() => props.product));
 
 const isFavorite = computed(() => {
   return globalStore.isFavorite(props.product.documentId);
 });
 
 const toggleFavorite = () => {
+  const wasFavorite = isFavorite.value;
   globalStore.toggleFavorite(props.product.documentId);
+  if (wasFavorite) {
+    toastSuccess(t('toast.removedFromFavorites'));
+  } else {
+    toastSuccess(t('toast.addedToFavorites'));
+  }
 };
 </script>
 
@@ -156,44 +138,11 @@ const toggleFavorite = () => {
   z-index: 1;
 }
 
-.favorite-btn {
+.favorite-btn-position {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  border: none;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
   z-index: 2;
-}
-
-.favorite-btn:hover {
-  transform: scale(1.1);
-}
-
-.heart-icon {
-  width: 20px;
-  height: 20px;
-  color: black;
-  transition: all 0.3s ease;
-}
-
-.heart-icon.filled {
-  color: #e74c3c;
-}
-
-.favorite-btn:hover .heart-icon {
-  color: #e74c3c;
-}
-
-.favorite-btn.active .heart-icon {
-  color: #e74c3c;
 }
 
 .product-info {

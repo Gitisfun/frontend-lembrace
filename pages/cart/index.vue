@@ -1,14 +1,14 @@
 <template>
   <div class="cart-page">
     <div v-if="!cartItems.length" class="empty-cart">
-      <p>Je winkelwagen is leeg</p>
-      <NuxtLink to="/products" class="continue-shopping">Bekijk onze producten</NuxtLink>
+      <p>{{ $t('cart.empty') }}</p>
+      <NuxtLink :to="localePath('/products')" class="continue-shopping">{{ $t('cart.viewProducts') }}</NuxtLink>
     </div>
 
     <div v-else class="cart-content">
       <!-- Cart Items -->
       <div class="cart-items">
-        <h2>Mijn bestelling</h2>
+        <h2>{{ $t('cart.title') }}</h2>
         <template v-if="!isMobile">
           <CartItem v-for="item in cartItems" :key="item.id" :item="item" @update:quantity="(quantity) => updateItemQuantity(item, quantity)" @remove="removeFromCart(item)" />
         </template>
@@ -19,30 +19,45 @@
 
       <!-- Order Summary -->
       <div class="order-summary">
-        <h2>Overzicht</h2>
+        <h2>{{ $t('cart.summary') }}</h2>
         <div class="summary-row">
-          <span>Subtotaal</span>
+          <span>{{ $t('cart.subtotal') }}</span>
           <span>€{{ subtotal.toFixed(2) }}</span>
         </div>
         <div class="summary-row">
-          <span>Verzendkosten</span>
+          <span>{{ $t('cart.shipping') }}</span>
           <span>€{{ shippingCost.toFixed(2) }}</span>
         </div>
         <div class="summary-row total">
-          <span>Totaal</span>
+          <span>{{ $t('cart.total') }}</span>
           <span>€{{ total.toFixed(2) }}</span>
         </div>
-        <button class="checkout-btn" @click="handleCheckout">Verder naar betalen</button>
+        <button class="checkout-btn" @click="handleCheckout">{{ $t('cart.checkout') }}</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { computed } from 'vue';
+import { useMediaQuery } from '@vueuse/core';
 import { useGlobalStore } from '~/stores/global';
+import { useToast } from '~/composables/useToast';
 import CartItem from '~/components/cart/CartItem.vue';
 import CartItemMobile from '~/components/cart/CartItemMobile.vue';
+
+const { t } = useI18n();
+const localePath = useLocalePath();
+const { success: toastSuccess } = useToast();
+
+// SEO Meta
+useSeoMeta({
+  title: () => t('seo.cart.title'),
+  description: () => t('seo.cart.description'),
+  ogTitle: () => t('seo.cart.title'),
+  ogDescription: () => t('seo.cart.description'),
+  robots: 'noindex, nofollow',
+});
 
 const globalStore = useGlobalStore();
 const cartItems = computed(() => globalStore.cartItems);
@@ -51,28 +66,17 @@ const shippingCost = 2.5;
 const subtotal = computed(() => globalStore.cartTotal);
 const total = computed(() => subtotal.value + shippingCost);
 
-const isMobile = ref(false);
-
-const checkMobile = () => {
-  isMobile.value = window.innerWidth <= 768;
-};
-
-onMounted(() => {
-  checkMobile();
-  window.addEventListener('resize', checkMobile);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('resize', checkMobile);
-});
+const isMobile = useMediaQuery('(max-width: 768px)');
 
 const updateItemQuantity = (item, newQuantity) => {
   if (newQuantity < 1) return;
   globalStore.updateQuantity(item.id, newQuantity);
+  toastSuccess(t('toast.cartUpdated'));
 };
 
 const removeFromCart = (item) => {
   globalStore.removeFromCart(item.id);
+  toastSuccess(t('toast.removedFromCart'));
 };
 
 const handleCheckout = () => {

@@ -2,22 +2,27 @@
   <div class="favorites-page">
     <div class="favorites-container">
       <div class="favorites-header">
-        <h1 class="favorites-title">My Favorites</h1>
-        <p class="favorites-subtitle">Your saved items</p>
+        <h1 class="favorites-title">{{ $t('favorites.title') }}</h1>
+        <p class="favorites-subtitle">{{ $t('favorites.subtitle') }}</p>
       </div>
 
-      <div v-if="loading" class="loading">Loading favorites...</div>
-      <div v-else-if="error" class="error">Error loading favorites: {{ error.message }}</div>
+      <!-- Loading State -->
+      <div v-if="loading" class="loading-grid">
+        <UiSkeletonProductCard v-for="i in 4" :key="i" />
+      </div>
+
+      <!-- Error State -->
+      <UiErrorState v-else-if="error" variant="inline" :title="$t('errors.favorites.title')" :message="$t('errors.favorites.message')" :retry-text="$t('common.retry')" @retry="fetchFavoriteProducts" />
+
+      <!-- Empty State -->
       <div v-else-if="favoriteProducts.length === 0" class="no-favorites">
         <div class="no-favorites-content">
           <div class="no-favorites-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
+            <IconHeart :size="80" />
           </div>
-          <h2 class="no-favorites-title">No favorites yet</h2>
-          <p class="no-favorites-description">Start browsing our products and add items to your favorites by clicking the heart icon.</p>
-          <NuxtLink to="/products" class="browse-products-btn"> Browse Products </NuxtLink>
+          <h2 class="no-favorites-title">{{ $t('favorites.empty.title') }}</h2>
+          <p class="no-favorites-description">{{ $t('favorites.empty.description') }}</p>
+          <NuxtLink :to="localePath('/products')" class="browse-products-btn">{{ $t('favorites.empty.browseProducts') }}</NuxtLink>
         </div>
       </div>
       <div v-else class="favorites-grid">
@@ -29,24 +34,36 @@
 
 <script setup>
 import { useGlobalStore } from '~/stores/global';
+import { useApiError } from '~/composables/useApiError';
 import ProductCard from '~/components/product/ProductCard.vue';
+
+const { t } = useI18n();
+const localePath = useLocalePath();
+
+// SEO Meta
+useSeoMeta({
+  title: () => t('seo.favorites.title'),
+  description: () => t('seo.favorites.description'),
+  ogTitle: () => t('seo.favorites.title'),
+  ogDescription: () => t('seo.favorites.description'),
+  robots: 'noindex, nofollow',
+});
 
 const { find } = useStrapi();
 const globalStore = useGlobalStore();
 
 const loading = ref(true);
-const error = ref(null);
+const { error, handleError, clearError } = useApiError();
 const favoriteProducts = ref([]);
 
 // Get favorite product IDs from store
 const favoriteIds = computed(() => globalStore.favoriteItems);
-console.log('favoriteIds', globalStore.favoriteItems);
 
 // Fetch favorite products
 const fetchFavoriteProducts = async () => {
   try {
     loading.value = true;
-    error.value = null;
+    clearError();
 
     if (favoriteIds.value.length === 0) {
       favoriteProducts.value = [];
@@ -62,8 +79,7 @@ const fetchFavoriteProducts = async () => {
 
     favoriteProducts.value = products || [];
   } catch (e) {
-    error.value = e.message;
-    console.error('Error fetching favorite products:', e);
+    handleError(e, 'Failed to load favorite products');
   } finally {
     loading.value = false;
   }
@@ -117,17 +133,23 @@ watch(
   gap: 1.5rem;
 }
 
-.loading,
-.error {
-  text-align: center;
-  font-family: var(--font-body);
-  font-size: 1.2rem;
-  color: var(--color-text);
-  padding: 2rem;
+.loading-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
 }
 
-.error {
-  color: var(--color-error);
+@media (max-width: 768px) {
+  .loading-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .loading-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .no-favorites {
