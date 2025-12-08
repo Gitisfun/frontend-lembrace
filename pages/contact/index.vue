@@ -50,10 +50,11 @@
 
 <script setup>
 import { ref, reactive } from 'vue';
-import { useFormValidation, validators } from '~/composables/useFormValidation';
+import { useFormValidation } from '~/composables/useFormValidation';
 import { useToast } from '~/composables/useToast';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
 import { buildContactEmailPayload } from '~/logic/utils';
+import { contactFormSchema, createContactFormData } from '~/schemas';
 
 const { t } = useI18n();
 const { success: toastSuccess, error: toastError } = useToast();
@@ -69,22 +70,10 @@ useSeoMeta({
   twitterDescription: () => t('seo.contact.description'),
 });
 
-const formData = reactive({
-  name: '',
-  email: '',
-  phone: '',
-  message: '',
-});
+const formData = reactive(createContactFormData());
 
 // Use the form validation composable
-const { errors, validateField, clearError, validateAll, resetErrors } = useFormValidation(formData, {
-  name: { rules: [validators.name()] },
-  email: { rules: [validators.email()] },
-  phone: { rules: [validators.phone()] },
-  message: {
-    rules: [validators.required('message'), validators.minLength(10, 'Message'), validators.maxLength(1000, 'Message')],
-  },
-});
+const { errors, validateField, clearError, validateAll, resetErrors } = useFormValidation(formData, contactFormSchema);
 
 const { isSubmitting, status: submitStatus, setSuccess, setError, startSubmitting, stopSubmitting } = useSubmitStatus();
 const forceValidation = ref(false);

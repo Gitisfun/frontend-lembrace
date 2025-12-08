@@ -36,22 +36,105 @@
         <div class="form-section">
           <h3>{{ $t('payment.contactDetails') }}</h3>
           <div class="form-grid">
-            <InputField id="firstName" v-model="form.firstName" :label="$t('payment.form.firstName')" type="text" required :placeholder="$t('payment.form.firstName')" :error="errors.firstName" :force-validation="forceValidation" show-success @blur="validateField('firstName')" />
-            <InputField id="lastName" v-model="form.lastName" :label="$t('payment.form.lastName')" type="text" required :placeholder="$t('payment.form.lastName')" :error="errors.lastName" :force-validation="forceValidation" show-success @blur="validateField('lastName')" />
-            <InputField id="email" v-model="form.email" :label="$t('payment.form.email')" type="email" required :placeholder="$t('payment.form.email')" :error="errors.email" :force-validation="forceValidation" show-success @blur="validateField('email')" />
-            <InputField id="phone" v-model="form.phone" :label="$t('payment.form.phone')" type="tel" :placeholder="$t('payment.form.phone')" :error="errors.phone" :force-validation="forceValidation" show-success @blur="validateField('phone')" />
+            <InputField
+              id="firstName"
+              v-model="form.firstName"
+              :label="$t('payment.form.firstName')"
+              type="text"
+              required
+              :placeholder="$t('payment.form.firstName')"
+              :error="errors.firstName"
+              :force-validation="forceValidation"
+              show-success
+              @blur="validateField('firstName')"
+              @update:model-value="handleFieldInput('firstName')"
+            />
+            <InputField
+              id="lastName"
+              v-model="form.lastName"
+              :label="$t('payment.form.lastName')"
+              type="text"
+              required
+              :placeholder="$t('payment.form.lastName')"
+              :error="errors.lastName"
+              :force-validation="forceValidation"
+              show-success
+              @blur="validateField('lastName')"
+              @update:model-value="handleFieldInput('lastName')"
+            />
+            <InputField
+              id="email"
+              v-model="form.email"
+              :label="$t('payment.form.email')"
+              type="email"
+              required
+              :placeholder="$t('payment.form.email')"
+              :error="errors.email"
+              :force-validation="forceValidation"
+              show-success
+              @blur="validateField('email')"
+              @update:model-value="handleFieldInput('email')"
+            />
+            <InputField id="phone" v-model="form.phone" :label="$t('payment.form.phone')" type="tel" :placeholder="$t('payment.form.phone')" :error="errors.phone" :force-validation="forceValidation" show-success @blur="validateField('phone')" @update:model-value="handleFieldInput('phone')" />
           </div>
         </div>
 
         <div class="form-section">
           <h3>{{ $t('payment.shippingAddress') }}</h3>
           <div class="form-grid">
-            <InputField id="street" v-model="form.street" :label="$t('payment.form.street')" type="text" required :placeholder="$t('payment.form.street')" :error="errors.street" :force-validation="forceValidation" show-success @blur="validateField('street')" />
-            <InputField id="houseNumber" v-model="form.houseNumber" :label="$t('payment.form.houseNumber')" type="text" required :placeholder="$t('payment.form.houseNumber')" :error="errors.houseNumber" :force-validation="forceValidation" show-success @blur="validateField('houseNumber')" />
+            <InputField
+              id="street"
+              v-model="form.street"
+              :label="$t('payment.form.street')"
+              type="text"
+              required
+              :placeholder="$t('payment.form.street')"
+              :error="errors.street"
+              :force-validation="forceValidation"
+              show-success
+              @blur="validateField('street')"
+              @update:model-value="handleFieldInput('street')"
+            />
+            <InputField
+              id="houseNumber"
+              v-model="form.houseNumber"
+              :label="$t('payment.form.houseNumber')"
+              type="text"
+              required
+              :placeholder="$t('payment.form.houseNumber')"
+              :error="errors.houseNumber"
+              :force-validation="forceValidation"
+              show-success
+              @blur="validateField('houseNumber')"
+              @update:model-value="handleFieldInput('houseNumber')"
+            />
             <InputField id="boxNumber" v-model="form.boxNumber" :label="$t('payment.form.boxNumber')" type="text" show-optional :placeholder="$t('payment.form.boxNumberOptional')" />
-            <InputField id="postalCode" v-model="form.postalCode" :label="$t('payment.form.postalCode')" type="text" required :placeholder="$t('payment.form.postalCode')" :error="errors.postalCode" :force-validation="forceValidation" show-success @blur="validateField('postalCode')" />
-            <InputField id="city" v-model="form.city" :label="$t('payment.form.city')" type="text" required :placeholder="$t('payment.form.city')" :error="errors.city" :force-validation="forceValidation" show-success @blur="validateField('city')" />
-            <InputSelect id="country" v-model="form.country" :label="$t('payment.form.country')" required :placeholder="$t('payment.form.selectCountry')" :options="countryOptions" :error="errors.country" show-success @blur="validateField('country')" />
+            <InputField
+              id="postalCode"
+              v-model="form.postalCode"
+              :label="$t('payment.form.postalCode')"
+              type="text"
+              required
+              :placeholder="$t('payment.form.postalCode')"
+              :error="errors.postalCode"
+              :force-validation="forceValidation"
+              show-success
+              @blur="validateField('postalCode')"
+              @update:model-value="handleFieldInput('postalCode')"
+            />
+            <InputField id="city" v-model="form.city" :label="$t('payment.form.city')" type="text" required :placeholder="$t('payment.form.city')" :error="errors.city" :force-validation="forceValidation" show-success @blur="validateField('city')" @update:model-value="handleFieldInput('city')" />
+            <InputSelect
+              id="country"
+              v-model="form.country"
+              :label="$t('payment.form.country')"
+              required
+              :placeholder="$t('payment.form.selectCountry')"
+              :options="countryOptions"
+              :error="errors.country"
+              show-success
+              @blur="validateField('country')"
+              @update:model-value="handleFieldInput('country')"
+            />
           </div>
         </div>
 
@@ -73,8 +156,9 @@ import { computed, ref, reactive } from 'vue';
 import { useGlobalStore } from '~/stores/global';
 import { useRouter } from 'vue-router';
 import { useToast } from '~/composables/useToast';
-import { useFormValidation, validators } from '~/composables/useFormValidation';
+import { useFormValidation } from '~/composables/useFormValidation';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
+import { paymentFormSchema, createPaymentFormData } from '~/schemas';
 
 const { t } = useI18n();
 const { error: toastError } = useToast();
@@ -97,57 +181,9 @@ const subtotal = computed(() => globalStore.cartTotal);
 const shippingCost = 2.5;
 const total = computed(() => subtotal.value + shippingCost);
 
-const form = reactive({
-  // Personal Information
-  firstName: '',
-  lastName: '',
-  email: '',
-  phone: '',
+const form = reactive(createPaymentFormData());
 
-  // Delivery Address
-  street: '',
-  houseNumber: '',
-  boxNumber: '',
-  postalCode: '',
-  city: '',
-  country: '',
-
-  // Delivery Method
-  deliveryMethod: 'standard',
-});
-
-// Validation schema
-const fieldConfigs = {
-  firstName: {
-    rules: [validators.name()],
-  },
-  lastName: {
-    rules: [validators.name()],
-  },
-  email: {
-    rules: [validators.email()],
-  },
-  phone: {
-    rules: [validators.phone()],
-  },
-  street: {
-    rules: [validators.required('street address')],
-  },
-  houseNumber: {
-    rules: [validators.required('house number')],
-  },
-  postalCode: {
-    rules: [validators.required('postal code')],
-  },
-  city: {
-    rules: [validators.required('city')],
-  },
-  country: {
-    rules: [validators.required('country')],
-  },
-};
-
-const { errors, validateField, validateAll, clearError } = useFormValidation(form, fieldConfigs);
+const { errors, validateField, validateAll, clearError } = useFormValidation(form, paymentFormSchema);
 
 const countryOptions = computed(() => [
   { value: 'Nederland', label: t('payment.form.countries.netherlands') },
@@ -162,6 +198,12 @@ const deliveryOptions = computed(() => [
   { value: 'standard', title: t('payment.delivery.standard'), details: t('payment.delivery.standardTime') },
   { value: 'express', title: t('payment.delivery.express'), details: t('payment.delivery.expressTime') },
 ]);
+
+// Handle field input - clear error when user starts typing
+const handleFieldInput = (fieldName) => {
+  clearError(fieldName);
+  forceValidation.value = false;
+};
 
 const generateOrderNumber = () => {
   // Generate a UUID v4
