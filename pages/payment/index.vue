@@ -36,47 +36,32 @@
         <div class="form-section">
           <h3>{{ $t('payment.contactDetails') }}</h3>
           <div class="form-grid">
-            <InputField id="firstName" v-model="form.firstName" :label="$t('payment.form.firstName')" type="text" required :placeholder="$t('payment.form.firstName')" />
-            <InputField id="lastName" v-model="form.lastName" :label="$t('payment.form.lastName')" type="text" required :placeholder="$t('payment.form.lastName')" />
-            <InputField id="email" v-model="form.email" :label="$t('payment.form.email')" type="email" required :placeholder="$t('payment.form.email')" />
-            <InputField id="phone" v-model="form.phone" :label="$t('payment.form.phone')" type="tel" required :placeholder="$t('payment.form.phone')" />
+            <InputField id="firstName" v-model="form.firstName" :label="$t('payment.form.firstName')" type="text" required :placeholder="$t('payment.form.firstName')" :error="errors.firstName" :force-validation="forceValidation" show-success @blur="validateField('firstName')" />
+            <InputField id="lastName" v-model="form.lastName" :label="$t('payment.form.lastName')" type="text" required :placeholder="$t('payment.form.lastName')" :error="errors.lastName" :force-validation="forceValidation" show-success @blur="validateField('lastName')" />
+            <InputField id="email" v-model="form.email" :label="$t('payment.form.email')" type="email" required :placeholder="$t('payment.form.email')" :error="errors.email" :force-validation="forceValidation" show-success @blur="validateField('email')" />
+            <InputField id="phone" v-model="form.phone" :label="$t('payment.form.phone')" type="tel" :placeholder="$t('payment.form.phone')" :error="errors.phone" :force-validation="forceValidation" show-success @blur="validateField('phone')" />
           </div>
         </div>
 
         <div class="form-section">
           <h3>{{ $t('payment.shippingAddress') }}</h3>
           <div class="form-grid">
-            <InputField id="street" v-model="form.street" :label="$t('payment.form.street')" type="text" required :placeholder="$t('payment.form.street')" />
-            <InputField id="houseNumber" v-model="form.houseNumber" :label="$t('payment.form.houseNumber')" type="text" required :placeholder="$t('payment.form.houseNumber')" />
+            <InputField id="street" v-model="form.street" :label="$t('payment.form.street')" type="text" required :placeholder="$t('payment.form.street')" :error="errors.street" :force-validation="forceValidation" show-success @blur="validateField('street')" />
+            <InputField id="houseNumber" v-model="form.houseNumber" :label="$t('payment.form.houseNumber')" type="text" required :placeholder="$t('payment.form.houseNumber')" :error="errors.houseNumber" :force-validation="forceValidation" show-success @blur="validateField('houseNumber')" />
             <InputField id="boxNumber" v-model="form.boxNumber" :label="$t('payment.form.boxNumber')" type="text" show-optional :placeholder="$t('payment.form.boxNumberOptional')" />
-            <InputField id="postalCode" v-model="form.postalCode" :label="$t('payment.form.postalCode')" type="text" required :placeholder="$t('payment.form.postalCode')" />
-            <InputField id="city" v-model="form.city" :label="$t('payment.form.city')" type="text" required :placeholder="$t('payment.form.city')" />
-            <InputSelect id="country" v-model="form.country" :label="$t('payment.form.country')" required :placeholder="$t('payment.form.selectCountry')" :options="countryOptions" />
+            <InputField id="postalCode" v-model="form.postalCode" :label="$t('payment.form.postalCode')" type="text" required :placeholder="$t('payment.form.postalCode')" :error="errors.postalCode" :force-validation="forceValidation" show-success @blur="validateField('postalCode')" />
+            <InputField id="city" v-model="form.city" :label="$t('payment.form.city')" type="text" required :placeholder="$t('payment.form.city')" :error="errors.city" :force-validation="forceValidation" show-success @blur="validateField('city')" />
+            <InputSelect id="country" v-model="form.country" :label="$t('payment.form.country')" required :placeholder="$t('payment.form.selectCountry')" :options="countryOptions" :error="errors.country" show-success @blur="validateField('country')" />
           </div>
         </div>
 
         <div class="form-section">
           <h3>{{ $t('payment.delivery.title') }}</h3>
-          <div class="delivery-options">
-            <label class="delivery-option">
-              <input type="radio" v-model="form.deliveryMethod" value="standard" required />
-              <div class="option-content">
-                <span class="option-title">{{ $t('payment.delivery.standard') }}</span>
-                <span class="option-details">{{ $t('payment.delivery.standardTime') }}</span>
-              </div>
-            </label>
-            <label class="delivery-option">
-              <input type="radio" v-model="form.deliveryMethod" value="express" required />
-              <div class="option-content">
-                <span class="option-title">{{ $t('payment.delivery.express') }}</span>
-                <span class="option-details">{{ $t('payment.delivery.expressTime') }}</span>
-              </div>
-            </label>
-          </div>
+          <InputRadioGroup v-model="form.deliveryMethod" :options="deliveryOptions" required />
         </div>
 
         <div class="form-actions">
-          <button @click="handleSubmit" type="submit" class="submit-btn">{{ $t('payment.placeOrder') }}</button>
+          <UiButtonSubmit disabled :text="$t('payment.placeOrder')" :loading="isSubmitting" :loading-text="$t('payment.processing')" />
         </div>
       </form>
     </div>
@@ -84,10 +69,12 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref, reactive } from 'vue';
 import { useGlobalStore } from '~/stores/global';
 import { useRouter } from 'vue-router';
 import { useToast } from '~/composables/useToast';
+import { useFormValidation, validators } from '~/composables/useFormValidation';
+import { useSubmitStatus } from '~/composables/useSubmitStatus';
 
 const { t } = useI18n();
 const { error: toastError } = useToast();
@@ -102,14 +89,15 @@ useSeoMeta({
 const { create } = useStrapi();
 const router = useRouter();
 const globalStore = useGlobalStore();
-const isLoading = ref(false);
+const { isSubmitting, withSubmit, stopSubmitting } = useSubmitStatus();
+const forceValidation = ref(false);
 
 const cartItems = computed(() => globalStore.cartItems);
 const subtotal = computed(() => globalStore.cartTotal);
 const shippingCost = 2.5;
 const total = computed(() => subtotal.value + shippingCost);
 
-const form = ref({
+const form = reactive({
   // Personal Information
   firstName: '',
   lastName: '',
@@ -128,6 +116,39 @@ const form = ref({
   deliveryMethod: 'standard',
 });
 
+// Validation schema
+const fieldConfigs = {
+  firstName: {
+    rules: [validators.name()],
+  },
+  lastName: {
+    rules: [validators.name()],
+  },
+  email: {
+    rules: [validators.email()],
+  },
+  phone: {
+    rules: [validators.phone()],
+  },
+  street: {
+    rules: [validators.required('street address')],
+  },
+  houseNumber: {
+    rules: [validators.required('house number')],
+  },
+  postalCode: {
+    rules: [validators.required('postal code')],
+  },
+  city: {
+    rules: [validators.required('city')],
+  },
+  country: {
+    rules: [validators.required('country')],
+  },
+};
+
+const { errors, validateField, validateAll, clearError } = useFormValidation(form, fieldConfigs);
+
 const countryOptions = computed(() => [
   { value: 'Nederland', label: t('payment.form.countries.netherlands') },
   { value: 'België', label: t('payment.form.countries.belgium') },
@@ -137,16 +158,29 @@ const countryOptions = computed(() => [
   { value: 'andere', label: t('payment.form.countries.other') },
 ]);
 
+const deliveryOptions = computed(() => [
+  { value: 'standard', title: t('payment.delivery.standard'), details: t('payment.delivery.standardTime') },
+  { value: 'express', title: t('payment.delivery.express'), details: t('payment.delivery.expressTime') },
+]);
+
 const generateOrderNumber = () => {
   // Generate a UUID v4
   return 'ORD-' + crypto.randomUUID();
 };
 
 const handleSubmit = async () => {
-  if (isLoading.value) return;
-  isLoading.value = true;
+  if (isSubmitting.value) return;
 
-  try {
+  // Force validation display on all fields
+  forceValidation.value = true;
+
+  // Validate all fields
+  if (!validateAll()) {
+    toastError(t('payment.form.validationError'));
+    return;
+  }
+
+  await withSubmit(async () => {
     const orderData = {
       orderNumber: generateOrderNumber(),
       unique_order_number: crypto.randomUUID(),
@@ -154,18 +188,18 @@ const handleSubmit = async () => {
       totalPrice: total.value,
       shippingCost: shippingCost,
       customerInfo: {
-        firstname: form.value.firstName,
-        lastname: form.value.lastName,
-        email: form.value.email,
-        phone: form.value.phone,
+        firstname: form.firstName,
+        lastname: form.lastName,
+        email: form.email,
+        phone: form.phone,
       },
       address: {
-        street: form.value.street,
-        number: form.value.houseNumber,
-        box: form.value.boxNumber || null,
-        postalcode: form.value.postalCode,
-        city: form.value.city,
-        country: form.value.country,
+        street: form.street,
+        number: form.houseNumber,
+        box: form.boxNumber || null,
+        postalcode: form.postalCode,
+        city: form.city,
+        country: form.country,
       },
       items: cartItems.value.map((item) => ({
         productId: item.documentId || item.id,
@@ -204,12 +238,14 @@ const handleSubmit = async () => {
     } else {
       throw new Error('Failed to create Mollie payment');
     }
-  } catch (error) {
-    console.error('Payment failed:', error);
-    toastError(t('payment.orderError'));
-  } finally {
-    isLoading.value = false;
-  }
+  })
+    .catch((error) => {
+      console.error('Payment failed:', error);
+      toastError(t('payment.orderError'));
+    })
+    .finally(() => {
+      stopSubmitting();
+    });
 };
 </script>
 
@@ -325,78 +361,12 @@ const handleSubmit = async () => {
   gap: 1rem;
 }
 
-.delivery-options {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.delivery-option {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.delivery-option:hover {
-  border-color: var(--color-gold);
-}
-
-.delivery-option input[type='radio'] {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--color-gold);
-}
-
-.option-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.option-title {
-  font-weight: 500;
-}
-
-.option-details {
-  font-size: 0.9rem;
-  color: #666;
-}
-
 .form-actions {
   margin-top: 2rem;
 }
 
-.submit-btn {
+.form-actions :deep(.submit-btn) {
   width: 100%;
-  padding: 1rem;
-  background: var(--color-gold);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 1.1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.submit-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.submit-btn:hover:not(:disabled) {
-  background: #b88b2a;
-  transform: translateY(-2px);
 }
 
 @media (max-width: 1024px) {
@@ -431,11 +401,6 @@ const handleSubmit = async () => {
 
   .form-section h3 {
     font-size: 1.1rem;
-  }
-
-  .submit-btn {
-    font-size: 1rem;
-    padding: 0.9rem;
   }
 }
 </style>

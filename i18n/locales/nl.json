@@ -133,6 +133,7 @@
       "city": "Plaats",
       "country": "Land",
       "selectCountry": "Selecteer land",
+      "optional": "(optioneel)",
       "countries": {
         "netherlands": "Nederland",
         "belgium": "België",
@@ -140,9 +141,11 @@
         "france": "Frankrijk",
         "uk": "Verenigd Koninkrijk",
         "other": "Andere"
-      }
+      },
+      "validationError": "Vul alle verplichte velden correct in."
     },
     "placeOrder": "Bestelling plaatsen",
+    "processing": "Verwerken...",
     "orderError": "Er is een fout opgetreden bij het verwerken van je bestelling. Probeer het later opnieuw.",
     "continueShopping": "Verder winkelen",
     "printOrder": "Bestelling afdrukken",
@@ -214,7 +217,8 @@
     "loading": "Laden...",
     "error": "Er is een fout opgetreden",
     "retry": "Opnieuw proberen",
-    "goHome": "Naar homepagina"
+    "goHome": "Naar homepagina",
+    "optional": "(optioneel)"
   },
   "errors": {
     "general": {

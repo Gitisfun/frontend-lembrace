@@ -133,6 +133,7 @@
       "city": "City",
       "country": "Country",
       "selectCountry": "Select country",
+      "optional": "(optional)",
       "countries": {
         "netherlands": "Netherlands",
         "belgium": "Belgium",
@@ -140,9 +141,11 @@
         "france": "France",
         "uk": "United Kingdom",
         "other": "Other"
-      }
+      },
+      "validationError": "Please complete all required fields correctly."
     },
     "placeOrder": "Place Order",
+    "processing": "Processing...",
     "orderError": "An error occurred while processing your order. Please try again later.",
     "continueShopping": "Continue Shopping",
     "printOrder": "Print Order",
@@ -214,7 +217,8 @@
     "loading": "Loading...",
     "error": "An error occurred",
     "retry": "Try again",
-    "goHome": "Go to homepage"
+    "goHome": "Go to homepage",
+    "optional": "(optional)"
   },
   "errors": {
     "general": {
