@@ -1,6 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
+
+  // Keep files in root directory (Nuxt 3 style structure)
+  srcDir: '.',
+
   devtools: { enabled: true },
   modules: ['@nuxtjs/strapi', '@nuxt/image', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@nuxtjs/i18n'],
   css: ['~/assets/css/main.css'],
@@ -56,7 +60,6 @@ export default defineNuxtConfig({
       { code: 'nl', name: 'Nederlands', file: 'nl.json', language: 'nl-BE' },
     ],
     defaultLocale: 'en',
-    lazy: true,
     langDir: 'locales',
     strategy: 'prefix_except_default',
     detectBrowserLanguage: {
