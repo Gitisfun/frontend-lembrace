@@ -78,7 +78,7 @@
             <InputField id="phone" v-model="form.phone" :label="$t('payment.form.phone')" type="tel" :placeholder="$t('payment.form.phone')" :error="errors.phone" :force-validation="forceValidation" show-success @blur="validateField('phone')" @update:model-value="handleFieldInput('phone')" />
           </div>
         </div>
-
+        <UiDivider />
         <div class="form-section">
           <h3>{{ $t('payment.shippingAddress') }}</h3>
           <div class="form-grid">
@@ -137,7 +137,7 @@
             />
           </div>
         </div>
-
+        <UiDivider />
         <div class="form-section">
           <h3>{{ $t('payment.delivery.title') }}</h3>
           <InputRadioGroup v-model="form.deliveryMethod" :options="deliveryOptions" required />
@@ -159,6 +159,7 @@ import { useToast } from '~/composables/useToast';
 import { useFormValidation } from '~/composables/useFormValidation';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
 import { paymentFormSchema, createPaymentFormData } from '~/schemas';
+import { buildOrderPayload } from '~/logic/utils';
 
 const { t } = useI18n();
 const { error: toastError } = useToast();
@@ -205,11 +206,6 @@ const handleFieldInput = (fieldName) => {
   forceValidation.value = false;
 };
 
-const generateOrderNumber = () => {
-  // Generate a UUID v4
-  return 'ORD-' + crypto.randomUUID();
-};
-
 const handleSubmit = async () => {
   if (isSubmitting.value) return;
 
@@ -223,35 +219,7 @@ const handleSubmit = async () => {
   }
 
   await withSubmit(async () => {
-    const orderData = {
-      orderNumber: generateOrderNumber(),
-      unique_order_number: crypto.randomUUID(),
-      orderStatus: 'pending',
-      totalPrice: total.value,
-      shippingCost: shippingCost,
-      customerInfo: {
-        firstname: form.firstName,
-        lastname: form.lastName,
-        email: form.email,
-        phone: form.phone,
-      },
-      address: {
-        street: form.street,
-        number: form.houseNumber,
-        box: form.boxNumber || null,
-        postalcode: form.postalCode,
-        city: form.city,
-        country: form.country,
-      },
-      items: cartItems.value.map((item) => ({
-        productId: item.documentId || item.id,
-        name: item.name,
-        amount: item.amount,
-        price: item.price,
-        discount: item.discount || 0,
-        calculatedPrice: item.calculatedPrice,
-      })),
-    };
+    const orderData = buildOrderPayload(form, cartItems.value, total.value, shippingCost);
 
     console.log('Sending order data to Strapi:', orderData);
 

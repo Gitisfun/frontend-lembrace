@@ -4,6 +4,65 @@ export const formatPrice = (price: number) =>
     currency: 'EUR',
   }).format(price);
 
+// Generate order number with UUID
+export const generateOrderNumber = () => 'ORD-' + crypto.randomUUID();
+
+// Order payload types
+interface PaymentFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  street: string;
+  houseNumber: string;
+  boxNumber: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  deliveryMethod: string;
+}
+
+interface CartItem {
+  id: string | number;
+  documentId?: string;
+  name: string;
+  amount: number;
+  price: number;
+  discount?: number;
+  calculatedPrice: number;
+}
+
+export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], totalPrice: number, shippingCost: number) => ({
+  orderNumber: generateOrderNumber(),
+  unique_order_number: crypto.randomUUID(),
+  orderStatus: 'pending',
+  totalPrice,
+  shippingCost,
+  customerInfo: {
+    firstname: form.firstName,
+    lastname: form.lastName,
+    email: form.email,
+    phone: form.phone,
+  },
+  address: {
+    street: form.street,
+    number: form.houseNumber,
+    box: form.boxNumber || null,
+    postalcode: form.postalCode,
+    city: form.city,
+    country: form.country,
+  },
+  items: cartItems.map((item) => ({
+    productId: item.documentId || item.id,
+    name: item.name,
+    amount: item.amount,
+    price: item.price,
+    discount: item.discount || 0,
+    calculatedPrice: item.calculatedPrice,
+  })),
+});
+
+// Contact form types
 interface ContactFormData {
   name: string;
   email: string;

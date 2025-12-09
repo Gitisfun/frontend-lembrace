@@ -34,6 +34,16 @@
         <div v-if="cartCount > 0" class="cart-total">
           {{ formattedCartTotal }}
         </div>
+        <!-- Auth: Profile icon or Login button -->
+        <NuxtLink v-if="authStore.isAuthenticated" :to="localePath('/profile')" class="profile-icon" :title="authStore.userFullName">
+          <div class="profile-icon-wrapper">
+            <IconUser :size="24" />
+          </div>
+        </NuxtLink>
+        <NuxtLink v-else :to="localePath('/login')" class="login-btn">
+          <IconUser :size="20" />
+          <span class="login-text">{{ $t('nav.login') }}</span>
+        </NuxtLink>
       </div>
     </div>
   </header>
@@ -41,6 +51,7 @@
 
 <script setup>
 import { useGlobalStore } from '~/stores/global';
+import { useAuthStore } from '~/stores/auth';
 import { formatPrice } from '~/logic/utils';
 
 const { t } = useI18n();
@@ -48,6 +59,7 @@ const localePath = useLocalePath();
 
 const isMenuOpen = ref(false);
 const globalStore = useGlobalStore();
+const authStore = useAuthStore();
 const cartCount = computed(() => globalStore.cartItemCount);
 const favoritesCount = computed(() => globalStore.favoriteItems.length);
 const formattedCartTotal = computed(() => formatPrice(globalStore.cartTotal));
@@ -285,6 +297,49 @@ const closeMenu = () => {
   white-space: nowrap;
 }
 
+.profile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.profile-icon:hover {
+  color: #d88c00;
+  transform: translateY(-2px);
+}
+
+.profile-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #333;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.login-btn:hover {
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+  background: rgba(212, 175, 55, 0.05);
+}
+
 @media (max-width: 768px) {
   .header-content {
     padding: 1rem;
@@ -333,6 +388,15 @@ const closeMenu = () => {
 
   .cart-total {
     display: none;
+  }
+
+  .login-btn .login-text {
+    display: none;
+  }
+
+  .login-btn {
+    padding: 0.5rem;
+    border: none;
   }
 }
 

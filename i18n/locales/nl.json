@@ -35,13 +35,30 @@
     "paymentSuccess": {
       "title": "Bestelling Bevestigd | L'embrace",
       "description": "Bedankt voor je bestelling bij L'embrace. Je handgemaakte sieraden zijn onderweg."
+    },
+    "orders": {
+      "title": "Mijn Bestellingen | L'embrace",
+      "description": "Bekijk je bestelgeschiedenis bij L'embrace."
+    },
+    "login": {
+      "title": "Inloggen | L'embrace",
+      "description": "Log in op je L'embrace account om je bestellingen en favorieten te beheren."
+    },
+    "register": {
+      "title": "Account Aanmaken | L'embrace",
+      "description": "Maak een account aan bij L'embrace om je favorieten op te slaan en je bestellingen te volgen."
+    },
+    "profile": {
+      "title": "Mijn Profiel | L'embrace",
+      "description": "Beheer je L'embrace accountinstellingen en bekijk je bestelgeschiedenis."
     }
   },
   "nav": {
     "home": "Home",
     "products": "Producten",
     "about": "Over ons",
-    "contact": "Contact"
+    "contact": "Contact",
+    "login": "Inloggen"
   },
   "footer": {
     "tagline": "Elegantie in elk detail – met de hand gemaakt voor jou."
@@ -128,7 +145,7 @@
       "street": "Straatnaam",
       "houseNumber": "Huisnummer",
       "boxNumber": "Busnummer",
-      "boxNumberOptional": "Busnummer (optioneel)",
+      "boxNumberOptional": "Busnummer",
       "postalCode": "Postcode",
       "city": "Plaats",
       "country": "Land",
@@ -263,8 +280,85 @@
       "apiError": "Kon je bericht niet verzenden. Probeer het later opnieuw."
     }
   },
+  "orders": {
+    "title": "Mijn Bestellingen",
+    "subtitle": "Bekijk en volg je bestellingen",
+    "orderNumber": "Bestelling",
+    "quantity": "Aantal",
+    "total": "Totaal",
+    "viewDetails": "Details Bekijken",
+    "backToProfile": "Terug naar Profiel",
+    "empty": {
+      "title": "Nog geen bestellingen",
+      "description": "Je hebt nog geen bestellingen geplaatst. Begin met winkelen om je bestellingen hier te zien.",
+      "browseProducts": "Bekijk Producten"
+    },
+    "status": {
+      "pending": "In afwachting",
+      "processing": "In behandeling",
+      "shipped": "Verzonden",
+      "delivered": "Bezorgd",
+      "cancelled": "Geannuleerd"
+    }
+  },
   "language": {
     "en": "English",
     "nl": "Nederlands"
+  },
+  "auth": {
+    "form": {
+      "email": "E-mailadres",
+      "emailPlaceholder": "jouw.email{'@'}voorbeeld.com",
+      "password": "Wachtwoord",
+      "passwordPlaceholder": "Voer je wachtwoord in",
+      "confirmPassword": "Bevestig wachtwoord",
+      "confirmPasswordPlaceholder": "Bevestig je wachtwoord",
+      "firstName": "Voornaam",
+      "firstNamePlaceholder": "Jan",
+      "lastName": "Achternaam",
+      "lastNamePlaceholder": "Janssen",
+      "validationError": "Vul alle verplichte velden correct in."
+    },
+    "login": {
+      "title": "Welkom",
+      "subtitle": "Log in op je account om verder te gaan",
+      "submit": "Inloggen",
+      "submitting": "Bezig met inloggen...",
+      "success": "Succesvol ingelogd!",
+      "error": "Ongeldig e-mailadres of wachtwoord. Probeer het opnieuw.",
+      "noAccount": "Nog geen account?",
+      "registerLink": "Maak er hier een aan"
+    },
+    "register": {
+      "title": "Account Aanmaken",
+      "subtitle": "Word lid en begin je winkelervaring",
+      "submit": "Account Aanmaken",
+      "submitting": "Account wordt aangemaakt...",
+      "success": "Account succesvol aangemaakt!",
+      "successMessage": "Je account is aangemaakt. Je kunt nu inloggen.",
+      "error": "Kon account niet aanmaken. Probeer het opnieuw.",
+      "hasAccount": "Heb je al een account?",
+      "loginLink": "Log hier in"
+    },
+    "profile": {
+      "title": "Mijn Profiel",
+      "details": "Accountgegevens",
+      "contact": "Contactgegevens",
+      "address": "Verzendadres",
+      "quickLinks": "Snelle Links",
+      "viewOrders": "Mijn Bestellingen",
+      "viewFavorites": "Mijn Favorieten",
+      "viewCart": "Mijn Winkelwagen",
+      "browseProducts": "Bekijk Producten",
+      "logout": "Uitloggen",
+      "logoutSuccess": "Succesvol uitgelogd!",
+      "edit": "Bewerken",
+      "save": "Opslaan",
+      "cancel": "Annuleren",
+      "saved": "Wijzigingen opgeslagen!",
+      "notProvided": "Niet opgegeven",
+      "noAddress": "Nog geen adres opgeslagen",
+      "phonePlaceholder": "+32 123 456 789"
+    }
   }
 }

@@ -1,0 +1,479 @@
+<template>
+  <div class="orders-page">
+    <div class="orders-container">
+      <div class="orders-header">
+        <h1 class="orders-title">{{ $t('orders.title') }}</h1>
+        <p class="orders-subtitle">{{ $t('orders.subtitle') }}</p>
+      </div>
+
+      <div v-if="orders.length === 0" class="empty-state">
+        <IconPackage :size="64" class="empty-icon" />
+        <h2 class="empty-title">{{ $t('orders.empty.title') }}</h2>
+        <p class="empty-description">{{ $t('orders.empty.description') }}</p>
+        <NuxtLink :to="localePath('/products')" class="browse-btn">
+          {{ $t('orders.empty.browseProducts') }}
+        </NuxtLink>
+      </div>
+
+      <div v-else class="orders-list">
+        <div v-for="order in orders" :key="order.id" class="order-card">
+          <div class="order-header">
+            <div class="order-info">
+              <span class="order-number">{{ $t('orders.orderNumber') }}: {{ order.orderNumber }}</span>
+              <span class="order-date">{{ formatDate(order.date) }}</span>
+            </div>
+            <span class="order-status" :class="order.status">
+              {{ $t(`orders.status.${order.status}`) }}
+            </span>
+          </div>
+
+          <div class="order-items">
+            <div v-for="item in order.items" :key="item.id" class="order-item">
+              <div class="item-image">
+                <img :src="item.image" :alt="item.name" />
+              </div>
+              <div class="item-details">
+                <span class="item-name">{{ item.name }}</span>
+                <span class="item-quantity">{{ $t('orders.quantity') }}: {{ item.quantity }}</span>
+              </div>
+              <div class="item-price">{{ formatPrice(item.price) }}</div>
+            </div>
+          </div>
+
+          <div class="order-footer">
+            <div class="order-total">
+              <span class="total-label">{{ $t('orders.total') }}:</span>
+              <span class="total-value">{{ formatPrice(order.total) }}</span>
+            </div>
+            <NuxtLink :to="localePath(`/orders/${order.id}`)" class="view-details-btn">
+              {{ $t('orders.viewDetails') }}
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+
+      <div class="back-link">
+        <NuxtLink :to="localePath('/profile')" class="back-btn"> ← {{ $t('orders.backToProfile') }} </NuxtLink>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { useAuthStore } from '~/stores/auth';
+import { formatPrice } from '~/logic/utils';
+
+const { t, locale } = useI18n();
+const localePath = useLocalePath();
+const authStore = useAuthStore();
+
+// SEO Meta
+useSeoMeta({
+  title: () => t('seo.orders.title'),
+  description: () => t('seo.orders.description'),
+  robots: 'noindex, nofollow',
+});
+
+// Redirect if not logged in
+if (!authStore.isAuthenticated) {
+  navigateTo(localePath('/login'));
+}
+
+// Format date based on locale
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(locale.value === 'nl' ? 'nl-BE' : 'en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
+
+// Dummy orders data
+const orders = ref([
+  {
+    id: '1',
+    orderNumber: 'ORD-2024-001234',
+    date: '2024-12-05',
+    status: 'delivered',
+    total: 89.99,
+    items: [
+      {
+        id: '1',
+        name: 'Gold Pearl Earrings',
+        quantity: 1,
+        price: 49.99,
+        image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=100&h=100&fit=crop',
+      },
+      {
+        id: '2',
+        name: 'Silver Chain Necklace',
+        quantity: 1,
+        price: 40.0,
+        image: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=100&h=100&fit=crop',
+      },
+    ],
+  },
+  {
+    id: '2',
+    orderNumber: 'ORD-2024-001198',
+    date: '2024-11-28',
+    status: 'shipped',
+    total: 65.5,
+    items: [
+      {
+        id: '3',
+        name: 'Rose Gold Bracelet',
+        quantity: 2,
+        price: 32.75,
+        image: 'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=100&h=100&fit=crop',
+      },
+    ],
+  },
+  {
+    id: '3',
+    orderNumber: 'ORD-2024-001156',
+    date: '2024-11-15',
+    status: 'processing',
+    total: 125.0,
+    items: [
+      {
+        id: '4',
+        name: 'Diamond Pendant',
+        quantity: 1,
+        price: 125.0,
+        image: 'https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=100&h=100&fit=crop',
+      },
+    ],
+  },
+]);
+</script>
+
+<style scoped>
+.orders-page {
+  background: var(--gradient-gold-vertical);
+  min-height: calc(100vh - 70px);
+  padding: 2rem 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.orders-container {
+  max-width: 700px;
+  width: 100%;
+}
+
+.orders-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.orders-title {
+  font-family: var(--font-primary);
+  font-size: 2.2rem;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.orders-subtitle {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-text-light);
+}
+
+.empty-state {
+  background: white;
+  border-radius: 16px;
+  padding: 4rem 2rem;
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+}
+
+.empty-icon {
+  color: var(--color-text-light);
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-family: var(--font-primary);
+  font-size: 1.5rem;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+}
+
+.empty-description {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-text-light);
+  margin-bottom: 1.5rem;
+}
+
+.browse-btn {
+  display: inline-block;
+  padding: 0.875rem 2rem;
+  background: var(--gradient-gold);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.browse-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.order-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.25rem;
+  background: #f8f8f8;
+  border-bottom: 1px solid #eee;
+}
+
+.order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.order-number {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.order-date {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+}
+
+.order-status {
+  padding: 0.35rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.order-status.delivered {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.order-status.shipped {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.order-status.processing {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.order-status.pending {
+  background: #fce4ec;
+  color: #c2185b;
+}
+
+.order-status.cancelled {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.order-items {
+  padding: 1rem 1.25rem;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.item-image {
+  width: 60px;
+  height: 60px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.item-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.item-name {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.item-quantity {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+}
+
+.item-price {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: #fafafa;
+  border-top: 1px solid #eee;
+}
+
+.order-total {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.total-label {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+}
+
+.total-value {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.view-details-btn {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--color-gold);
+  color: var(--color-gold);
+  text-decoration: none;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.view-details-btn:hover {
+  background: var(--color-gold);
+  color: white;
+}
+
+.back-link {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.back-btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  color: var(--color-text);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  color: var(--color-gold);
+}
+
+@media (max-width: 768px) {
+  .orders-title {
+    font-size: 1.8rem;
+  }
+
+  .order-header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .order-footer {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
+  .order-total {
+    justify-content: space-between;
+  }
+
+  .view-details-btn {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .orders-page {
+    padding: 1rem 0.5rem;
+  }
+
+  .order-item {
+    flex-wrap: wrap;
+  }
+
+  .item-price {
+    width: 100%;
+    text-align: right;
+    margin-top: 0.25rem;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>

@@ -5,6 +5,12 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/strapi', '@nuxt/image', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@nuxtjs/i18n'],
   css: ['~/assets/css/main.css'],
 
+  runtimeConfig: {
+    public: {
+      authApiKey: process.env.AUTH_API_KEY || '',
+    },
+  },
+
   app: {
     head: {
       htmlAttrs: {
