@@ -128,7 +128,7 @@
         </div>
 
         <div class="form-actions">
-          <UiButtonSubmit disabled :text="$t('payment.placeOrder')" :loading="isSubmitting" :loading-text="$t('payment.processing')" />
+          <UiButtonSubmit :text="$t('payment.placeOrder')" :loading="isSubmitting" :loading-text="$t('payment.processing')" />
         </div>
       </form>
     </div>
@@ -144,10 +144,11 @@ import { useFormValidation } from '~/composables/useFormValidation';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
 import { useUserProfile } from '~/composables/useUserProfile';
 import { paymentFormSchema, billingAddressSchema, createPaymentFormData } from '~/schemas';
-import { buildOrderPayload } from '~/logic/utils';
+import { buildOrderPayload, fetchOrderNumber } from '~/logic/utils';
 
 const { t } = useI18n();
 const { error: toastError } = useToast();
+const config = useRuntimeConfig();
 
 // SEO Meta
 useSeoMeta({
@@ -346,17 +347,18 @@ const handleSubmit = async () => {
       });
     }
 
-    // Get new order ID from order number api
+    // Get new order number from order number API
+    const orderNumber = await fetchOrderNumber(config.public.authApiKey);
 
-    // Add order ID to formdata
-
-    /*
+    // Build order payload with order number
     const orderData = buildOrderPayload(form, cartItems.value, total.value, shippingCost, {
       useSameAddressForBilling: useSameAddressForBilling.value,
+      orderNumber,
     });
 
     console.log('Sending order data to Strapi:', orderData);
-
+    // Create order in Strapi
+    /*
     const result = await create('orders', orderData);
     console.log('Order created successfully:', result);
 

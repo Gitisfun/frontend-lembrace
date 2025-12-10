@@ -4,8 +4,18 @@ export const formatPrice = (price: number) =>
     currency: 'EUR',
   }).format(price);
 
-// Generate order number with UUID
-export const generateOrderNumber = () => 'ORD-' + crypto.randomUUID();
+// Order number API
+const ORDER_NUMBER_API = 'https://order-number-api-912e55947744.herokuapp.com/api/counter';
+
+export const fetchOrderNumber = async (apiKey: string): Promise<string> => {
+  const response = await $fetch<{ order_number: string }>(ORDER_NUMBER_API, {
+    method: 'GET',
+    headers: {
+      'X-API-Key': apiKey,
+    },
+  });
+  return response.order_number;
+};
 
 // Order payload types
 interface PaymentFormData {
@@ -40,10 +50,15 @@ interface CartItem {
 
 interface BuildOrderOptions {
   useSameAddressForBilling?: boolean;
+  orderNumber?: string;
 }
 
 export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], totalPrice: number, shippingCost: number, options: BuildOrderOptions = {}) => {
-  const { useSameAddressForBilling = true } = options;
+  const { useSameAddressForBilling = true, orderNumber } = options;
+
+  if (!orderNumber) {
+    throw new Error('Order number is required');
+  }
 
   const shippingAddress = {
     street: form.street,
@@ -66,7 +81,7 @@ export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], 
       };
 
   return {
-    orderNumber: generateOrderNumber(),
+    orderNumber,
     unique_order_number: crypto.randomUUID(),
     orderStatus: 'pending',
     totalPrice,
@@ -77,7 +92,7 @@ export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], 
       email: form.email,
       phone: form.phone,
     },
-    address: shippingAddress,
+    shippingAddress,
     billingAddress,
     items: cartItems.map((item) => ({
       productId: item.documentId || item.id,
