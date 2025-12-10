@@ -92,7 +92,10 @@ export const validators = {
 
   phone: (): ValidationRule => (value) => {
     if (!value) return ''; // Phone is optional
-    if (!/^[\+]?[1-9]\d{7,15}$/.test(value)) {
+    // Remove common formatting characters (spaces, dashes, dots, parentheses)
+    const cleanedNumber = value.replace(/[\s\-\.\(\)]/g, '');
+    // Allow optional + prefix, then 8-15 digits (supports international and local formats)
+    if (!/^[\+]?[0-9]{8,15}$/.test(cleanedNumber)) {
       return 'Please enter a valid phone number';
     }
     return '';
@@ -102,7 +105,8 @@ export const validators = {
     if (!value) return 'Please enter your name';
     if (value.length < 2) return 'Name must be at least 2 characters long';
     if (value.length > 50) return 'Name must be less than 50 characters';
-    if (!/^[a-zA-Z\s'-]+$/.test(value)) {
+    // Allow letters (including accented), spaces, hyphens, and apostrophes
+    if (!/^[\p{L}\s'-]+$/u.test(value)) {
       return 'Name can only contain letters, spaces, hyphens, and apostrophes';
     }
     return '';
