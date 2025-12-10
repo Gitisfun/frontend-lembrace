@@ -1,12 +1,39 @@
 import { defineStore } from 'pinia';
 
-interface UserAddress {
+// Legacy local address format (for backward compatibility)
+interface LocalUserAddress {
   street: string;
   houseNumber: string;
   boxNumber: string;
   postalCode: string;
   city: string;
   country: string;
+}
+
+// API address format
+export interface UserAddress {
+  id?: string;
+  user_id?: string;
+  street: string;
+  house: string;
+  box: string;
+  postalcode: string;
+  city: string;
+  country: string;
+  type: 'billing' | 'shipping' | 'both';
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
+}
+
+// API contact format
+export interface UserContact {
+  id?: string;
+  user_id?: string;
+  phone: string;
+  created_at?: string;
+  updated_at?: string;
+  deleted_at?: string | null;
 }
 
 interface User {
@@ -17,18 +44,22 @@ interface User {
   last_name: string;
   status: string;
   phone?: string;
-  address?: UserAddress;
+  address?: LocalUserAddress;
 }
 
 interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  // Legacy local storage (kept for backward compatibility)
   phone: string;
-  address: UserAddress;
+  address: LocalUserAddress;
+  // API-synced data
+  addresses: UserAddress[];
+  contact: UserContact | null;
 }
 
-const defaultAddress: UserAddress = {
+const defaultAddress: LocalUserAddress = {
   street: '',
   houseNumber: '',
   boxNumber: '',
@@ -42,8 +73,12 @@ export const useAuthStore = defineStore('auth', {
     user: null,
     token: null,
     isAuthenticated: false,
+    // Legacy
     phone: '',
     address: { ...defaultAddress },
+    // API-synced
+    addresses: [],
+    contact: null,
   }),
 
   getters: {
@@ -58,8 +93,14 @@ export const useAuthStore = defineStore('auth', {
       const last = state.user.last_name?.[0] || '';
       return `${first}${last}`.toUpperCase();
     },
-    userPhone: (state) => state.phone,
+    // Legacy getters
+    userPhone: (state) => state.contact?.phone || state.phone,
     userAddress: (state) => state.address,
+    // API address getters
+    userAddresses: (state) => state.addresses || [],
+    billingAddresses: (state) => (state.addresses || []).filter((a) => a.type === 'billing' || a.type === 'both'),
+    shippingAddresses: (state) => (state.addresses || []).filter((a) => a.type === 'shipping' || a.type === 'both'),
+    userContact: (state) => state.contact,
   },
 
   actions: {
@@ -84,6 +125,8 @@ export const useAuthStore = defineStore('auth', {
       this.isAuthenticated = false;
       this.phone = '';
       this.address = { ...defaultAddress };
+      this.addresses = [];
+      this.contact = null;
     },
 
     updateUser(userData: Partial<User>) {
@@ -92,12 +135,49 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    // Legacy local methods (kept for backward compatibility)
     updatePhone(phone: string) {
       this.phone = phone;
     },
 
-    updateAddress(address: Partial<UserAddress>) {
+    updateAddress(address: Partial<LocalUserAddress>) {
       this.address = { ...this.address, ...address };
+    },
+
+    // API-synced address methods
+    setAddresses(addresses: UserAddress[]) {
+      this.addresses = addresses || [];
+    },
+
+    addAddress(address: UserAddress) {
+      if (!this.addresses) {
+        this.addresses = [];
+      }
+      this.addresses.push(address);
+    },
+
+    updateAddressInStore(address: UserAddress) {
+      if (!this.addresses) {
+        this.addresses = [];
+        return;
+      }
+      const index = this.addresses.findIndex((a) => a.id === address.id);
+      if (index !== -1) {
+        this.addresses[index] = address;
+      }
+    },
+
+    removeAddress(addressId: string) {
+      if (!this.addresses) {
+        this.addresses = [];
+        return;
+      }
+      this.addresses = this.addresses.filter((a) => a.id !== addressId);
+    },
+
+    // API-synced contact methods
+    setContact(contact: UserContact) {
+      this.contact = contact;
     },
   },
 

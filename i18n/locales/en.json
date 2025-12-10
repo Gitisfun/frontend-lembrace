@@ -345,6 +345,7 @@
       "details": "Account Details",
       "contact": "Contact Information",
       "address": "Shipping Address",
+      "addresses": "My Addresses",
       "quickLinks": "Quick Links",
       "viewOrders": "My Orders",
       "viewFavorites": "My Favorites",
@@ -354,11 +355,27 @@
       "logoutSuccess": "Successfully signed out!",
       "edit": "Edit",
       "save": "Save",
+      "saving": "Saving...",
       "cancel": "Cancel",
       "saved": "Changes saved successfully!",
       "notProvided": "Not provided",
       "noAddress": "No address saved yet",
-      "phonePlaceholder": "+32 123 456 789"
+      "noAddresses": "No addresses saved yet",
+      "phonePlaceholder": "+32 123 456 789",
+      "addAddress": "Add Address",
+      "editAddress": "Edit Address",
+      "deleteAddress": "Delete",
+      "confirmDeleteAddress": "Are you sure you want to delete this address?",
+      "addressDeleted": "Address deleted successfully",
+      "addressSaved": "Address saved successfully",
+      "contactSaved": "Contact information saved successfully",
+      "addressType": {
+        "label": "Address Type",
+        "billing": "Billing",
+        "shipping": "Shipping",
+        "both": "Billing & Shipping"
+      },
+      "loadingProfile": "Loading profile..."
     }
   }
 }

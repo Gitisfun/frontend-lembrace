@@ -345,6 +345,7 @@
       "details": "Accountgegevens",
       "contact": "Contactgegevens",
       "address": "Verzendadres",
+      "addresses": "Mijn Adressen",
       "quickLinks": "Snelle Links",
       "viewOrders": "Mijn Bestellingen",
       "viewFavorites": "Mijn Favorieten",
@@ -354,11 +355,27 @@
       "logoutSuccess": "Succesvol uitgelogd!",
       "edit": "Bewerken",
       "save": "Opslaan",
+      "saving": "Opslaan...",
       "cancel": "Annuleren",
       "saved": "Wijzigingen opgeslagen!",
       "notProvided": "Niet opgegeven",
       "noAddress": "Nog geen adres opgeslagen",
-      "phonePlaceholder": "+32 123 456 789"
+      "noAddresses": "Nog geen adressen opgeslagen",
+      "phonePlaceholder": "+32 123 456 789",
+      "addAddress": "Adres toevoegen",
+      "editAddress": "Adres bewerken",
+      "deleteAddress": "Verwijderen",
+      "confirmDeleteAddress": "Weet je zeker dat je dit adres wilt verwijderen?",
+      "addressDeleted": "Adres succesvol verwijderd",
+      "addressSaved": "Adres succesvol opgeslagen",
+      "contactSaved": "Contactgegevens succesvol opgeslagen",
+      "addressType": {
+        "label": "Adrestype",
+        "billing": "Facturatie",
+        "shipping": "Levering",
+        "both": "Facturatie & Levering"
+      },
+      "loadingProfile": "Profiel laden..."
     }
   }
 }

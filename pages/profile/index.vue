@@ -48,10 +48,12 @@
         </div>
 
         <div v-if="isEditingContact" class="edit-form">
-          <InputField id="phone" v-model="editForm.phone" :label="$t('payment.form.phone')" type="tel" :placeholder="$t('auth.profile.phonePlaceholder')" />
+          <InputField id="phone" v-model="contactForm.phone" :label="$t('payment.form.phone')" type="tel" :placeholder="$t('auth.profile.phonePlaceholder')" />
           <div class="form-actions">
-            <button @click="cancelEditingContact" class="cancel-btn">{{ $t('auth.profile.cancel') }}</button>
-            <button @click="saveContact" class="save-btn">{{ $t('auth.profile.save') }}</button>
+            <button @click="cancelEditingContact" class="cancel-btn" :disabled="isSavingContact">{{ $t('auth.profile.cancel') }}</button>
+            <button @click="saveContact" class="save-btn" :disabled="isSavingContact">
+              {{ isSavingContact ? $t('auth.profile.saving') : $t('auth.profile.save') }}
+            </button>
           </div>
         </div>
 
@@ -65,53 +67,70 @@
 
       <UiDivider />
 
-      <!-- Address (Editable) -->
+      <!-- Addresses (Multiple, Editable) -->
       <div class="profile-section">
         <div class="section-header">
-          <h2 class="section-title">{{ $t('auth.profile.address') }}</h2>
-          <button v-if="!isEditingAddress" @click="startEditingAddress" class="edit-btn">
-            {{ $t('auth.profile.edit') }}
+          <h2 class="section-title">{{ $t('auth.profile.addresses') }}</h2>
+          <button @click="startAddingAddress" class="edit-btn">
+            {{ $t('auth.profile.addAddress') }}
           </button>
         </div>
 
-        <div v-if="isEditingAddress" class="edit-form">
+        <!-- Loading State -->
+        <div v-if="isLoadingProfile" class="loading-state">
+          <UiLoadingSpinner />
+          <span>{{ $t('auth.profile.loadingProfile') }}</span>
+        </div>
+
+        <!-- Address Form (Add/Edit) -->
+        <div v-else-if="isEditingAddress" class="edit-form address-form">
+          <h3 class="form-subtitle">{{ editingAddressId ? $t('auth.profile.editAddress') : $t('auth.profile.addAddress') }}</h3>
+
           <div class="form-row">
-            <InputField id="street" v-model="editForm.address.street" :label="$t('payment.form.street')" type="text" />
+            <InputField id="street" v-model="addressForm.street" :label="$t('payment.form.street')" type="text" required />
             <div class="form-row-small">
-              <InputField id="houseNumber" v-model="editForm.address.houseNumber" :label="$t('payment.form.houseNumber')" type="text" />
-              <InputField id="boxNumber" v-model="editForm.address.boxNumber" :label="$t('payment.form.boxNumberOptional')" type="text" />
+              <InputField id="house" v-model="addressForm.house" :label="$t('payment.form.houseNumber')" type="text" required />
+              <InputField id="box" v-model="addressForm.box" :label="$t('payment.form.boxNumberOptional')" type="text" />
             </div>
           </div>
           <div class="form-row">
-            <InputField id="postalCode" v-model="editForm.address.postalCode" :label="$t('payment.form.postalCode')" type="text" />
-            <InputField id="city" v-model="editForm.address.city" :label="$t('payment.form.city')" type="text" />
+            <InputField id="postalcode" v-model="addressForm.postalcode" :label="$t('payment.form.postalCode')" type="text" required />
+            <InputField id="city" v-model="addressForm.city" :label="$t('payment.form.city')" type="text" required />
           </div>
-          <InputSelect id="country" v-model="editForm.address.country" :label="$t('payment.form.country')" :options="countryOptions" :placeholder="$t('payment.form.selectCountry')" />
+          <InputSelect id="country" v-model="addressForm.country" :label="$t('payment.form.country')" :options="countryOptions" :placeholder="$t('payment.form.selectCountry')" required />
+          <InputSelect id="type" v-model="addressForm.type" :label="$t('auth.profile.addressType.label')" :options="addressTypeOptions" required />
+
           <div class="form-actions">
-            <button @click="cancelEditingAddress" class="cancel-btn">{{ $t('auth.profile.cancel') }}</button>
-            <button @click="saveAddress" class="save-btn">{{ $t('auth.profile.save') }}</button>
+            <button @click="cancelEditingAddress" class="cancel-btn" :disabled="isSavingAddress">{{ $t('auth.profile.cancel') }}</button>
+            <button @click="saveAddress" class="save-btn" :disabled="isSavingAddress">
+              {{ isSavingAddress ? $t('auth.profile.saving') : $t('auth.profile.save') }}
+            </button>
           </div>
         </div>
 
-        <div v-else class="details-grid">
-          <div class="detail-item" v-if="hasAddress">
-            <span class="detail-label">{{ $t('payment.form.street') }}</span>
-            <span class="detail-value">
-              {{ authStore.userAddress.street }} {{ authStore.userAddress.houseNumber }}
-              <span v-if="authStore.userAddress.boxNumber">, {{ authStore.userAddress.boxNumber }}</span>
-            </span>
+        <!-- Address List -->
+        <div v-else-if="authStore.userAddresses?.length > 0" class="address-list">
+          <div v-for="address in authStore.userAddresses || []" :key="address.id" class="address-card">
+            <div class="address-type-badge" :class="address.type">
+              {{ getAddressTypeLabel(address.type) }}
+            </div>
+            <div class="address-content">
+              <p class="address-line">
+                {{ address.street }} {{ address.house }}<span v-if="address.box">, {{ address.box }}</span>
+              </p>
+              <p class="address-line">{{ address.postalcode }} {{ address.city }}</p>
+              <p class="address-line">{{ getCountryLabel(address.country) }}</p>
+            </div>
+            <div class="address-actions">
+              <button @click="startEditingAddress(address)" class="edit-btn-small">{{ $t('auth.profile.edit') }}</button>
+              <button @click="confirmDeleteAddress(address)" class="delete-btn-small">{{ $t('auth.profile.deleteAddress') }}</button>
+            </div>
           </div>
-          <div class="detail-item" v-if="hasAddress">
-            <span class="detail-label">{{ $t('payment.form.city') }}</span>
-            <span class="detail-value">{{ authStore.userAddress.postalCode }} {{ authStore.userAddress.city }}</span>
-          </div>
-          <div class="detail-item" v-if="authStore.userAddress.country">
-            <span class="detail-label">{{ $t('payment.form.country') }}</span>
-            <span class="detail-value">{{ getCountryLabel(authStore.userAddress.country) }}</span>
-          </div>
-          <div class="detail-item full-width" v-if="!hasAddress">
-            <span class="detail-value text-muted">{{ $t('auth.profile.noAddress') }}</span>
-          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else class="empty-state">
+          <span class="detail-value text-muted">{{ $t('auth.profile.noAddresses') }}</span>
         </div>
       </div>
 
@@ -152,14 +171,16 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed } from 'vue';
+import { reactive, ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import { useToast } from '~/composables/useToast';
+import { useUserProfile } from '~/composables/useUserProfile';
 
 const { t } = useI18n();
 const localePath = useLocalePath();
 const authStore = useAuthStore();
-const { success: toastSuccess } = useToast();
+const { success: toastSuccess, error: toastError } = useToast();
+const { isLoading: isLoadingProfile, fetchUserProfile, createAddress, updateAddress: apiUpdateAddress, deleteAddress: apiDeleteAddress, upsertContact } = useUserProfile();
 
 // SEO Meta
 useSeoMeta({
@@ -176,19 +197,35 @@ if (!authStore.isAuthenticated) {
 // Edit states
 const isEditingContact = ref(false);
 const isEditingAddress = ref(false);
+const editingAddressId = ref(null);
+const isSavingContact = ref(false);
+const isSavingAddress = ref(false);
 
-// Edit form
-const editForm = reactive({
+// Contact form
+const contactForm = reactive({
   phone: '',
-  address: {
-    street: '',
-    houseNumber: '',
-    boxNumber: '',
-    postalCode: '',
-    city: '',
-    country: '',
-  },
 });
+
+// Address form
+const addressForm = reactive({
+  street: '',
+  house: '',
+  box: '',
+  postalcode: '',
+  city: '',
+  country: '',
+  type: 'shipping',
+});
+
+const resetAddressForm = () => {
+  addressForm.street = '';
+  addressForm.house = '';
+  addressForm.box = '';
+  addressForm.postalcode = '';
+  addressForm.city = '';
+  addressForm.country = '';
+  addressForm.type = 'shipping';
+};
 
 // Country options
 const countryOptions = computed(() => [
@@ -200,19 +237,26 @@ const countryOptions = computed(() => [
   { value: 'other', label: t('payment.form.countries.other') },
 ]);
 
+// Address type options
+const addressTypeOptions = computed(() => [
+  { value: 'billing', label: t('auth.profile.addressType.billing') },
+  { value: 'shipping', label: t('auth.profile.addressType.shipping') },
+  { value: 'both', label: t('auth.profile.addressType.both') },
+]);
+
 const getCountryLabel = (value) => {
   const country = countryOptions.value.find((c) => c.value === value);
   return country ? country.label : value;
 };
 
-const hasAddress = computed(() => {
-  const addr = authStore.userAddress;
-  return addr.street || addr.city || addr.postalCode;
-});
+const getAddressTypeLabel = (type) => {
+  const option = addressTypeOptions.value.find((o) => o.value === type);
+  return option ? option.label : type;
+};
 
 // Contact editing
 const startEditingContact = () => {
-  editForm.phone = authStore.userPhone;
+  contactForm.phone = authStore.userPhone || '';
   isEditingContact.value = true;
 };
 
@@ -220,26 +264,99 @@ const cancelEditingContact = () => {
   isEditingContact.value = false;
 };
 
-const saveContact = () => {
-  authStore.updatePhone(editForm.phone);
-  isEditingContact.value = false;
-  toastSuccess(t('auth.profile.saved'));
+const saveContact = async () => {
+  isSavingContact.value = true;
+  try {
+    const result = await upsertContact({ phone: contactForm.phone });
+    if (result) {
+      toastSuccess(t('auth.profile.contactSaved'));
+      isEditingContact.value = false;
+    } else {
+      toastError(t('common.error'));
+    }
+  } catch (error) {
+    console.error('Failed to save contact:', error);
+    toastError(t('common.error'));
+  } finally {
+    isSavingContact.value = false;
+  }
 };
 
 // Address editing
-const startEditingAddress = () => {
-  editForm.address = { ...authStore.userAddress };
+const startAddingAddress = () => {
+  resetAddressForm();
+  editingAddressId.value = null;
+  isEditingAddress.value = true;
+};
+
+const startEditingAddress = (address) => {
+  addressForm.street = address.street || '';
+  addressForm.house = address.house || '';
+  addressForm.box = address.box || '';
+  addressForm.postalcode = address.postalcode || '';
+  addressForm.city = address.city || '';
+  addressForm.country = address.country || '';
+  addressForm.type = address.type || 'shipping';
+  editingAddressId.value = address.id;
   isEditingAddress.value = true;
 };
 
 const cancelEditingAddress = () => {
   isEditingAddress.value = false;
+  editingAddressId.value = null;
+  resetAddressForm();
 };
 
-const saveAddress = () => {
-  authStore.updateAddress(editForm.address);
-  isEditingAddress.value = false;
-  toastSuccess(t('auth.profile.saved'));
+const saveAddress = async () => {
+  isSavingAddress.value = true;
+  try {
+    const addressData = {
+      street: addressForm.street,
+      house: addressForm.house,
+      box: addressForm.box,
+      postalcode: addressForm.postalcode,
+      city: addressForm.city,
+      country: addressForm.country,
+      type: addressForm.type,
+    };
+
+    let result;
+    if (editingAddressId.value) {
+      result = await apiUpdateAddress(editingAddressId.value, addressData);
+    } else {
+      result = await createAddress(addressData);
+    }
+
+    if (result) {
+      toastSuccess(t('auth.profile.addressSaved'));
+      isEditingAddress.value = false;
+      editingAddressId.value = null;
+      resetAddressForm();
+    } else {
+      toastError(t('common.error'));
+    }
+  } catch (error) {
+    console.error('Failed to save address:', error);
+    toastError(t('common.error'));
+  } finally {
+    isSavingAddress.value = false;
+  }
+};
+
+const confirmDeleteAddress = async (address) => {
+  if (confirm(t('auth.profile.confirmDeleteAddress'))) {
+    try {
+      const success = await apiDeleteAddress(address.id);
+      if (success) {
+        toastSuccess(t('auth.profile.addressDeleted'));
+      } else {
+        toastError(t('common.error'));
+      }
+    } catch (error) {
+      console.error('Failed to delete address:', error);
+      toastError(t('common.error'));
+    }
+  }
 };
 
 // Logout
@@ -248,6 +365,13 @@ const handleLogout = () => {
   toastSuccess(t('auth.profile.logoutSuccess'));
   navigateTo(localePath('/'));
 };
+
+// Load profile data on mount
+onMounted(async () => {
+  if (authStore.isAuthenticated) {
+    await fetchUserProfile();
+  }
+});
 </script>
 
 <style scoped>
@@ -419,6 +543,20 @@ const handleLogout = () => {
   gap: 1rem;
 }
 
+.address-form {
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 12px;
+}
+
+.form-subtitle {
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -451,9 +589,14 @@ const handleLogout = () => {
   transition: all 0.3s ease;
 }
 
-.cancel-btn:hover {
+.cancel-btn:hover:not(:disabled) {
   border-color: #999;
   color: var(--color-text);
+}
+
+.cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .save-btn {
@@ -469,9 +612,120 @@ const handleLogout = () => {
   transition: all 0.3s ease;
 }
 
-.save-btn:hover {
+.save-btn:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Address List Styles */
+.address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.address-card {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 1.25rem;
+  position: relative;
+}
+
+.address-type-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+}
+
+.address-type-badge.billing {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+
+.address-type-badge.shipping {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.address-type-badge.both {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.address-content {
+  margin-bottom: 1rem;
+}
+
+.address-line {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.address-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-btn-small,
+.delete-btn-small {
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.edit-btn-small {
+  background: transparent;
+  border: 1px solid var(--color-gold);
+  color: var(--color-gold);
+}
+
+.edit-btn-small:hover {
+  background: var(--color-gold);
+  color: white;
+}
+
+.delete-btn-small {
+  background: transparent;
+  border: 1px solid #e53e3e;
+  color: #e53e3e;
+}
+
+.delete-btn-small:hover {
+  background: #e53e3e;
+  color: white;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 0;
+  color: var(--color-text-light);
+  font-family: var(--font-body);
 }
 
 .quick-links {
@@ -581,6 +835,16 @@ const handleLogout = () => {
   .cancel-btn,
   .save-btn {
     width: 100%;
+  }
+
+  .address-actions {
+    flex-direction: column;
+  }
+
+  .edit-btn-small,
+  .delete-btn-small {
+    width: 100%;
+    text-align: center;
   }
 }
 
