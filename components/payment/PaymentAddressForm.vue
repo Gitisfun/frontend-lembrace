@@ -143,6 +143,9 @@ const countryOptions = computed(() => [
 <style scoped>
 .new-address-form {
   margin-top: 1rem;
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 12px;
 }
 
 .form-grid {
