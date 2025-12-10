@@ -1,6 +1,5 @@
 <template>
-  <div class="form-section">
-    <h3>{{ $t('payment.contactDetails') }}</h3>
+  <div class="contact-form">
     <div class="form-grid">
       <InputField
         id="firstName"
@@ -85,17 +84,6 @@ defineEmits(['update:firstName', 'update:lastName', 'update:email', 'update:phon
 </script>
 
 <style scoped>
-.form-section {
-  margin-bottom: 2rem;
-}
-
-.form-section h3 {
-  font-family: var(--font-primary);
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  color: var(--color-text);
-}
-
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -105,10 +93,6 @@ defineEmits(['update:firstName', 'update:lastName', 'update:email', 'update:phon
 @media (max-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr;
-  }
-
-  .form-section h3 {
-    font-size: 1.1rem;
   }
 }
 </style>

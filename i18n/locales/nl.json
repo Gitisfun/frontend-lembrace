@@ -311,6 +311,7 @@
     "nl": "Nederlands"
   },
   "auth": {
+    "sessionExpired": "Je sessie is verlopen. Log opnieuw in.",
     "form": {
       "email": "E-mailadres",
       "emailPlaceholder": "jouw.email{'@'}voorbeeld.com",

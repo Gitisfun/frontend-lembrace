@@ -9,20 +9,29 @@
         <h2>{{ $t('payment.personalInfo') }}</h2>
 
         <!-- Contact Details -->
-        <PaymentContactForm
-          :first-name="form.firstName"
-          :last-name="form.lastName"
-          :email="form.email"
-          :phone="form.phone"
-          :errors="errors"
-          :force-validation="forceValidation"
-          :disabled="isAuthenticated"
-          @update:first-name="updateField('firstName', $event)"
-          @update:last-name="updateField('lastName', $event)"
-          @update:email="updateField('email', $event)"
-          @update:phone="updateField('phone', $event)"
-          @validate="validateField($event)"
-        />
+        <div class="form-section">
+          <h3>{{ $t('payment.contactDetails') }}</h3>
+
+          <!-- Loading State for Logged-in Users -->
+          <UiFormSkeleton v-if="isAuthenticated && isLoadingProfile && !isProfileLoaded" type="fields" :rows="2" :columns="2" />
+
+          <!-- Contact Form -->
+          <PaymentContactForm
+            v-else
+            :first-name="form.firstName"
+            :last-name="form.lastName"
+            :email="form.email"
+            :phone="form.phone"
+            :errors="errors"
+            :force-validation="forceValidation"
+            :disabled="isAuthenticated"
+            @update:first-name="updateField('firstName', $event)"
+            @update:last-name="updateField('lastName', $event)"
+            @update:email="updateField('email', $event)"
+            @update:phone="updateField('phone', $event)"
+            @validate="validateField($event)"
+          />
+        </div>
 
         <UiDivider />
 
@@ -30,12 +39,15 @@
         <div class="form-section">
           <h3>{{ $t('payment.shippingAddress') }}</h3>
 
+          <!-- Loading State for Logged-in Users -->
+          <UiFormSkeleton v-if="isAuthenticated && isLoadingProfile && !isProfileLoaded" type="options" :count="2" />
+
           <!-- Address Selection for Logged-in Users -->
-          <InputRadioGroup v-if="isAuthenticated && hasAddresses" v-model="selectedShippingAddressId" :options="shippingAddressOptions" />
+          <InputRadioGroup v-else-if="isAuthenticated && hasAddresses" v-model="selectedShippingAddressId" :options="shippingAddressOptions" />
 
           <!-- New Address Form -->
           <PaymentAddressForm
-            v-if="!isAuthenticated || !hasAddresses || selectedShippingAddressId === 'new'"
+            v-if="(!isAuthenticated || !hasAddresses || selectedShippingAddressId === 'new') && (!isLoadingProfile || isProfileLoaded)"
             :street="form.street"
             :house-number="form.houseNumber"
             :box-number="form.boxNumber"
@@ -62,17 +74,24 @@
         <!-- Billing Address Section -->
         <div class="form-section">
           <h3>{{ $t('payment.billingAddress') }}</h3>
+
+          <!-- Loading State for Logged-in Users -->
+          <UiFormSkeleton v-if="isAuthenticated && isLoadingProfile && !isProfileLoaded" type="options" :count="2" />
+
           <!-- Same as Shipping / Different toggle -->
-          <InputRadioGroup v-model="billingAddressChoice" :options="billingChoiceOptions" />
+          <InputRadioGroup v-else v-model="billingAddressChoice" :options="billingChoiceOptions" />
 
           <!-- Billing Address Selection (when different from shipping) -->
           <div v-if="!useSameAddressForBilling" class="billing-address-section">
+            <!-- Loading State for Logged-in Users -->
+            <UiFormSkeleton v-if="isAuthenticated && isLoadingProfile && !isProfileLoaded" type="options" :count="2" />
+
             <!-- Address Picker for Logged-in Users -->
-            <InputRadioGroup v-if="isAuthenticated && hasBillingAddresses" v-model="selectedBillingAddressId" :options="billingAddressOptions" />
+            <InputRadioGroup v-else-if="isAuthenticated && hasBillingAddresses" v-model="selectedBillingAddressId" :options="billingAddressOptions" />
 
             <!-- New Billing Address Form -->
             <PaymentAddressForm
-              v-if="!isAuthenticated || !hasBillingAddresses || selectedBillingAddressId === 'new'"
+              v-if="(!isAuthenticated || !hasBillingAddresses || selectedBillingAddressId === 'new') && (!isLoadingProfile || isProfileLoaded)"
               :street="form.billingStreet"
               :house-number="form.billingHouseNumber"
               :box-number="form.billingBoxNumber"
@@ -101,7 +120,11 @@
         <!-- Delivery Method -->
         <div class="form-section">
           <h3>{{ $t('payment.delivery.title') }}</h3>
-          <InputRadioGroup v-model="form.deliveryMethod" :options="deliveryOptions" required />
+
+          <!-- Loading State for Logged-in Users -->
+          <UiFormSkeleton v-if="isAuthenticated && isLoadingProfile && !isProfileLoaded" type="options" :count="2" />
+
+          <InputRadioGroup v-else v-model="form.deliveryMethod" :options="deliveryOptions" required />
         </div>
 
         <div class="form-actions">
@@ -136,9 +159,10 @@ useSeoMeta({
 const { create } = useStrapi();
 const globalStore = useGlobalStore();
 const authStore = useAuthStore();
-const { fetchUserProfile, createAddress } = useUserProfile();
+const { fetchUserProfile, createAddress, isLoading: isLoadingProfile } = useUserProfile();
 const { isSubmitting, withSubmit, stopSubmitting } = useSubmitStatus();
 const forceValidation = ref(false);
+const isProfileLoaded = ref(false);
 
 // Auth state
 const isAuthenticated = computed(() => authStore.isAuthenticated);
@@ -322,6 +346,11 @@ const handleSubmit = async () => {
       });
     }
 
+    // Get new order ID from order number api
+
+    // Add order ID to formdata
+
+    /*
     const orderData = buildOrderPayload(form, cartItems.value, total.value, shippingCost, {
       useSameAddressForBilling: useSameAddressForBilling.value,
     });
@@ -335,7 +364,9 @@ const handleSubmit = async () => {
       ...orderData,
       orderId: result.data.id,
     };
+    */
 
+    /*
     const mollieResponse = await $fetch('/api/mollie/create-payment', {
       method: 'POST',
       body: { orderData: orderDataWithId },
@@ -347,6 +378,7 @@ const handleSubmit = async () => {
     } else {
       throw new Error('Failed to create Mollie payment');
     }
+    */
   })
     .catch((error) => {
       console.error('Payment failed:', error);
@@ -362,6 +394,7 @@ onMounted(async () => {
   if (authStore.isAuthenticated) {
     await fetchUserProfile();
     prefillUserData();
+    isProfileLoaded.value = true;
   }
 });
 
@@ -370,8 +403,10 @@ watch(
   () => authStore.isAuthenticated,
   async (isAuth) => {
     if (isAuth) {
+      isProfileLoaded.value = false;
       await fetchUserProfile();
       prefillUserData();
+      isProfileLoaded.value = true;
     }
   }
 );

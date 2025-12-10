@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import { useAuthStore } from '~/stores/auth';
+import { useAuthGuard } from '~/composables/useAuthGuard';
 
 export interface UserAddress {
   id?: string;
@@ -28,6 +29,7 @@ export interface UserContact {
 export const useUserProfile = () => {
   const config = useRuntimeConfig();
   const authStore = useAuthStore();
+  const { isAuthError, handleAuthError } = useAuthGuard();
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
@@ -65,6 +67,10 @@ export const useUserProfile = () => {
       }
       return [];
     } catch (err) {
+      if (isAuthError(err)) {
+        handleAuthError();
+        return [];
+      }
       console.error('Failed to fetch addresses:', err);
       error.value = 'Failed to load addresses';
       return [];
@@ -91,6 +97,10 @@ export const useUserProfile = () => {
       }
       return null;
     } catch (err) {
+      if (isAuthError(err)) {
+        handleAuthError();
+        return null;
+      }
       console.error('Failed to create address:', err);
       error.value = 'Failed to create address';
       return null;
@@ -117,6 +127,10 @@ export const useUserProfile = () => {
       }
       return null;
     } catch (err) {
+      if (isAuthError(err)) {
+        handleAuthError();
+        return null;
+      }
       console.error('Failed to update address:', err);
       error.value = 'Failed to update address';
       return null;
@@ -139,6 +153,10 @@ export const useUserProfile = () => {
       authStore.removeAddress(addressId);
       return true;
     } catch (err) {
+      if (isAuthError(err)) {
+        handleAuthError();
+        return false;
+      }
       console.error('Failed to delete address:', err);
       error.value = 'Failed to delete address';
       return false;
@@ -166,6 +184,10 @@ export const useUserProfile = () => {
       }
       return null;
     } catch (err) {
+      if (isAuthError(err)) {
+        handleAuthError();
+        return null;
+      }
       console.error('Failed to fetch contact:', err);
       error.value = 'Failed to load contact info';
       return null;
@@ -192,6 +214,10 @@ export const useUserProfile = () => {
       }
       return null;
     } catch (err) {
+      if (isAuthError(err)) {
+        handleAuthError();
+        return null;
+      }
       console.error('Failed to save contact:', err);
       error.value = 'Failed to save contact info';
       return null;

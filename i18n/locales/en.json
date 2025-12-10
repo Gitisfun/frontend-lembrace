@@ -311,6 +311,7 @@
     "nl": "Nederlands"
   },
   "auth": {
+    "sessionExpired": "Your session has expired. Please log in again.",
     "form": {
       "email": "Email address",
       "emailPlaceholder": "your.email{'@'}example.com",
