@@ -79,7 +79,7 @@
 </template>
 
 <script setup>
-const { t } = useI18n();
+import { getCountryOptions } from '~/constants/countries';
 
 defineProps({
   street: {
@@ -130,14 +130,7 @@ defineProps({
 
 defineEmits(['update:street', 'update:houseNumber', 'update:boxNumber', 'update:postalCode', 'update:city', 'update:country', 'update:saveAddress', 'validate']);
 
-const countryOptions = computed(() => [
-  { value: 'Nederland', label: t('payment.form.countries.netherlands') },
-  { value: 'België', label: t('payment.form.countries.belgium') },
-  { value: 'Duitsland', label: t('payment.form.countries.germany') },
-  { value: 'Frankrijk', label: t('payment.form.countries.france') },
-  { value: 'Verenigd Koninkrijk', label: t('payment.form.countries.uk') },
-  { value: 'andere', label: t('payment.form.countries.other') },
-]);
+const countryOptions = getCountryOptions();
 </script>
 
 <style scoped>

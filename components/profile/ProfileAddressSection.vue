@@ -30,6 +30,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
+import { getCountryOptions } from '~/constants/countries';
 
 const props = defineProps({
   addresses: {
@@ -54,14 +55,7 @@ const isEditing = ref(false);
 const editingAddress = ref(null);
 
 // Country options
-const countryOptions = computed(() => [
-  { value: 'netherlands', label: t('payment.form.countries.netherlands') },
-  { value: 'belgium', label: t('payment.form.countries.belgium') },
-  { value: 'germany', label: t('payment.form.countries.germany') },
-  { value: 'france', label: t('payment.form.countries.france') },
-  { value: 'uk', label: t('payment.form.countries.uk') },
-  { value: 'other', label: t('payment.form.countries.other') },
-]);
+const countryOptions = getCountryOptions();
 
 // Address type options
 const addressTypeOptions = computed(() => [
