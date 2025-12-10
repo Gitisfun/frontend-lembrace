@@ -111,9 +111,6 @@
         <!-- Address List -->
         <div v-else-if="authStore.userAddresses?.length > 0" class="address-list">
           <div v-for="address in authStore.userAddresses || []" :key="address.id" class="address-card">
-            <div class="address-type-badge" :class="address.type">
-              {{ getAddressTypeLabel(address.type) }}
-            </div>
             <div class="address-content">
               <p class="address-line">
                 {{ address.street }} {{ address.house }}<span v-if="address.box">, {{ address.box }}</span>
@@ -247,11 +244,6 @@ const addressTypeOptions = computed(() => [
 const getCountryLabel = (value) => {
   const country = countryOptions.value.find((c) => c.value === value);
   return country ? country.label : value;
-};
-
-const getAddressTypeLabel = (type) => {
-  const option = addressTypeOptions.value.find((o) => o.value === type);
-  return option ? option.label : type;
 };
 
 // Contact editing
@@ -635,32 +627,6 @@ onMounted(async () => {
   border-radius: 12px;
   padding: 1.25rem;
   position: relative;
-}
-
-.address-type-badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.75rem;
-}
-
-.address-type-badge.billing {
-  background: #e3f2fd;
-  color: #1565c0;
-}
-
-.address-type-badge.shipping {
-  background: #e8f5e9;
-  color: #2e7d32;
-}
-
-.address-type-badge.both {
-  background: #fff3e0;
-  color: #ef6c00;
 }
 
 .address-content {

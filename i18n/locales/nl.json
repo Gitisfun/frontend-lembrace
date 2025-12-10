@@ -130,6 +130,9 @@
     "personalInfo": "Persoonlijke gegevens",
     "contactDetails": "Contactgegevens",
     "shippingAddress": "Verzendadres",
+    "billingAddress": "Factuuradres",
+    "sameAsShipping": "Zelfde als verzendadres",
+    "useDifferentBilling": "Gebruik een ander factuuradres",
     "delivery": {
       "title": "Levering",
       "standard": "Standaard levering",
@@ -161,6 +164,8 @@
       },
       "validationError": "Vul alle verplichte velden correct in."
     },
+    "useNewAddress": "Gebruik een nieuw adres",
+    "saveAddress": "Sla dit adres op in mijn account",
     "placeOrder": "Bestelling plaatsen",
     "processing": "Verwerken...",
     "orderError": "Er is een fout opgetreden bij het verwerken van je bestelling. Probeer het later opnieuw.",

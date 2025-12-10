@@ -19,6 +19,12 @@ interface PaymentFormData {
   postalCode: string;
   city: string;
   country: string;
+  billingStreet: string;
+  billingHouseNumber: string;
+  billingBoxNumber: string;
+  billingPostalCode: string;
+  billingCity: string;
+  billingCountry: string;
   deliveryMethod: string;
 }
 
@@ -32,35 +38,57 @@ interface CartItem {
   calculatedPrice: number;
 }
 
-export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], totalPrice: number, shippingCost: number) => ({
-  orderNumber: generateOrderNumber(),
-  unique_order_number: crypto.randomUUID(),
-  orderStatus: 'pending',
-  totalPrice,
-  shippingCost,
-  customerInfo: {
-    firstname: form.firstName,
-    lastname: form.lastName,
-    email: form.email,
-    phone: form.phone,
-  },
-  address: {
+interface BuildOrderOptions {
+  useSameAddressForBilling?: boolean;
+}
+
+export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], totalPrice: number, shippingCost: number, options: BuildOrderOptions = {}) => {
+  const { useSameAddressForBilling = true } = options;
+
+  const shippingAddress = {
     street: form.street,
     number: form.houseNumber,
     box: form.boxNumber || null,
     postalcode: form.postalCode,
     city: form.city,
     country: form.country,
-  },
-  items: cartItems.map((item) => ({
-    productId: item.documentId || item.id,
-    name: item.name,
-    amount: item.amount,
-    price: item.price,
-    discount: item.discount || 0,
-    calculatedPrice: item.calculatedPrice,
-  })),
-});
+  };
+
+  const billingAddress = useSameAddressForBilling
+    ? shippingAddress
+    : {
+        street: form.billingStreet,
+        number: form.billingHouseNumber,
+        box: form.billingBoxNumber || null,
+        postalcode: form.billingPostalCode,
+        city: form.billingCity,
+        country: form.billingCountry,
+      };
+
+  return {
+    orderNumber: generateOrderNumber(),
+    unique_order_number: crypto.randomUUID(),
+    orderStatus: 'pending',
+    totalPrice,
+    shippingCost,
+    customerInfo: {
+      firstname: form.firstName,
+      lastname: form.lastName,
+      email: form.email,
+      phone: form.phone,
+    },
+    address: shippingAddress,
+    billingAddress,
+    items: cartItems.map((item) => ({
+      productId: item.documentId || item.id,
+      name: item.name,
+      amount: item.amount,
+      price: item.price,
+      discount: item.discount || 0,
+      calculatedPrice: item.calculatedPrice,
+    })),
+  };
+};
 
 // Contact form types
 interface ContactFormData {

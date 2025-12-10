@@ -130,6 +130,9 @@
     "personalInfo": "Personal Information",
     "contactDetails": "Contact Details",
     "shippingAddress": "Shipping Address",
+    "billingAddress": "Billing Address",
+    "sameAsShipping": "Same as shipping address",
+    "useDifferentBilling": "Use a different billing address",
     "delivery": {
       "title": "Delivery",
       "standard": "Standard delivery",
@@ -161,6 +164,8 @@
       },
       "validationError": "Please complete all required fields correctly."
     },
+    "useNewAddress": "Use a new address",
+    "saveAddress": "Save this address to my account",
     "placeOrder": "Place Order",
     "processing": "Processing...",
     "orderError": "An error occurred while processing your order. Please try again later.",
