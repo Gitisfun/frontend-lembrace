@@ -171,7 +171,6 @@ const handleSubmit = async () => {
       },
       body: {
         email: formData.email,
-        username: formData.email,
         password: formData.password,
         first_name: formData.firstName,
         last_name: formData.lastName,
