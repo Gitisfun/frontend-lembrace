@@ -1,4 +1,5 @@
 import { createMollieClient } from '@mollie/api-client';
+import { sendEmail } from '~/logic/utils';
 
 // Function to generate order confirmation email
 const generateOrderConfirmationEmail = (orderData: any, orderNumber: string) => {
@@ -165,18 +166,12 @@ export default defineEventHandler(async (event) => {
 
             if (customerEmail) {
               // Send order confirmation email
-              await $fetch('http://localhost:1337/api/email/send', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: {
-                  email: customerEmail,
-                  name: orderData.customerInfo?.firstname || 'Klant',
-                  subject: `Bestelling bevestiging - ${orderNumber}`,
-                  to: customerEmail,
-                  text: generateOrderConfirmationEmail(orderData, orderNumber),
-                },
+              await sendEmail({
+                email: customerEmail,
+                name: orderData.customerInfo?.firstname || 'Klant',
+                subject: `Bestelling bevestiging - ${orderNumber}`,
+                to: customerEmail,
+                text: generateOrderConfirmationEmail(orderData, orderNumber),
               });
               console.log(`Order confirmation email sent to ${customerEmail}`);
             }

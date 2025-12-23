@@ -49,15 +49,17 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { useFormValidation } from '~/composables/useFormValidation';
 import { useToast } from '~/composables/useToast';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
-import { buildContactEmailPayload } from '~/logic/utils';
+import { buildContactEmailPayload, sendEmail } from '~/logic/utils';
 import { contactFormSchema, createContactFormData } from '~/schemas';
+import { useAuthStore } from '~/stores/auth';
 
 const { t } = useI18n();
 const { success: toastSuccess, error: toastError } = useToast();
+const authStore = useAuthStore();
 
 // SEO Meta
 useSeoMeta({
@@ -71,6 +73,16 @@ useSeoMeta({
 });
 
 const formData = reactive(createContactFormData());
+
+// Autofill form if user is logged in
+onMounted(() => {
+  if (authStore.isAuthenticated && authStore.currentUser) {
+    const user = authStore.currentUser;
+    formData.name = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+    formData.email = user.email || '';
+    formData.phone = authStore.userPhone || '';
+  }
+});
 
 // Use the form validation composable
 const { errors, validateField, clearError, validateAll, resetErrors } = useFormValidation(formData, contactFormSchema);
@@ -97,18 +109,7 @@ const handleSubmit = async () => {
   startSubmitting();
 
   try {
-    // Call the actual email endpoint
-    const response = await fetch('http://localhost:1337/api/email/send', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(buildContactEmailPayload(formData)),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    await sendEmail(buildContactEmailPayload(formData));
 
     setSuccess(t('contact.success'));
     toastSuccess(t('toast.contact.success'));

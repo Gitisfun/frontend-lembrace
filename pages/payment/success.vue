@@ -75,6 +75,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { sendEmail } from '~/logic/utils';
 
 const { t } = useI18n();
 const localePath = useLocalePath();
@@ -153,18 +154,12 @@ const sendConfirmationEmail = async () => {
       const emailContent = generateOrderConfirmationEmail(order, orderNumber.value);
 
       // Send email
-      await $fetch('http://localhost:1337/api/email/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: {
-          email: customerEmail,
-          name: order.customerInfo.firstname || 'Klant',
-          subject: `Bestelling bevestiging - ${orderNumber.value}`,
-          to: customerEmail,
-          text: emailContent,
-        },
+      await sendEmail({
+        email: customerEmail,
+        name: order.customerInfo.firstname || 'Klant',
+        subject: `Bestelling bevestiging - ${orderNumber.value}`,
+        to: customerEmail,
+        text: emailContent,
       });
 
       emailSent.value = true;
@@ -196,18 +191,12 @@ const sendSellerNotificationEmail = async () => {
       // Send email to seller (you can configure the seller email address)
       const sellerEmail = 'info@lembrace.be'; // Replace with actual seller email
 
-      await $fetch('http://localhost:1337/api/email/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: {
-          email: sellerEmail,
-          name: 'LemBrace Team',
-          subject: `Nieuwe bestelling ontvangen - ${orderNumber.value}`,
-          to: sellerEmail,
-          text: emailContent,
-        },
+      await sendEmail({
+        email: sellerEmail,
+        name: 'LemBrace Team',
+        subject: `Nieuwe bestelling ontvangen - ${orderNumber.value}`,
+        to: sellerEmail,
+        text: emailContent,
       });
 
       console.log('Seller notification email sent successfully');

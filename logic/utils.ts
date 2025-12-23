@@ -135,3 +135,24 @@ export const buildContactEmailPayload = (formData: ContactFormData, recipientEma
 <p><em>Sent from L'embrace Contact Form</em></p>
   `.trim(),
 });
+
+// Email sending types and function
+export interface SendEmailOptions {
+  to: string;
+  email: string;
+  name: string;
+  subject: string;
+  text: string;
+}
+
+const EMAIL_API_URL = process.env.STRAPI_URL || 'http://localhost:1337';
+
+export const sendEmail = async (options: SendEmailOptions): Promise<void> => {
+  await $fetch(`${EMAIL_API_URL}/api/email/send`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: options,
+  });
+};

@@ -23,10 +23,7 @@ export default defineNuxtConfig({
       charset: 'utf-8',
       viewport: 'width=device-width, initial-scale=1',
       link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/icon.png' },
-        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/icon.png' },
-        { rel: 'icon', type: 'image/png', sizes: '192x192', href: '/icon.png' },
-        { rel: 'apple-touch-icon', sizes: '180x180', href: '/icon.png' },
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
         { rel: 'canonical', href: 'https://lembrace.be' },
       ],
       meta: [
