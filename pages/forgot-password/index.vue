@@ -112,12 +112,13 @@ const handleSubmit = async () => {
       const siteUrl = window.location.origin;
       const resetLink = `${siteUrl}/reset-password/${tokenResponse.data.password_reset_token}`;
 
-      await sendEmail({
-        to: formData.email,
-        email: formData.email,
-        name: formData.email,
-        subject: "Reset your L'embrace password",
-        text: `
+      await sendEmail(
+        {
+          to: formData.email,
+          email: formData.email,
+          name: formData.email,
+          subject: "Reset your L'embrace password",
+          text: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #333; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">Reset Your Password</h2>
             <p style="color: #666; line-height: 1.6;">You requested to reset your password for your L'embrace account.</p>
@@ -131,7 +132,9 @@ const handleSubmit = async () => {
             <p style="color: #666; font-style: italic;">L'embrace - Elegance in every detail</p>
           </div>
         `.trim(),
-      });
+        },
+        config.public.strapiUrl
+      );
     }
 
     emailSent.value = true;

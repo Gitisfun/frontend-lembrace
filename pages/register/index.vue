@@ -194,12 +194,13 @@ const handleSubmit = async () => {
         const siteUrl = window.location.origin;
         const verificationLink = `${siteUrl}/register/confirmation/${tokenResponse.data.email_verification_token}`;
 
-        await sendEmail({
-          to: formData.email,
-          email: formData.email,
-          name: `${formData.firstName} ${formData.lastName}`,
-          subject: "Verify your L'embrace account",
-          text: `
+        await sendEmail(
+          {
+            to: formData.email,
+            email: formData.email,
+            name: `${formData.firstName} ${formData.lastName}`,
+            subject: "Verify your L'embrace account",
+            text: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
               <h2 style="color: #333; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">Welcome to L'embrace!</h2>
               <p style="color: #666; line-height: 1.6;">Thank you for creating an account. Please verify your email address to complete your registration.</p>
@@ -213,7 +214,9 @@ const handleSubmit = async () => {
               <p style="color: #666; font-style: italic;">L'embrace - Elegance in every detail</p>
             </div>
           `.trim(),
-        });
+          },
+          config.public.strapiUrl
+        );
       }
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError);

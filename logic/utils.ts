@@ -145,10 +145,8 @@ export interface SendEmailOptions {
   text: string;
 }
 
-const EMAIL_API_URL = process.env.STRAPI_URL || 'http://localhost:1337';
-
-export const sendEmail = async (options: SendEmailOptions): Promise<void> => {
-  await $fetch(`${EMAIL_API_URL}/api/email/send`, {
+export const sendEmail = async (options: SendEmailOptions, apiUrl: string): Promise<void> => {
+  await $fetch(`${apiUrl}/api/email/send`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

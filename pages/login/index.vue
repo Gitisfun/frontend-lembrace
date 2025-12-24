@@ -152,12 +152,13 @@ const resendVerificationEmail = async () => {
     const siteUrl = window.location.origin;
     const verificationLink = `${siteUrl}/register/confirmation/${tokenResponse.data.email_verification_token}`;
 
-    await sendEmail({
-      to: formData.email,
-      email: formData.email,
-      name: formData.email,
-      subject: "Verify your L'embrace account",
-      text: `
+    await sendEmail(
+      {
+        to: formData.email,
+        email: formData.email,
+        name: formData.email,
+        subject: "Verify your L'embrace account",
+        text: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #333; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">Verify Your Email</h2>
           <p style="color: #666; line-height: 1.6;">You requested a new verification email for your L'embrace account.</p>
@@ -171,7 +172,9 @@ const resendVerificationEmail = async () => {
           <p style="color: #666; font-style: italic;">L'embrace - Elegance in every detail</p>
         </div>
       `.trim(),
-    });
+      },
+      config.public.strapiUrl
+    );
 
     setSuccess(t('auth.login.resendSuccess'));
     toastSuccess(t('auth.login.resendSuccess'));

@@ -109,7 +109,8 @@ const handleSubmit = async () => {
   startSubmitting();
 
   try {
-    await sendEmail(buildContactEmailPayload(formData));
+    const config = useRuntimeConfig();
+    await sendEmail(buildContactEmailPayload(formData), config.public.strapiUrl);
 
     setSuccess(t('contact.success'));
     toastSuccess(t('toast.contact.success'));

@@ -154,13 +154,14 @@ const sendConfirmationEmail = async () => {
       const emailContent = generateOrderConfirmationEmail(order, orderNumber.value);
 
       // Send email
+      const config = useRuntimeConfig();
       await sendEmail({
         email: customerEmail,
         name: order.customerInfo.firstname || 'Klant',
         subject: `Bestelling bevestiging - ${orderNumber.value}`,
         to: customerEmail,
         text: emailContent,
-      });
+      }, config.public.strapiUrl);
 
       emailSent.value = true;
       console.log('Order confirmation email sent successfully');
@@ -191,13 +192,14 @@ const sendSellerNotificationEmail = async () => {
       // Send email to seller (you can configure the seller email address)
       const sellerEmail = 'info@lembrace.be'; // Replace with actual seller email
 
+      const config = useRuntimeConfig();
       await sendEmail({
         email: sellerEmail,
         name: 'LemBrace Team',
         subject: `Nieuwe bestelling ontvangen - ${orderNumber.value}`,
         to: sellerEmail,
         text: emailContent,
-      });
+      }, config.public.strapiUrl);
 
       console.log('Seller notification email sent successfully');
     }

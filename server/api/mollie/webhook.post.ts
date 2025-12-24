@@ -166,13 +166,17 @@ export default defineEventHandler(async (event) => {
 
             if (customerEmail) {
               // Send order confirmation email
-              await sendEmail({
-                email: customerEmail,
-                name: orderData.customerInfo?.firstname || 'Klant',
-                subject: `Bestelling bevestiging - ${orderNumber}`,
-                to: customerEmail,
-                text: generateOrderConfirmationEmail(orderData, orderNumber),
-              });
+              const config = useRuntimeConfig(event);
+              await sendEmail(
+                {
+                  email: customerEmail,
+                  name: orderData.customerInfo?.firstname || 'Klant',
+                  subject: `Bestelling bevestiging - ${orderNumber}`,
+                  to: customerEmail,
+                  text: generateOrderConfirmationEmail(orderData, orderNumber),
+                },
+                config.public.strapiUrl
+              );
               console.log(`Order confirmation email sent to ${customerEmail}`);
             }
           } catch (emailError) {

@@ -12,6 +12,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       authApiKey: process.env.AUTH_API_KEY || '',
+      strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337',
     },
   },
 
