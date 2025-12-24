@@ -48,9 +48,25 @@
       "title": "Create Account | L'embrace",
       "description": "Create an account at L'embrace to save your favorites and track your orders."
     },
+    "verify": {
+      "title": "Verify Your Email | L'embrace",
+      "description": "Check your email inbox to verify your L'embrace account."
+    },
+    "confirmation": {
+      "title": "Email Confirmation | L'embrace",
+      "description": "Confirming your L'embrace account email address."
+    },
     "profile": {
       "title": "My Profile | L'embrace",
       "description": "Manage your L'embrace account settings and view your order history."
+    },
+    "forgotPassword": {
+      "title": "Forgot Password | L'embrace",
+      "description": "Reset your L'embrace account password."
+    },
+    "resetPassword": {
+      "title": "Reset Password | L'embrace",
+      "description": "Create a new password for your L'embrace account."
     }
   },
   "nav": {
@@ -332,8 +348,44 @@
       "submitting": "Signing in...",
       "success": "Successfully logged in!",
       "error": "Invalid email or password. Please try again.",
+      "notVerified": "Email address has not been verified. Please check your inbox.",
+      "resendVerification": "Resend Verification Email",
+      "resending": "Sending...",
+      "resendCooldown": "Resend in {seconds}s",
+      "resendSuccess": "Verification email sent successfully!",
+      "resendError": "Failed to send verification email. Please try again.",
+      "forgotPassword": "Forgot password?",
       "noAccount": "Don't have an account?",
       "registerLink": "Create one here"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "subtitle": "Enter your email address and we'll send you a link to reset your password.",
+      "submit": "Send Reset Link",
+      "submitting": "Sending...",
+      "success": "Password reset email sent!",
+      "successTitle": "Check Your Email",
+      "successMessage": "We've sent you a link to reset your password. Please check your inbox.",
+      "sentTo": "Email sent to:",
+      "backToLogin": "Back to Login"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your new password below.",
+      "verifying": "Verifying your link...",
+      "newPasswordPlaceholder": "Enter new password",
+      "submit": "Reset Password",
+      "submitting": "Resetting...",
+      "success": "Password reset successfully!",
+      "successTitle": "Password Changed",
+      "successMessage": "Your password has been successfully reset. You can now sign in with your new password.",
+      "loginButton": "Sign In",
+      "invalidTitle": "Invalid or Expired Link",
+      "invalidMessage": "This password reset link is invalid or has expired. Please request a new one.",
+      "requestNew": "Request New Link",
+      "error": "Failed to reset password. Please try again.",
+      "tokenExpired": "This password reset link has expired. Please request a new one.",
+      "backToLogin": "Back to Login"
     },
     "register": {
       "title": "Create Account",
@@ -345,6 +397,36 @@
       "error": "Could not create account. Please try again.",
       "hasAccount": "Already have an account?",
       "loginLink": "Sign in here"
+    },
+    "verify": {
+      "title": "Check Your Email",
+      "subtitle": "We've sent you a verification email to complete your registration.",
+      "sentTo": "Email sent to:",
+      "instructions": "Please click the link in the email to verify your account. Once verified, you'll be able to sign in.",
+      "tipsTitle": "Didn't receive the email?",
+      "tip1": "Check your spam or junk folder",
+      "tip2": "Make sure the email address above is correct",
+      "resendEmail": "Resend Verification Email",
+      "resending": "Sending...",
+      "resendCooldown": "Resend in {seconds}s",
+      "resendSuccess": "Verification email sent successfully!",
+      "resendError": "Failed to resend email. Please try again.",
+      "alreadyVerified": "Your email is already verified. You can now sign in.",
+      "backToLogin": "Back to Login"
+    },
+    "confirmation": {
+      "verifying": "Verifying your email...",
+      "successTitle": "Email Verified!",
+      "successMessage": "Your email has been successfully verified. You can now sign in to your account.",
+      "loginButton": "Sign In",
+      "invalidTitle": "Invalid Link",
+      "invalidMessage": "This verification link is invalid or has already been used. Please request a new verification email.",
+      "expiredTitle": "Link Expired",
+      "expiredMessage": "This verification link has expired. Please register again to receive a new verification email.",
+      "registerAgain": "Register Again",
+      "errorTitle": "Verification Failed",
+      "errorMessage": "Something went wrong while verifying your email. Please try again.",
+      "backToLogin": "Back to Login"
     },
     "profile": {
       "title": "My Profile",

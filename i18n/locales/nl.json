@@ -48,9 +48,25 @@
       "title": "Account Aanmaken | L'embrace",
       "description": "Maak een account aan bij L'embrace om je favorieten op te slaan en je bestellingen te volgen."
     },
+    "verify": {
+      "title": "Verifieer Je E-mail | L'embrace",
+      "description": "Controleer je inbox om je L'embrace account te verifiëren."
+    },
+    "confirmation": {
+      "title": "E-mail Bevestiging | L'embrace",
+      "description": "Je L'embrace account e-mailadres wordt bevestigd."
+    },
     "profile": {
       "title": "Mijn Profiel | L'embrace",
       "description": "Beheer je L'embrace accountinstellingen en bekijk je bestelgeschiedenis."
+    },
+    "forgotPassword": {
+      "title": "Wachtwoord Vergeten | L'embrace",
+      "description": "Herstel je L'embrace account wachtwoord."
+    },
+    "resetPassword": {
+      "title": "Wachtwoord Herstellen | L'embrace",
+      "description": "Maak een nieuw wachtwoord aan voor je L'embrace account."
     }
   },
   "nav": {
@@ -332,8 +348,44 @@
       "submitting": "Bezig met inloggen...",
       "success": "Succesvol ingelogd!",
       "error": "Ongeldig e-mailadres of wachtwoord. Probeer het opnieuw.",
+      "notVerified": "E-mailadres is nog niet geverifieerd. Controleer je inbox.",
+      "resendVerification": "Verificatie e-mail opnieuw versturen",
+      "resending": "Versturen...",
+      "resendCooldown": "Opnieuw versturen in {seconds}s",
+      "resendSuccess": "Verificatie e-mail succesvol verzonden!",
+      "resendError": "Kon verificatie e-mail niet versturen. Probeer het opnieuw.",
+      "forgotPassword": "Wachtwoord vergeten?",
       "noAccount": "Nog geen account?",
       "registerLink": "Maak er hier een aan"
+    },
+    "forgotPassword": {
+      "title": "Wachtwoord Vergeten",
+      "subtitle": "Voer je e-mailadres in en we sturen je een link om je wachtwoord te herstellen.",
+      "submit": "Verstuur Herstellink",
+      "submitting": "Versturen...",
+      "success": "E-mail voor wachtwoordherstel verzonden!",
+      "successTitle": "Controleer Je E-mail",
+      "successMessage": "We hebben je een link gestuurd om je wachtwoord te herstellen. Controleer je inbox.",
+      "sentTo": "E-mail verzonden naar:",
+      "backToLogin": "Terug naar Inloggen"
+    },
+    "resetPassword": {
+      "title": "Wachtwoord Herstellen",
+      "subtitle": "Voer hieronder je nieuwe wachtwoord in.",
+      "verifying": "Je link wordt geverifieerd...",
+      "newPasswordPlaceholder": "Voer nieuw wachtwoord in",
+      "submit": "Wachtwoord Herstellen",
+      "submitting": "Herstellen...",
+      "success": "Wachtwoord succesvol hersteld!",
+      "successTitle": "Wachtwoord Gewijzigd",
+      "successMessage": "Je wachtwoord is succesvol hersteld. Je kunt nu inloggen met je nieuwe wachtwoord.",
+      "loginButton": "Inloggen",
+      "invalidTitle": "Ongeldige of Verlopen Link",
+      "invalidMessage": "Deze wachtwoordherstel link is ongeldig of verlopen. Vraag een nieuwe aan.",
+      "requestNew": "Nieuwe Link Aanvragen",
+      "error": "Kon wachtwoord niet herstellen. Probeer het opnieuw.",
+      "tokenExpired": "Deze wachtwoordherstel link is verlopen. Vraag een nieuwe aan.",
+      "backToLogin": "Terug naar Inloggen"
     },
     "register": {
       "title": "Account Aanmaken",
@@ -345,6 +397,36 @@
       "error": "Kon account niet aanmaken. Probeer het opnieuw.",
       "hasAccount": "Heb je al een account?",
       "loginLink": "Log hier in"
+    },
+    "verify": {
+      "title": "Controleer Je E-mail",
+      "subtitle": "We hebben je een verificatie e-mail gestuurd om je registratie te voltooien.",
+      "sentTo": "E-mail verzonden naar:",
+      "instructions": "Klik op de link in de e-mail om je account te verifiëren. Zodra je account is geverifieerd, kun je inloggen.",
+      "tipsTitle": "E-mail niet ontvangen?",
+      "tip1": "Controleer je spam of ongewenste e-mail map",
+      "tip2": "Controleer of het bovenstaande e-mailadres correct is",
+      "resendEmail": "Verificatie e-mail opnieuw versturen",
+      "resending": "Versturen...",
+      "resendCooldown": "Opnieuw versturen in {seconds}s",
+      "resendSuccess": "Verificatie e-mail succesvol verzonden!",
+      "resendError": "Kon e-mail niet opnieuw versturen. Probeer het opnieuw.",
+      "alreadyVerified": "Je e-mail is al geverifieerd. Je kunt nu inloggen.",
+      "backToLogin": "Terug naar Inloggen"
+    },
+    "confirmation": {
+      "verifying": "Je e-mail wordt geverifieerd...",
+      "successTitle": "E-mail Geverifieerd!",
+      "successMessage": "Je e-mail is succesvol geverifieerd. Je kunt nu inloggen op je account.",
+      "loginButton": "Inloggen",
+      "invalidTitle": "Ongeldige Link",
+      "invalidMessage": "Deze verificatielink is ongeldig of is al gebruikt. Vraag een nieuwe verificatie e-mail aan.",
+      "expiredTitle": "Link Verlopen",
+      "expiredMessage": "Deze verificatielink is verlopen. Registreer opnieuw om een nieuwe verificatie e-mail te ontvangen.",
+      "registerAgain": "Opnieuw Registreren",
+      "errorTitle": "Verificatie Mislukt",
+      "errorMessage": "Er is iets misgegaan bij het verifiëren van je e-mail. Probeer het opnieuw.",
+      "backToLogin": "Terug naar Inloggen"
     },
     "profile": {
       "title": "Mijn Profiel",

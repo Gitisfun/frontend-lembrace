@@ -35,10 +35,25 @@
           @update:model-value="handleFieldInput('password')"
         />
 
+        <div class="forgot-password-wrapper">
+          <NuxtLink :to="localePath('/forgot-password')" class="forgot-password-link">
+            {{ $t('auth.login.forgotPassword') }}
+          </NuxtLink>
+        </div>
+
         <UiButtonSubmit :loading="isSubmitting" :text="$t('auth.login.submit')" :loading-text="$t('auth.login.submitting')" />
       </form>
 
       <UiAlertMessage v-if="submitStatus" :type="submitStatus.type" :message="submitStatus.message" class="submit-status" />
+
+      <!-- Resend verification email section -->
+      <div v-if="showResendVerification" class="resend-section">
+        <button class="resend-btn" :disabled="isResending || resendCooldown > 0" @click="resendVerificationEmail">
+          <span v-if="isResending">{{ $t('auth.login.resending') }}</span>
+          <span v-else-if="resendCooldown > 0">{{ $t('auth.login.resendCooldown', { seconds: resendCooldown }) }}</span>
+          <span v-else>{{ $t('auth.login.resendVerification') }}</span>
+        </button>
+      </div>
 
       <div class="login-footer">
         <p class="register-prompt">
@@ -51,11 +66,12 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, onUnmounted } from 'vue';
 import { useFormValidation, validators } from '~/composables/useFormValidation';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
 import { useAuthStore } from '~/stores/auth';
 import { useToast } from '~/composables/useToast';
+import { sendEmail } from '~/logic/utils';
 
 const { t } = useI18n();
 const localePath = useLocalePath();
@@ -87,13 +103,101 @@ const loginSchema = {
 };
 
 const { errors, validateField, clearError, validateAll } = useFormValidation(formData, loginSchema);
-const { isSubmitting, status: submitStatus, setError, startSubmitting, stopSubmitting } = useSubmitStatus();
+const { isSubmitting, status: submitStatus, setError, setSuccess, startSubmitting, stopSubmitting, clearStatus } = useSubmitStatus();
 const forceValidation = ref(false);
+
+// Resend verification email state
+const showResendVerification = ref(false);
+const isResending = ref(false);
+const resendCooldown = ref(0);
+let cooldownInterval = null;
 
 const handleFieldInput = (fieldName) => {
   clearError(fieldName);
   forceValidation.value = false;
+  showResendVerification.value = false;
 };
+
+const startCooldown = () => {
+  resendCooldown.value = 60;
+  cooldownInterval = setInterval(() => {
+    resendCooldown.value--;
+    if (resendCooldown.value <= 0) {
+      clearInterval(cooldownInterval);
+      cooldownInterval = null;
+    }
+  }, 1000);
+};
+
+const resendVerificationEmail = async () => {
+  if (isResending.value || resendCooldown.value > 0) return;
+
+  isResending.value = true;
+  clearStatus();
+
+  try {
+    // Get the verification token
+    const tokenResponse = await $fetch(`https://sundrops-api-345f2765b0ea.herokuapp.com/api/auth/verification-token/${encodeURIComponent(formData.email)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': config.public.authApiKey,
+      },
+    });
+
+    if (!tokenResponse?.data?.email_verification_token) {
+      throw new Error('Failed to get verification token');
+    }
+
+    const siteUrl = window.location.origin;
+    const verificationLink = `${siteUrl}/register/confirmation/${tokenResponse.data.email_verification_token}`;
+
+    await sendEmail({
+      to: formData.email,
+      email: formData.email,
+      name: formData.email,
+      subject: "Verify your L'embrace account",
+      text: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">Verify Your Email</h2>
+          <p style="color: #666; line-height: 1.6;">You requested a new verification email for your L'embrace account.</p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verificationLink}" style="display: inline-block; background-color: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold;">Verify Email Address</a>
+          </div>
+          <p style="color: #888; font-size: 14px;">Or copy and paste this link in your browser:</p>
+          <p style="color: #d4af37; word-break: break-all; font-size: 14px;">${verificationLink}</p>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+          <p style="color: #888; font-size: 12px;">If you did not request this, you can safely ignore this email.</p>
+          <p style="color: #666; font-style: italic;">L'embrace - Elegance in every detail</p>
+        </div>
+      `.trim(),
+    });
+
+    setSuccess(t('auth.login.resendSuccess'));
+    toastSuccess(t('auth.login.resendSuccess'));
+    startCooldown();
+  } catch (error) {
+    console.error('Failed to resend verification email:', error);
+    const statusCode = error?.response?.status || error?.data?.statusCode || error?.statusCode;
+
+    if (statusCode === 409) {
+      setSuccess(t('auth.verify.alreadyVerified'));
+      toastSuccess(t('auth.verify.alreadyVerified'));
+      showResendVerification.value = false;
+    } else {
+      setError(t('auth.login.resendError'));
+      toastError(t('auth.login.resendError'));
+    }
+  } finally {
+    isResending.value = false;
+  }
+};
+
+onUnmounted(() => {
+  if (cooldownInterval) {
+    clearInterval(cooldownInterval);
+  }
+});
 
 const handleSubmit = async () => {
   forceValidation.value = true;
@@ -127,8 +231,16 @@ const handleSubmit = async () => {
     }
   } catch (error) {
     console.error('Login failed:', error);
-    setError(t('auth.login.error'));
-    toastError(t('auth.login.error'));
+    const statusCode = error?.response?.status || error?.data?.statusCode || error?.statusCode;
+
+    if (statusCode === 403) {
+      setError(t('auth.login.notVerified'));
+      toastError(t('auth.login.notVerified'));
+      showResendVerification.value = true;
+    } else {
+      setError(t('auth.login.error'));
+      toastError(t('auth.login.error'));
+    }
   } finally {
     stopSubmitting();
   }
@@ -188,8 +300,54 @@ const handleSubmit = async () => {
   width: 100%;
 }
 
+.forgot-password-wrapper {
+  text-align: right;
+  margin-top: -0.5rem;
+}
+
+.forgot-password-link {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-gold);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
 .submit-status {
   margin-top: 1.5rem;
+}
+
+.resend-section {
+  margin-top: 1rem;
+}
+
+.resend-btn {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-gold);
+  background: transparent;
+  border: 2px solid var(--color-gold);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.resend-btn:hover:not(:disabled) {
+  background: var(--color-gold);
+  color: white;
+}
+
+.resend-btn:disabled {
+  border-color: #ccc;
+  color: #999;
+  cursor: not-allowed;
 }
 
 .login-footer {

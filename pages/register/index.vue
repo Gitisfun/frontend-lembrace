@@ -100,6 +100,7 @@ import { useFormValidation, validators } from '~/composables/useFormValidation';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
 import { useAuthStore } from '~/stores/auth';
 import { useToast } from '~/composables/useToast';
+import { sendEmail } from '~/logic/utils';
 
 const { t } = useI18n();
 const localePath = useLocalePath();
@@ -178,23 +179,54 @@ const handleSubmit = async () => {
       },
     });
 
-    if (response.user) {
-      // Auto-login after registration
-      if (response.token) {
-        authStore.login(response.user, response.token);
-      } else {
-        authStore.setUser(response.user);
+    // Get verification token and send verification email
+    try {
+      // Get the verification token
+      const tokenResponse = await $fetch(`https://sundrops-api-345f2765b0ea.herokuapp.com/api/auth/verification-token/${encodeURIComponent(formData.email)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': config.public.authApiKey,
+        },
+      });
+
+      if (tokenResponse?.data?.email_verification_token) {
+        const siteUrl = window.location.origin;
+        const verificationLink = `${siteUrl}/register/confirmation/${tokenResponse.data.email_verification_token}`;
+
+        await sendEmail({
+          to: formData.email,
+          email: formData.email,
+          name: `${formData.firstName} ${formData.lastName}`,
+          subject: "Verify your L'embrace account",
+          text: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+              <h2 style="color: #333; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">Welcome to L'embrace!</h2>
+              <p style="color: #666; line-height: 1.6;">Thank you for creating an account. Please verify your email address to complete your registration.</p>
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${verificationLink}" style="display: inline-block; background-color: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold;">Verify Email Address</a>
+              </div>
+              <p style="color: #888; font-size: 14px;">Or copy and paste this link in your browser:</p>
+              <p style="color: #d4af37; word-break: break-all; font-size: 14px;">${verificationLink}</p>
+              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+              <p style="color: #888; font-size: 12px;">If you did not create this account, you can safely ignore this email.</p>
+              <p style="color: #666; font-style: italic;">L'embrace - Elegance in every detail</p>
+            </div>
+          `.trim(),
+        });
       }
-      toastSuccess(t('auth.register.success'));
-      navigateTo(localePath('/profile'));
-    } else {
-      setSuccess(t('auth.register.successMessage'));
-      toastSuccess(t('auth.register.success'));
-      // Redirect to login if no auto-login
-      setTimeout(() => {
-        navigateTo(localePath('/login'));
-      }, 2000);
+    } catch (emailError) {
+      console.error('Failed to send verification email:', emailError);
+      // Continue to verification page even if email sending fails
+      // User can resend from there
     }
+
+    // Redirect to verification page after successful registration
+    toastSuccess(t('auth.register.success'));
+    navigateTo({
+      path: localePath('/register/verify'),
+      query: { email: formData.email },
+    });
   } catch (error) {
     console.error('Registration failed:', error);
     const errorMessage = error?.data?.message || t('auth.register.error');
