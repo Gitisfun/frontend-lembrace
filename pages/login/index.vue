@@ -152,9 +152,6 @@ const resendVerificationEmail = async () => {
     const siteUrl = window.location.origin;
     const verificationLink = `${siteUrl}/register/confirmation/${tokenResponse.data.email_verification_token}`;
 
-    console.log('config.public.strapiUrl');
-    console.log(config.public.strapiUrl);
-
     await sendEmail(
       {
         to: formData.email,

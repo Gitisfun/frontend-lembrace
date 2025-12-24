@@ -60,6 +60,9 @@ const localePath = useLocalePath();
 const config = useRuntimeConfig();
 const { success: toastSuccess, error: toastError } = useToast();
 
+console.log('config.public.strapiUrl');
+console.log(config.public.strapiUrl);
+
 // SEO Meta
 useSeoMeta({
   title: () => t('seo.forgotPassword.title'),
