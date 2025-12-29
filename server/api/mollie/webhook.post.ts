@@ -173,7 +173,7 @@ export default defineEventHandler(async (event) => {
                   name: orderData.customerInfo?.firstname || 'Klant',
                   subject: `Bestelling bevestiging - ${orderNumber}`,
                   to: customerEmail,
-                  text: generateOrderConfirmationEmail(orderData, orderNumber),
+                  html: generateOrderConfirmationEmail(orderData, orderNumber),
                 },
                 config.public.strapiUrl
               );

@@ -160,7 +160,7 @@ const sendConfirmationEmail = async () => {
         name: order.customerInfo.firstname || 'Klant',
         subject: `Bestelling bevestiging - ${orderNumber.value}`,
         to: customerEmail,
-        text: emailContent,
+        html: emailContent,
       }, config.public.strapiUrl);
 
       emailSent.value = true;
@@ -198,7 +198,7 @@ const sendSellerNotificationEmail = async () => {
         name: 'LemBrace Team',
         subject: `Nieuwe bestelling ontvangen - ${orderNumber.value}`,
         to: sellerEmail,
-        text: emailContent,
+        html: emailContent,
       }, config.public.strapiUrl);
 
       console.log('Seller notification email sent successfully');

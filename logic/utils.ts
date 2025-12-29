@@ -118,7 +118,7 @@ export const buildContactEmailPayload = (formData: ContactFormData, recipientEma
   name: formData.name,
   subject: `New Contact Form Message from ${formData.name}`,
   to: recipientEmail,
-  text: `
+  html: `
 <h2>Contact Form Submission</h2>
 
 <h3>Contact Details:</h3>
@@ -142,7 +142,7 @@ export interface SendEmailOptions {
   email: string;
   name: string;
   subject: string;
-  text: string;
+  html: string;
 }
 
 export const sendEmail = async (options: SendEmailOptions, apiUrl: string): Promise<void> => {

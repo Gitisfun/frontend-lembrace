@@ -120,7 +120,7 @@ const resendEmail = async () => {
         email: userEmail.value,
         name: userEmail.value,
         subject: "Verify your L'embrace account",
-        text: `
+        html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #333; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">Verify Your Email</h2>
           <p style="color: #666; line-height: 1.6;">You requested a new verification email for your L'embrace account.</p>

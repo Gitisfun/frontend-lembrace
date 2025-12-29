@@ -200,7 +200,7 @@ const handleSubmit = async () => {
             email: formData.email,
             name: `${formData.firstName} ${formData.lastName}`,
             subject: "Verify your L'embrace account",
-            text: `
+            html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
               <h2 style="color: #333; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">Welcome to L'embrace!</h2>
               <p style="color: #666; line-height: 1.6;">Thank you for creating an account. Please verify your email address to complete your registration.</p>
