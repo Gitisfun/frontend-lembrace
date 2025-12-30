@@ -59,12 +59,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useAuthentication } from '~/composables/useAuthentication';
 
 const { t } = useI18n();
 const localePath = useLocalePath();
 const route = useRoute();
-const router = useRouter();
-const config = useRuntimeConfig();
+const { verifyEmail: verifyEmailApi } = useAuthentication();
 
 // SEO Meta
 useSeoMeta({
@@ -87,32 +87,9 @@ const verifyEmail = async () => {
   }
 
   try {
-    const response = await $fetch('https://sundrops-api-345f2765b0ea.herokuapp.com/api/auth/verify-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': config.public.authApiKey,
-      },
-      body: {
-        token,
-      },
-    });
-
-    status.value = 'success';
-    resultMessage.value = response?.message || '';
-  } catch (error) {
-    console.error('Email verification failed:', error);
-
-    const statusCode = error?.response?.status || error?.data?.statusCode || 500;
-    resultMessage.value = error?.data?.message || '';
-
-    if (statusCode === 400) {
-      status.value = 'invalid';
-    } else if (statusCode === 410) {
-      status.value = 'expired';
-    } else {
-      status.value = 'error';
-    }
+    const result = await verifyEmailApi(token);
+    status.value = result.status;
+    resultMessage.value = result.message || '';
   } finally {
     isLoading.value = false;
   }

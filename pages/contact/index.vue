@@ -53,7 +53,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { useFormValidation } from '~/composables/useFormValidation';
 import { useToast } from '~/composables/useToast';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
-import { buildContactEmailPayload, sendEmail } from '~/logic/utils';
+import { createContactEmailPayload, sendEmail } from '~/logic/email';
 import { contactFormSchema, createContactFormData } from '~/schemas';
 import { useAuthStore } from '~/stores/auth';
 
@@ -110,7 +110,7 @@ const handleSubmit = async () => {
 
   try {
     const config = useRuntimeConfig();
-    await sendEmail(buildContactEmailPayload(formData), config.public.strapiUrl);
+    await sendEmail(createContactEmailPayload(formData), config.public.strapiUrl);
 
     setSuccess(t('contact.success'));
     toastSuccess(t('toast.contact.success'));

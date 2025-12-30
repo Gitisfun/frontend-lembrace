@@ -48,15 +48,12 @@
 
 <script setup>
 import { ref, onUnmounted } from 'vue';
-import { useToast } from '~/composables/useToast';
-import { sendEmail } from '~/logic/utils';
+import { useAuthentication } from '~/composables/useAuthentication';
 
 const { t } = useI18n();
 const localePath = useLocalePath();
 const route = useRoute();
-const router = useRouter();
-const config = useRuntimeConfig();
-const { success: toastSuccess, error: toastError } = useToast();
+const { resendVerificationEmail } = useAuthentication();
 
 // SEO Meta
 useSeoMeta({
@@ -91,6 +88,16 @@ const startCooldown = () => {
   }, 1000);
 };
 
+const setAlertError = (message) => {
+  alertType.value = 'error';
+  alertMessage.value = message;
+};
+
+const setAlertSuccess = (message) => {
+  alertType.value = 'success';
+  alertMessage.value = message;
+};
+
 const resendEmail = async () => {
   if (isResending.value || cooldown.value > 0) return;
 
@@ -98,65 +105,17 @@ const resendEmail = async () => {
   alertMessage.value = '';
 
   try {
-    // Get the verification token
-    const tokenResponse = await $fetch(`https://sundrops-api-345f2765b0ea.herokuapp.com/api/auth/verification-token/${encodeURIComponent(userEmail.value)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': config.public.authApiKey,
-      },
-    });
+    const result = await resendVerificationEmail(userEmail.value, setAlertError, setAlertSuccess);
 
-    if (!tokenResponse?.data?.email_verification_token) {
-      throw new Error('Failed to get verification token');
-    }
-
-    const siteUrl = window.location.origin;
-    const verificationLink = `${siteUrl}/register/confirmation/${tokenResponse.data.email_verification_token}`;
-
-    await sendEmail(
-      {
-        to: userEmail.value,
-        email: userEmail.value,
-        name: userEmail.value,
-        subject: "Verify your L'embrace account",
-        html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #333; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">Verify Your Email</h2>
-          <p style="color: #666; line-height: 1.6;">You requested a new verification email for your L'embrace account.</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${verificationLink}" style="display: inline-block; background-color: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold;">Verify Email Address</a>
-          </div>
-          <p style="color: #888; font-size: 14px;">Or copy and paste this link in your browser:</p>
-          <p style="color: #d4af37; word-break: break-all; font-size: 14px;">${verificationLink}</p>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-          <p style="color: #888; font-size: 12px;">If you did not request this, you can safely ignore this email.</p>
-          <p style="color: #666; font-style: italic;">L'embrace - Elegance in every detail</p>
-        </div>
-      `.trim(),
-      },
-      config.public.strapiUrl
-    );
-
-    alertType.value = 'success';
-    alertMessage.value = t('auth.verify.resendSuccess');
-    toastSuccess(t('auth.verify.resendSuccess'));
-    startCooldown();
-  } catch (error) {
-    console.error('Failed to resend verification email:', error);
-    const statusCode = error?.response?.status || error?.data?.statusCode || error?.statusCode;
-
-    alertType.value = 'error';
-    if (statusCode === 409) {
-      alertMessage.value = t('auth.verify.alreadyVerified');
-      toastSuccess(t('auth.verify.alreadyVerified'));
-      // Redirect to login after a short delay
-      setTimeout(() => {
-        navigateTo(localePath('/login'));
-      }, 2000);
-    } else {
-      alertMessage.value = error?.data?.message || t('auth.verify.resendError');
-      toastError(alertMessage.value);
+    if (result.success) {
+      if (result.alreadyVerified) {
+        // Redirect to login after a short delay
+        setTimeout(() => {
+          navigateTo(localePath('/login'));
+        }, 2000);
+      } else {
+        startCooldown();
+      }
     }
   } finally {
     isResending.value = false;

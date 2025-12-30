@@ -1,83 +1,5 @@
 import { createMollieClient } from '@mollie/api-client';
-import { sendEmail } from '~/logic/utils';
-
-// Function to generate order confirmation email
-const generateOrderConfirmationEmail = (orderData: any, orderNumber: string) => {
-  const deliveryDate = new Date();
-  const isExpress = orderData.deliveryMethod === 'express';
-  if (isExpress) {
-    deliveryDate.setDate(deliveryDate.getDate() + 1);
-  } else {
-    deliveryDate.setDate(deliveryDate.getDate() + 3);
-  }
-
-  const expectedDelivery = deliveryDate.toLocaleDateString('nl-NL', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-
-  return `<h2>Bestelling Bevestiging - ${orderNumber}</h2>
-
-<p>Beste ${orderData.customerInfo?.firstname || 'Klant'},</p>
-
-<p>Bedankt voor je bestelling! Je betaling is succesvol verwerkt en je bestelling wordt nu voorbereid.</p>
-
-<h3>Bestelling Details:</h3>
-<ul>
-  <li><strong>Bestelnummer:</strong> ${orderNumber}</li>
-  <li><strong>Datum:</strong> ${new Date().toLocaleDateString('nl-NL', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })}</li>
-  <li><strong>Verzendmethode:</strong> ${isExpress ? 'Express levering' : 'Standaard levering'}</li>
-  <li><strong>Verwachte levering:</strong> ${expectedDelivery}</li>
-</ul>
-
-<h3>Verzendadres:</h3>
-<p>
-  ${orderData.customerInfo?.firstname} ${orderData.customerInfo?.lastname}<br>
-  ${orderData.address?.street} ${orderData.address?.number}${orderData.address?.box ? ` bus ${orderData.address.box}` : ''}<br>
-  ${orderData.address?.postalcode} ${orderData.address?.city}<br>
-  ${orderData.address?.country}
-</p>
-
-<h3>Bestelde Items:</h3>
-<ul>
-  ${
-    orderData.items
-      ?.map(
-        (item: any) => `
-    <li>${item.name} x${item.amount} - €${item.calculatedPrice.toFixed(2)}</li>
-  `
-      )
-      .join('') || '<li>Geen items gevonden</li>'
-  }
-</ul>
-
-<h3>Prijs Overzicht:</h3>
-<ul>
-  <li><strong>Subtotaal:</strong> €${(orderData.totalPrice - orderData.shippingCost).toFixed(2)}</li>
-  <li><strong>Verzendkosten:</strong> €${orderData.shippingCost.toFixed(2)}</li>
-  <li><strong>Totaal:</strong> €${orderData.totalPrice.toFixed(2)}</li>
-</ul>
-
-<h3>Volgende Stappen:</h3>
-<ol>
-  <li>We verwerken je bestelling en bereiden deze voor op verzending</li>
-  <li>Je ontvangt een e-mail zodra je pakket is verzonden met tracking informatie</li>
-  <li>Je pakket wordt geleverd op het opgegeven adres</li>
-</ol>
-
-<p>Heb je vragen over je bestelling? Neem gerust contact met ons op!</p>
-
-<p>Met vriendelijke groet,<br>
-Het LemBrace Team</p>
-
-<hr>
-<p><em>Deze e-mail is automatisch gegenereerd. Reageer niet op dit e-mailadres.</em></p>`;
-};
+import { sendOrderConfirmationEmail, type OrderData } from '~/logic/email';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -162,22 +84,20 @@ export default defineEventHandler(async (event) => {
         if (payment.status === 'paid' && updateResponse?.data) {
           try {
             const orderData = updateResponse.data;
-            const customerEmail = orderData.customerInfo?.email;
 
-            if (customerEmail) {
+            if (orderData.customerInfo?.email) {
               // Send order confirmation email
               const config = useRuntimeConfig(event);
-              await sendEmail(
-                {
-                  email: customerEmail,
-                  name: orderData.customerInfo?.firstname || 'Klant',
-                  subject: `Bestelling bevestiging - ${orderNumber}`,
-                  to: customerEmail,
-                  html: generateOrderConfirmationEmail(orderData, orderNumber),
-                },
-                config.public.strapiUrl
-              );
-              console.log(`Order confirmation email sent to ${customerEmail}`);
+              const emailOrderData: OrderData = {
+                deliveryMethod: orderData.deliveryMethod,
+                totalPrice: orderData.totalPrice,
+                shippingCost: orderData.shippingCost,
+                customerInfo: orderData.customerInfo,
+                address: orderData.address,
+                items: orderData.items,
+              };
+              await sendOrderConfirmationEmail(emailOrderData, orderNumber, config.public.strapiUrl);
+              console.log(`Order confirmation email sent to ${orderData.customerInfo.email}`);
             }
           } catch (emailError) {
             console.error('Failed to send order confirmation email:', emailError);

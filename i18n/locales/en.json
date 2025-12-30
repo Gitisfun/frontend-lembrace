@@ -367,7 +367,8 @@
       "successTitle": "Check Your Email",
       "successMessage": "We've sent you a link to reset your password. Please check your inbox.",
       "sentTo": "Email sent to:",
-      "backToLogin": "Back to Login"
+      "backToLogin": "Back to Login",
+      "userNotFound": "No account found with this email address."
     },
     "resetPassword": {
       "title": "Reset Password",

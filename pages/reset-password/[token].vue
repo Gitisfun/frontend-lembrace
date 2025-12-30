@@ -21,11 +21,10 @@
         </div>
 
         <form @submit.prevent="handleSubmit" class="reset-password-form" novalidate>
-          <InputField
+          <InputPassword
             id="password"
             v-model="formData.password"
             :label="$t('auth.form.password')"
-            type="password"
             :placeholder="$t('auth.resetPassword.newPasswordPlaceholder')"
             required
             show-success
@@ -35,11 +34,10 @@
             @update:model-value="handleFieldInput('password')"
           />
 
-          <InputField
+          <InputPassword
             id="confirmPassword"
             v-model="formData.confirmPassword"
             :label="$t('auth.form.confirmPassword')"
-            type="password"
             :placeholder="$t('auth.form.confirmPasswordPlaceholder')"
             required
             show-success
@@ -69,12 +67,13 @@ import { reactive, ref } from 'vue';
 import { useFormValidation, validators } from '~/composables/useFormValidation';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
 import { useToast } from '~/composables/useToast';
+import { useAuthentication } from '~/composables/useAuthentication';
 
 const { t } = useI18n();
 const localePath = useLocalePath();
 const route = useRoute();
-const config = useRuntimeConfig();
-const { success: toastSuccess, error: toastError } = useToast();
+const { error: toastError } = useToast();
+const { resetPassword } = useAuthentication();
 
 // SEO Meta
 useSeoMeta({
@@ -123,33 +122,11 @@ const handleSubmit = async () => {
   startSubmitting();
 
   try {
-    await $fetch('https://sundrops-api-345f2765b0ea.herokuapp.com/api/auth/reset-password', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': config.public.authApiKey,
-      },
-      body: {
-        token,
-        new_password: formData.password,
-      },
-    });
+    const result = await resetPassword(token, formData.password, setError);
 
-    resetSuccess.value = true;
-    toastSuccess(t('auth.resetPassword.success'));
-  } catch (error) {
-    console.error('Password reset failed:', error);
-    const statusCode = error?.response?.status || error?.data?.statusCode || error?.statusCode;
-
-    let errorMessage;
-    if (statusCode === 410) {
-      errorMessage = t('auth.resetPassword.tokenExpired');
-    } else {
-      errorMessage = error?.data?.message || t('auth.resetPassword.error');
+    if (result.success) {
+      resetSuccess.value = true;
     }
-
-    setError(errorMessage);
-    toastError(errorMessage);
   } finally {
     stopSubmitting();
   }

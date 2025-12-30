@@ -367,7 +367,8 @@
       "successTitle": "Controleer Je E-mail",
       "successMessage": "We hebben je een link gestuurd om je wachtwoord te herstellen. Controleer je inbox.",
       "sentTo": "E-mail verzonden naar:",
-      "backToLogin": "Terug naar Inloggen"
+      "backToLogin": "Terug naar Inloggen",
+      "userNotFound": "Geen account gevonden met dit e-mailadres."
     },
     "resetPassword": {
       "title": "Wachtwoord Herstellen",

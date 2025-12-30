@@ -1,12 +1,25 @@
+// ============================================================================
+// General Utility Functions
+// ============================================================================
+
+/**
+ * Formats a price in EUR currency with Dutch locale
+ */
 export const formatPrice = (price: number) =>
   new Intl.NumberFormat('nl-NL', {
     style: 'currency',
     currency: 'EUR',
   }).format(price);
 
-// Order number API
+// ============================================================================
+// Order Number API
+// ============================================================================
+
 const ORDER_NUMBER_API = 'https://order-number-api-912e55947744.herokuapp.com/api/counter';
 
+/**
+ * Fetches a new unique order number from the order API
+ */
 export const fetchOrderNumber = async (apiKey: string): Promise<string> => {
   const response = await $fetch<{ order_number: string }>(ORDER_NUMBER_API, {
     method: 'GET',
@@ -17,7 +30,10 @@ export const fetchOrderNumber = async (apiKey: string): Promise<string> => {
   return response.order_number;
 };
 
-// Order payload types
+// ============================================================================
+// Order Payload Builder
+// ============================================================================
+
 interface PaymentFormData {
   firstName: string;
   lastName: string;
@@ -53,6 +69,9 @@ interface BuildOrderOptions {
   orderNumber?: string;
 }
 
+/**
+ * Builds an order payload for submission to the API
+ */
 export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], totalPrice: number, shippingCost: number, options: BuildOrderOptions = {}) => {
   const { useSameAddressForBilling = true, orderNumber } = options;
 
@@ -103,54 +122,4 @@ export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], 
       calculatedPrice: item.calculatedPrice,
     })),
   };
-};
-
-// Contact form types
-interface ContactFormData {
-  name: string;
-  email: string;
-  phone?: string;
-  message: string;
-}
-
-export const buildContactEmailPayload = (formData: ContactFormData, recipientEmail: string = 'info@lembrace.be') => ({
-  email: formData.email,
-  name: formData.name,
-  subject: `New Contact Form Message from ${formData.name}`,
-  to: recipientEmail,
-  html: `
-<h2>Contact Form Submission</h2>
-
-<h3>Contact Details:</h3>
-<ul>
-  <li><strong>Name:</strong> ${formData.name}</li>
-  <li><strong>Email:</strong> ${formData.email}</li>
-  <li><strong>Phone:</strong> ${formData.phone || 'Not provided'}</li>
-</ul>
-
-<h3>Message:</h3>
-<p>${formData.message}</p>
-
-<hr>
-<p><em>Sent from L'embrace Contact Form</em></p>
-  `.trim(),
-});
-
-// Email sending types and function
-export interface SendEmailOptions {
-  to: string;
-  email: string;
-  name: string;
-  subject: string;
-  html: string;
-}
-
-export const sendEmail = async (options: SendEmailOptions, apiUrl: string): Promise<void> => {
-  await $fetch(`${apiUrl}/api/email/send`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: options,
-  });
 };

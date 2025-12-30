@@ -53,15 +53,12 @@ import { reactive, ref } from 'vue';
 import { useFormValidation, validators } from '~/composables/useFormValidation';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
 import { useToast } from '~/composables/useToast';
-import { sendEmail } from '~/logic/utils';
+import { useAuthentication } from '~/composables/useAuthentication';
 
 const { t } = useI18n();
 const localePath = useLocalePath();
-const config = useRuntimeConfig();
-const { success: toastSuccess, error: toastError } = useToast();
-
-console.log('config.public.strapiUrl');
-console.log(config.public.strapiUrl);
+const { error: toastError } = useToast();
+const { requestPasswordReset } = useAuthentication();
 
 // SEO Meta
 useSeoMeta({
@@ -99,54 +96,10 @@ const handleSubmit = async () => {
   startSubmitting();
 
   try {
-    // Request password reset token from API
-    const tokenResponse = await $fetch(`https://sundrops-api-345f2765b0ea.herokuapp.com/api/auth/password-reset-token`, {
-      method: 'POST',
-      body: {
-        email: formData.email,
-      },
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': config.public.authApiKey,
-      },
-    });
-
-    if (tokenResponse?.data?.password_reset_token) {
-      const siteUrl = window.location.origin;
-      const resetLink = `${siteUrl}/reset-password/${tokenResponse.data.password_reset_token}`;
-
-      await sendEmail(
-        {
-          to: formData.email,
-          email: formData.email,
-          name: formData.email,
-          subject: "Reset your L'embrace password",
-          html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <h2 style="color: #333; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">Reset Your Password</h2>
-            <p style="color: #666; line-height: 1.6;">You requested to reset your password for your L'embrace account.</p>
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${resetLink}" style="display: inline-block; background-color: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold;">Reset Password</a>
-            </div>
-            <p style="color: #888; font-size: 14px;">Or copy and paste this link in your browser:</p>
-            <p style="color: #d4af37; word-break: break-all; font-size: 14px;">${resetLink}</p>
-            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-            <p style="color: #888; font-size: 12px;">If you did not request this, you can safely ignore this email. Your password will remain unchanged.</p>
-            <p style="color: #666; font-style: italic;">L'embrace - Elegance in every detail</p>
-          </div>
-        `.trim(),
-        },
-        config.public.strapiUrl
-      );
+    const result = await requestPasswordReset(formData.email, setError);
+    if (result.success) {
+      emailSent.value = true;
     }
-
-    emailSent.value = true;
-    toastSuccess(t('auth.forgotPassword.success'));
-  } catch (error) {
-    console.error('Forgot password failed:', error);
-    // Always show success to prevent email enumeration
-    emailSent.value = true;
-    toastSuccess(t('auth.forgotPassword.success'));
   } finally {
     stopSubmitting();
   }

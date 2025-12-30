@@ -1,30 +1,6 @@
 import { ref } from 'vue';
-import { useAuthStore } from '~/stores/auth';
+import { useAuthStore, type UserAddress, type UserContact } from '~/stores/auth';
 import { useAuthGuard } from '~/composables/useAuthGuard';
-
-export interface UserAddress {
-  id?: string;
-  user_id?: string;
-  street: string;
-  house: string;
-  box: string;
-  postalcode: string;
-  city: string;
-  country: string;
-  type: 'billing' | 'shipping' | 'both';
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string | null;
-}
-
-export interface UserContact {
-  id?: string;
-  user_id?: string;
-  phone: string;
-  created_at?: string;
-  updated_at?: string;
-  deleted_at?: string | null;
-}
 
 export const useUserProfile = () => {
   const config = useRuntimeConfig();

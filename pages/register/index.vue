@@ -51,11 +51,10 @@
           @update:model-value="handleFieldInput('email')"
         />
 
-        <InputField
+        <InputPassword
           id="password"
           v-model="formData.password"
           :label="$t('auth.form.password')"
-          type="password"
           :placeholder="$t('auth.form.passwordPlaceholder')"
           required
           show-success
@@ -65,11 +64,10 @@
           @update:model-value="handleFieldInput('password')"
         />
 
-        <InputField
+        <InputPassword
           id="confirmPassword"
           v-model="formData.confirmPassword"
           :label="$t('auth.form.confirmPassword')"
-          type="password"
           :placeholder="$t('auth.form.confirmPasswordPlaceholder')"
           required
           show-success
@@ -100,14 +98,13 @@ import { useFormValidation, validators } from '~/composables/useFormValidation';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
 import { useAuthStore } from '~/stores/auth';
 import { useToast } from '~/composables/useToast';
-import { sendEmail } from '~/logic/utils';
+import { useAuthentication } from '~/composables/useAuthentication';
 
 const { t } = useI18n();
 const localePath = useLocalePath();
-const router = useRouter();
-const config = useRuntimeConfig();
 const authStore = useAuthStore();
-const { success: toastSuccess, error: toastError } = useToast();
+const { error: toastError } = useToast();
+const { register } = useAuthentication();
 
 // SEO Meta
 useSeoMeta({
@@ -145,7 +142,7 @@ const registerSchema = {
 };
 
 const { errors, validateField, clearError, validateAll } = useFormValidation(formData, registerSchema);
-const { isSubmitting, status: submitStatus, setSuccess, setError, startSubmitting, stopSubmitting } = useSubmitStatus();
+const { isSubmitting, status: submitStatus, setError, startSubmitting, stopSubmitting } = useSubmitStatus();
 const forceValidation = ref(false);
 
 const handleFieldInput = (fieldName) => {
@@ -164,77 +161,22 @@ const handleSubmit = async () => {
   startSubmitting();
 
   try {
-    const response = await $fetch('https://sundrops-api-345f2765b0ea.herokuapp.com/api/auth/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': config.public.authApiKey,
-      },
-      body: {
+    const result = await register(
+      {
         email: formData.email,
         password: formData.password,
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        status: 'active',
+        firstName: formData.firstName,
+        lastName: formData.lastName,
       },
-    });
+      setError
+    );
 
-    // Get verification token and send verification email
-    try {
-      // Get the verification token
-      const tokenResponse = await $fetch(`https://sundrops-api-345f2765b0ea.herokuapp.com/api/auth/verification-token/${encodeURIComponent(formData.email)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': config.public.authApiKey,
-        },
+    if (result.success) {
+      navigateTo({
+        path: localePath('/register/verify'),
+        query: { email: formData.email },
       });
-
-      if (tokenResponse?.data?.email_verification_token) {
-        const siteUrl = window.location.origin;
-        const verificationLink = `${siteUrl}/register/confirmation/${tokenResponse.data.email_verification_token}`;
-
-        await sendEmail(
-          {
-            to: formData.email,
-            email: formData.email,
-            name: `${formData.firstName} ${formData.lastName}`,
-            subject: "Verify your L'embrace account",
-            html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-              <h2 style="color: #333; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">Welcome to L'embrace!</h2>
-              <p style="color: #666; line-height: 1.6;">Thank you for creating an account. Please verify your email address to complete your registration.</p>
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${verificationLink}" style="display: inline-block; background-color: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold;">Verify Email Address</a>
-              </div>
-              <p style="color: #888; font-size: 14px;">Or copy and paste this link in your browser:</p>
-              <p style="color: #d4af37; word-break: break-all; font-size: 14px;">${verificationLink}</p>
-              <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-              <p style="color: #888; font-size: 12px;">If you did not create this account, you can safely ignore this email.</p>
-              <p style="color: #666; font-style: italic;">L'embrace - Elegance in every detail</p>
-            </div>
-          `.trim(),
-          },
-          config.public.strapiUrl
-        );
-      }
-    } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
-      // Continue to verification page even if email sending fails
-      // User can resend from there
     }
-
-    // Redirect to verification page after successful registration
-    toastSuccess(t('auth.register.success'));
-    navigateTo({
-      path: localePath('/register/verify'),
-      query: { email: formData.email },
-    });
-  } catch (error) {
-    console.error('Registration failed:', error);
-    const errorMessage = error?.data?.message || t('auth.register.error');
-    setError(errorMessage);
-    toastError(errorMessage);
   } finally {
     stopSubmitting();
   }

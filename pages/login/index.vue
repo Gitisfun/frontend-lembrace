@@ -21,11 +21,10 @@
           @update:model-value="handleFieldInput('email')"
         />
 
-        <InputField
+        <InputPassword
           id="password"
           v-model="formData.password"
           :label="$t('auth.form.password')"
-          type="password"
           :placeholder="$t('auth.form.passwordPlaceholder')"
           required
           show-success
@@ -71,14 +70,13 @@ import { useFormValidation, validators } from '~/composables/useFormValidation';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
 import { useAuthStore } from '~/stores/auth';
 import { useToast } from '~/composables/useToast';
-import { sendEmail } from '~/logic/utils';
+import { useAuthentication } from '~/composables/useAuthentication';
 
 const { t } = useI18n();
 const localePath = useLocalePath();
-const router = useRouter();
-const config = useRuntimeConfig();
 const authStore = useAuthStore();
-const { success: toastSuccess, error: toastError } = useToast();
+const { error: toastError } = useToast();
+const { login, resendVerificationEmail: resendVerification } = useAuthentication();
 
 // SEO Meta
 useSeoMeta({
@@ -136,60 +134,14 @@ const resendVerificationEmail = async () => {
   clearStatus();
 
   try {
-    // Get the verification token
-    const tokenResponse = await $fetch(`https://sundrops-api-345f2765b0ea.herokuapp.com/api/auth/verification-token/${encodeURIComponent(formData.email)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': config.public.authApiKey,
-      },
-    });
+    const result = await resendVerification(formData.email, setError, setSuccess);
 
-    if (!tokenResponse?.data?.email_verification_token) {
-      throw new Error('Failed to get verification token');
-    }
-
-    const siteUrl = window.location.origin;
-    const verificationLink = `${siteUrl}/register/confirmation/${tokenResponse.data.email_verification_token}`;
-
-    await sendEmail(
-      {
-        to: formData.email,
-        email: formData.email,
-        name: formData.email,
-        subject: "Verify your L'embrace account",
-        html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #333; border-bottom: 2px solid #d4af37; padding-bottom: 10px;">Verify Your Email</h2>
-          <p style="color: #666; line-height: 1.6;">You requested a new verification email for your L'embrace account.</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${verificationLink}" style="display: inline-block; background-color: #d4af37; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: bold;">Verify Email Address</a>
-          </div>
-          <p style="color: #888; font-size: 14px;">Or copy and paste this link in your browser:</p>
-          <p style="color: #d4af37; word-break: break-all; font-size: 14px;">${verificationLink}</p>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-          <p style="color: #888; font-size: 12px;">If you did not request this, you can safely ignore this email.</p>
-          <p style="color: #666; font-style: italic;">L'embrace - Elegance in every detail</p>
-        </div>
-      `.trim(),
-      },
-      config.public.strapiUrl
-    );
-
-    setSuccess(t('auth.login.resendSuccess'));
-    toastSuccess(t('auth.login.resendSuccess'));
-    startCooldown();
-  } catch (error) {
-    console.error('Failed to resend verification email:', error);
-    const statusCode = error?.response?.status || error?.data?.statusCode || error?.statusCode;
-
-    if (statusCode === 409) {
-      setSuccess(t('auth.verify.alreadyVerified'));
-      toastSuccess(t('auth.verify.alreadyVerified'));
-      showResendVerification.value = false;
-    } else {
-      setError(t('auth.login.resendError'));
-      toastError(t('auth.login.resendError'));
+    if (result.success) {
+      if (result.alreadyVerified) {
+        showResendVerification.value = false;
+      } else {
+        startCooldown();
+      }
     }
   } finally {
     isResending.value = false;
@@ -213,36 +165,13 @@ const handleSubmit = async () => {
   startSubmitting();
 
   try {
-    const response = await $fetch('https://sundrops-api-345f2765b0ea.herokuapp.com/api/auth/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': config.public.authApiKey,
-      },
-      body: {
-        identifier: formData.email,
-        password: formData.password,
-      },
-    });
+    const result = await login({ email: formData.email, password: formData.password }, setError);
 
-    if (response.success && response.data) {
-      authStore.login(response.data, response.token);
-      toastSuccess(t('auth.login.success'));
+    if (result.success && result.data && result.token) {
+      authStore.login(result.data, result.token);
       navigateTo(localePath('/profile'));
-    } else {
-      throw new Error(response.message || 'Invalid response');
-    }
-  } catch (error) {
-    console.error('Login failed:', error);
-    const statusCode = error?.response?.status || error?.data?.statusCode || error?.statusCode;
-
-    if (statusCode === 403) {
-      setError(t('auth.login.notVerified'));
-      toastError(t('auth.login.notVerified'));
+    } else if (result.showResendVerification) {
       showResendVerification.value = true;
-    } else {
-      setError(t('auth.login.error'));
-      toastError(t('auth.login.error'));
     }
   } finally {
     stopSubmitting();
