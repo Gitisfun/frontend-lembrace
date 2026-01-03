@@ -8,9 +8,7 @@
         </div>
         <h1 class="success-title">{{ $t('auth.resetPassword.successTitle') }}</h1>
         <p class="success-message">{{ $t('auth.resetPassword.successMessage') }}</p>
-        <NuxtLink :to="localePath('/login')" class="action-btn">
-          {{ $t('auth.resetPassword.loginButton') }}
-        </NuxtLink>
+        <UiButton variant="primary" :to="localePath('/login')" :text="$t('auth.resetPassword.loginButton')" />
       </div>
 
       <!-- Reset Form -->
@@ -181,26 +179,6 @@ const handleSubmit = async () => {
   color: var(--color-text-light);
   line-height: 1.6;
   margin-bottom: 1.5rem;
-}
-
-.action-btn {
-  display: inline-block;
-  padding: 1rem 2rem;
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 600;
-  color: white;
-  background: var(--color-gold);
-  border: none;
-  border-radius: 12px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.action-btn:hover {
-  background: var(--color-gold-dark, #c4a030);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
 }
 
 .reset-password-header {

@@ -30,11 +30,15 @@
       </div>
 
       <div class="verify-actions">
-        <button class="resend-btn" :disabled="isResending || cooldown > 0" @click="resendEmail">
-          <span v-if="isResending">{{ $t('auth.verify.resending') }}</span>
-          <span v-else-if="cooldown > 0">{{ $t('auth.verify.resendCooldown', { seconds: cooldown }) }}</span>
-          <span v-else>{{ $t('auth.verify.resendEmail') }}</span>
-        </button>
+        <UiButton
+          variant="primary"
+          full-width
+          :loading="isResending"
+          :loading-text="$t('auth.verify.resending')"
+          :disabled="cooldown > 0"
+          :text="cooldown > 0 ? $t('auth.verify.resendCooldown', { seconds: cooldown }) : $t('auth.verify.resendEmail')"
+          @click="resendEmail"
+        />
 
         <NuxtLink :to="localePath('/login')" class="login-link">
           {{ $t('auth.verify.backToLogin') }}
@@ -251,32 +255,6 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 1rem;
   align-items: center;
-}
-
-.resend-btn {
-  width: 100%;
-  padding: 1rem 2rem;
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 600;
-  color: white;
-  background: var(--color-gold);
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.resend-btn:hover:not(:disabled) {
-  background: var(--color-gold-dark, #c4a030);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-}
-
-.resend-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-  transform: none;
 }
 
 .login-link {

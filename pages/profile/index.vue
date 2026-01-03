@@ -44,9 +44,7 @@
 
       <!-- Logout -->
       <div class="profile-actions">
-        <button @click="handleLogout" class="logout-btn">
-          {{ $t('auth.profile.logout') }}
-        </button>
+        <UiButton variant="danger" full-width :text="$t('auth.profile.logout')" @click="handleLogout" />
       </div>
     </div>
   </div>
@@ -230,29 +228,6 @@ onMounted(async () => {
 
 .profile-actions {
   margin-top: 0.5rem;
-}
-
-.logout-btn {
-  width: 100%;
-  padding: 0.75rem 1.5rem;
-  background: transparent;
-  color: #b91c1c;
-  border: 1.5px solid #e5e5e5;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.logout-btn:hover {
-  border-color: #b91c1c;
-  background: #fef2f2;
-}
-
-.logout-btn:active {
-  background: #fee2e2;
 }
 
 @media (max-width: 768px) {

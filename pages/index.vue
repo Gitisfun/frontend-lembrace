@@ -129,6 +129,7 @@ await fetchContent();
 }
 
 .hero {
+  margin-top: 2rem;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -305,20 +306,30 @@ await fetchContent();
   top: 90%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0, 0, 0, 0.7);
-  border: 1px solid #fff;
+  background: #1a1a1a;
+  backdrop-filter: blur(10px);
+  border: none;
   color: #fff;
-  font-size: 1.2rem;
-  padding: 0.7em 2.2em;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.9rem 2.5rem;
   cursor: pointer;
-  font-family: inherit;
-  letter-spacing: 0.03em;
-  transition: background 0.2s, color 0.2s;
+  font-family: var(--font-body);
+  letter-spacing: 0.08em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 2;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
+
 .center-overlay-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.95);
+  color: #1a1a1a;
+  transform: translate(-50%, -50%) scale(1.02);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.center-overlay-btn:active {
+  transform: translate(-50%, -50%) scale(0.98);
 }
 
 @media (max-width: 1024px) {
@@ -334,7 +345,8 @@ await fetchContent();
     min-height: 200px;
   }
   .center-overlay-btn {
-    font-size: 1rem;
+    font-size: 0.85rem;
+    padding: 0.8rem 2rem;
     top: 50%;
   }
 }

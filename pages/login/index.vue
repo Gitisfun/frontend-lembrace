@@ -47,11 +47,15 @@
 
       <!-- Resend verification email section -->
       <div v-if="showResendVerification" class="resend-section">
-        <button class="resend-btn" :disabled="isResending || resendCooldown > 0" @click="resendVerificationEmail">
-          <span v-if="isResending">{{ $t('auth.login.resending') }}</span>
-          <span v-else-if="resendCooldown > 0">{{ $t('auth.login.resendCooldown', { seconds: resendCooldown }) }}</span>
-          <span v-else>{{ $t('auth.login.resendVerification') }}</span>
-        </button>
+        <UiButton
+          variant="outline-gold"
+          full-width
+          :loading="isResending"
+          :loading-text="$t('auth.login.resending')"
+          :disabled="resendCooldown > 0"
+          :text="resendCooldown > 0 ? $t('auth.login.resendCooldown', { seconds: resendCooldown }) : $t('auth.login.resendVerification')"
+          @click="resendVerificationEmail"
+        />
       </div>
 
       <div class="login-footer">
@@ -255,31 +259,6 @@ const handleSubmit = async () => {
 
 .resend-section {
   margin-top: 1rem;
-}
-
-.resend-btn {
-  width: 100%;
-  padding: 0.875rem 1.5rem;
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-gold);
-  background: transparent;
-  border: 2px solid var(--color-gold);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.resend-btn:hover:not(:disabled) {
-  background: var(--color-gold);
-  color: white;
-}
-
-.resend-btn:disabled {
-  border-color: #ccc;
-  color: #999;
-  cursor: not-allowed;
 }
 
 .login-footer {

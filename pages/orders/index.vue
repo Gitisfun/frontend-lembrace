@@ -10,9 +10,7 @@
         <IconPackage :size="64" class="empty-icon" />
         <h2 class="empty-title">{{ $t('orders.empty.title') }}</h2>
         <p class="empty-description">{{ $t('orders.empty.description') }}</p>
-        <NuxtLink :to="localePath('/products')" class="browse-btn">
-          {{ $t('orders.empty.browseProducts') }}
-        </NuxtLink>
+        <UiButton variant="primary" :to="localePath('/products')" :text="$t('orders.empty.browseProducts')" />
       </div>
 
       <div v-else class="orders-list">
@@ -51,7 +49,7 @@
       </div>
 
       <div class="back-link">
-        <NuxtLink :to="localePath('/profile')" class="back-btn"> ← {{ $t('orders.backToProfile') }} </NuxtLink>
+        <UiButton variant="ghost" :to="localePath('/profile')" icon-left="←" :text="$t('orders.backToProfile')" />
       </div>
     </div>
   </div>
@@ -269,23 +267,6 @@ const orders = ref([
   margin-bottom: 1.5rem;
 }
 
-.browse-btn {
-  display: inline-block;
-  padding: 0.875rem 2rem;
-  background: var(--gradient-gold);
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.browse-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-}
-
 .orders-list {
   display: flex;
   flex-direction: column;
@@ -456,20 +437,6 @@ const orders = ref([
 .back-link {
   margin-top: 2rem;
   text-align: center;
-}
-
-.back-btn {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  color: var(--color-text);
-  text-decoration: none;
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-}
-
-.back-btn:hover {
-  color: var(--color-gold);
 }
 
 @media (max-width: 768px) {

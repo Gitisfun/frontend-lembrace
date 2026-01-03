@@ -14,9 +14,7 @@
         </div>
         <h1 class="result-title">{{ $t('auth.confirmation.successTitle') }}</h1>
         <p class="result-message">{{ resultMessage || $t('auth.confirmation.successMessage') }}</p>
-        <NuxtLink :to="localePath('/login')" class="action-btn">
-          {{ $t('auth.confirmation.loginButton') }}
-        </NuxtLink>
+        <UiButton variant="primary" :to="localePath('/login')" :text="$t('auth.confirmation.loginButton')" />
       </div>
 
       <!-- Error States -->
@@ -35,18 +33,14 @@
         <template v-else-if="status === 'expired'">
           <h1 class="result-title">{{ $t('auth.confirmation.expiredTitle') }}</h1>
           <p class="result-message">{{ resultMessage || $t('auth.confirmation.expiredMessage') }}</p>
-          <button class="action-btn secondary" @click="goToRegister">
-            {{ $t('auth.confirmation.registerAgain') }}
-          </button>
+          <UiButton variant="outline" :text="$t('auth.confirmation.registerAgain')" @click="goToRegister" />
         </template>
 
         <!-- Server Error (500) -->
         <template v-else>
           <h1 class="result-title">{{ $t('auth.confirmation.errorTitle') }}</h1>
           <p class="result-message">{{ resultMessage || $t('auth.confirmation.errorMessage') }}</p>
-          <button class="action-btn secondary" @click="retryVerification">
-            {{ $t('common.retry') }}
-          </button>
+          <UiButton variant="outline" :text="$t('common.retry')" @click="retryVerification" />
         </template>
 
         <NuxtLink :to="localePath('/login')" class="login-link">
@@ -199,38 +193,6 @@ onMounted(() => {
   line-height: 1.6;
   margin: 0 0 1rem 0;
   max-width: 400px;
-}
-
-.action-btn {
-  display: inline-block;
-  padding: 1rem 2rem;
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 600;
-  color: white;
-  background: var(--color-gold);
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  margin-top: 0.5rem;
-}
-
-.action-btn:hover {
-  background: var(--color-gold-dark, #c4a030);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-}
-
-.action-btn.secondary {
-  background: #f3f4f6;
-  color: var(--color-text);
-}
-
-.action-btn.secondary:hover {
-  background: #e5e7eb;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .login-link {

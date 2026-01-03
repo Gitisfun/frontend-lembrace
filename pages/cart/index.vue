@@ -2,7 +2,7 @@
   <div class="cart-page">
     <div v-if="!cartItems.length" class="empty-cart">
       <p>{{ $t('cart.empty') }}</p>
-      <NuxtLink :to="localePath('/products')" class="continue-shopping">{{ $t('cart.viewProducts') }}</NuxtLink>
+      <UiButton variant="primary" :to="localePath('/products')" :text="$t('cart.viewProducts')" />
     </div>
 
     <div v-else class="cart-content">
@@ -32,7 +32,7 @@
           <span>{{ $t('cart.total') }}</span>
           <span>€{{ total.toFixed(2) }}</span>
         </div>
-        <button class="checkout-btn" @click="handleCheckout">{{ $t('cart.checkout') }}</button>
+        <UiButton variant="primary" full-width :text="$t('cart.checkout')" class="checkout-btn" @click="handleCheckout" />
       </div>
     </div>
   </div>
@@ -152,31 +152,7 @@ const handleCheckout = () => {
 }
 
 .checkout-btn {
-  width: 100%;
-  padding: 0.85rem 1.5rem;
-  background: var(--color-gold);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  transition: all 0.25s ease;
   margin-top: 1.5rem;
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
-}
-
-.checkout-btn:hover {
-  background: #c9a227;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
-}
-
-.checkout-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
 }
 
 .empty-cart {
@@ -191,31 +167,6 @@ const handleCheckout = () => {
   font-size: 1.2rem;
   color: var(--color-text);
   margin-bottom: 1.5rem;
-}
-
-.continue-shopping {
-  display: inline-block;
-  padding: 0.85rem 1.5rem;
-  background: var(--color-gold);
-  color: white;
-  text-decoration: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
-}
-
-.continue-shopping:hover {
-  background: #c9a227;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
-}
-
-.continue-shopping:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
 }
 
 @media (max-width: 1024px) {
@@ -257,11 +208,6 @@ const handleCheckout = () => {
 
   .summary-row.total {
     font-size: 1.1rem;
-  }
-
-  .checkout-btn {
-    font-size: 0.9rem;
-    padding: 0.8rem 1.25rem;
   }
 }
 </style>

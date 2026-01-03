@@ -22,7 +22,7 @@
           </div>
           <h2 class="no-favorites-title">{{ $t('favorites.empty.title') }}</h2>
           <p class="no-favorites-description">{{ $t('favorites.empty.description') }}</p>
-          <NuxtLink :to="localePath('/products')" class="browse-products-btn">{{ $t('favorites.empty.browseProducts') }}</NuxtLink>
+          <UiButton variant="primary" :to="localePath('/products')" :text="$t('favorites.empty.browseProducts')" />
         </div>
       </div>
       <div v-else class="favorites-grid">
@@ -188,26 +188,6 @@ watch(
   color: #666;
   line-height: 1.5;
   margin: 0 0 2rem 0;
-}
-
-.browse-products-btn {
-  display: inline-block;
-  padding: 0.9rem 1.8rem;
-  background: var(--color-gold);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-}
-
-.browse-products-btn:hover {
-  background: #b88b2a;
-  transform: translateY(-1px);
 }
 
 @media (max-width: 768px) {

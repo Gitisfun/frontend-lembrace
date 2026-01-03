@@ -66,14 +66,14 @@
             <!-- Promocode Input -->
             <div class="promocode-section">
               <input v-model="promocode" type="text" :placeholder="$t('product.promocode.placeholder')" class="promocode-input" />
-              <button @click="applyPromocode" class="apply-promocode-btn">{{ $t('product.promocode.apply') }}</button>
+              <UiButton variant="primary" size="sm" :text="$t('product.promocode.apply')" @click="applyPromocode" />
             </div>
 
             <!-- Divider -->
             <div class="action-divider"></div>
-            <button class="add-to-cart" @click="addToCart">{{ $t('product.addToCart') }}</button>
-            <button v-if="isInCart" class="remove-from-cart" @click="removeFromCart">{{ $t('product.removeFromCart') }}</button>
-            <NuxtLink :to="localePath('/cart')" class="checkout-btn">{{ $t('product.checkout') }}</NuxtLink>
+            <UiButton variant="primary" full-width :text="$t('product.addToCart')" @click="addToCart" />
+            <UiButton v-if="isInCart" variant="danger" full-width :text="$t('product.removeFromCart')" @click="removeFromCart" />
+            <UiButton variant="secondary" full-width :arrow="true" :to="localePath('/cart')" :text="$t('product.checkout')" />
           </template>
         </div>
       </div>
@@ -433,25 +433,6 @@ const applyPromocode = () => {
   color: #999;
 }
 
-.apply-promocode-btn {
-  padding: 0.8rem 1.5rem;
-  background: var(--color-gold);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
-}
-
-.apply-promocode-btn:hover {
-  background: #b88b2a;
-  transform: translateY(-1px);
-}
-
 .action-divider {
   height: 1px;
   background: linear-gradient(to right, transparent, #e8d8b4, transparent);
@@ -506,100 +487,6 @@ const applyPromocode = () => {
   animation: fadeIn 0.3s ease-in-out;
 }
 
-.add-to-cart {
-  width: 100%;
-  padding: 0.85rem 1.5rem;
-  background: var(--color-gold);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
-}
-
-.add-to-cart:hover {
-  background: #c9a227;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
-}
-
-.add-to-cart:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
-}
-
-.remove-from-cart {
-  width: 100%;
-  padding: 0.75rem 1.5rem;
-  background: transparent;
-  color: #b91c1c;
-  border: 1.5px solid #e5e5e5;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.remove-from-cart:hover {
-  border-color: #b91c1c;
-  background: #fef2f2;
-}
-
-.remove-from-cart:active {
-  background: #fee2e2;
-}
-
-.checkout-btn {
-  width: 100%;
-  padding: 0.85rem 1.5rem;
-  background: #1f2937;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  text-decoration: none;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  box-sizing: border-box;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-}
-
-.checkout-btn::after {
-  content: '→';
-  font-size: 1rem;
-  transition: transform 0.2s ease;
-}
-
-.checkout-btn:hover {
-  background: #374151;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
-}
-
-.checkout-btn:hover::after {
-  transform: translateX(3px);
-}
-
-.checkout-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-}
-
 .title-decoration {
   width: 15%;
   height: 2px;
@@ -644,22 +531,6 @@ const applyPromocode = () => {
 
   .image-thumbnails {
     gap: 0.25rem;
-  }
-
-  .add-to-cart {
-    width: 100%;
-    min-width: unset;
-    margin: 0;
-  }
-
-  .remove-from-cart {
-    width: 100%;
-  }
-
-  .checkout-btn {
-    width: 100%;
-    min-width: unset;
-    margin: 0;
   }
 }
 
