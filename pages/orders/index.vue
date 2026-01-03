@@ -20,34 +20,32 @@
           <div class="order-header">
             <div class="order-info">
               <span class="order-number">{{ $t('orders.orderNumber') }}: {{ order.orderNumber }}</span>
-              <span class="order-date">{{ formatDate(order.date) }}</span>
+              <span class="order-time">{{ formatTime(order.orderDate) }}</span>
+              <span class="order-date">{{ formatDate(order.orderDate) }}</span>
             </div>
-            <span class="order-status" :class="order.status">
-              {{ $t(`orders.status.${order.status}`) }}
+            <span class="order-status" :class="order.orderStatus">
+              {{ $t(`orders.status.${order.orderStatus}`) }}
             </span>
           </div>
 
           <div class="order-items">
             <div v-for="item in order.items" :key="item.id" class="order-item">
               <div class="item-image">
-                <img :src="item.image" :alt="item.name" />
+                <img :src="getItemImage(item)" :alt="item.name" />
               </div>
               <div class="item-details">
                 <span class="item-name">{{ item.name }}</span>
-                <span class="item-quantity">{{ $t('orders.quantity') }}: {{ item.quantity }}</span>
+                <span class="item-quantity">{{ $t('orders.quantity') }}: {{ item.amount }}</span>
               </div>
-              <div class="item-price">{{ formatPrice(item.price) }}</div>
+              <div class="item-price">{{ formatPrice(item.calculatedPrice) }}</div>
             </div>
           </div>
 
           <div class="order-footer">
             <div class="order-total">
               <span class="total-label">{{ $t('orders.total') }}:</span>
-              <span class="total-value">{{ formatPrice(order.total) }}</span>
+              <span class="total-value">{{ formatPrice(order.totalPrice) }}</span>
             </div>
-            <NuxtLink :to="localePath(`/orders/${order.id}`)" class="view-details-btn">
-              {{ $t('orders.viewDetails') }}
-            </NuxtLink>
           </div>
         </div>
       </div>
@@ -67,6 +65,19 @@ import { formatPrice } from '~/logic/utils';
 const { t, locale } = useI18n();
 const localePath = useLocalePath();
 const authStore = useAuthStore();
+const { find } = useStrapi();
+const config = useRuntimeConfig();
+const orders = ref([]);
+
+// Get item image URL from product relation
+const getItemImage = (item) => {
+  const image = item.productId?.image?.[0];
+  if (image) {
+    const imageUrl = image.formats?.thumbnail?.url || image.url;
+    return `${config.public.strapiUrl}${imageUrl}`;
+  }
+  return '/placeholder-product.png';
+};
 
 // SEO Meta
 useSeoMeta({
@@ -80,6 +91,43 @@ if (!authStore.isAuthenticated) {
   navigateTo(localePath('/login'));
 }
 
+const fetchContent = async () => {
+  try {
+    //isLoading.value = true;
+    //hasError.value = false;
+    const response = await find('orders', {
+      filters: {
+        customerId: authStore.user?.id,
+      },
+      populate: {
+        customerInfo: true,
+        shippingAddress: true,
+        billingAddress: true,
+        items: {
+          populate: {
+            productId: {
+              populate: '*',
+            },
+          },
+        },
+      },
+    });
+    orders.value = response.data;
+    console.log('response');
+    console.log(response);
+    //pageContent.value = response;
+  } catch (error) {
+    console.error('Failed to load homepage content:', error);
+    //hasError.value = true;
+  } finally {
+    //isLoading.value = false;
+  }
+};
+
+console.log('fetchContent');
+
+await fetchContent();
+
 // Format date based on locale
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -90,7 +138,16 @@ const formatDate = (dateString) => {
   });
 };
 
+// Format time based on locale
+const formatTime = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString(locale.value === 'nl' ? 'nl-BE' : 'en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
 // Dummy orders data
+/*
 const orders = ref([
   {
     id: '1',
@@ -148,6 +205,7 @@ const orders = ref([
     ],
   },
 ]);
+*/
 </script>
 
 <style scoped>
@@ -264,6 +322,12 @@ const orders = ref([
   color: var(--color-text);
 }
 
+.order-time {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+}
+
 .order-date {
   font-family: var(--font-body);
   font-size: 0.85rem;
@@ -294,8 +358,8 @@ const orders = ref([
 }
 
 .order-status.pending {
-  background: #fce4ec;
-  color: #c2185b;
+  background: #fff3e0;
+  color: #ef6c00;
 }
 
 .order-status.cancelled {
@@ -371,8 +435,9 @@ const orders = ref([
 
 .order-total {
   display: flex;
-  gap: 0.5rem;
+  justify-content: space-between;
   align-items: center;
+  width: 100%;
 }
 
 .total-label {
@@ -386,24 +451,6 @@ const orders = ref([
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--color-text);
-}
-
-.view-details-btn {
-  padding: 0.5rem 1rem;
-  background: transparent;
-  border: 1px solid var(--color-gold);
-  color: var(--color-gold);
-  text-decoration: none;
-  border-radius: 6px;
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.view-details-btn:hover {
-  background: var(--color-gold);
-  color: white;
 }
 
 .back-link {
@@ -443,10 +490,6 @@ const orders = ref([
 
   .order-total {
     justify-content: space-between;
-  }
-
-  .view-details-btn {
-    text-align: center;
   }
 }
 

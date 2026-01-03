@@ -158,27 +158,27 @@ const fetchRelatedProducts = async () => {
 };
 
 const fetchProduct = async () => {
-try {
+  try {
     loading.value = true;
     error.value = null;
 
-  const { data: response } = await findOne('products', route.params.id, {
-    populate: ['image', 'subcategory'],
-  });
-  product.value = response;
+    const { data: response } = await findOne('products', route.params.id, {
+      populate: ['image', 'subcategory'],
+    });
+    product.value = response;
 
-  // Set the first image as selected if images exist
-  if (product.value?.image && product.value.image.length > 0) {
-    selectedImage.value = product.value.image[0];
+    // Set the first image as selected if images exist
+    if (product.value?.image && product.value.image.length > 0) {
+      selectedImage.value = product.value.image[0];
+    }
+
+    // Fetch related products
+    await fetchRelatedProducts();
+  } catch (e) {
+    handleError(e, 'Failed to load product');
+  } finally {
+    loading.value = false;
   }
-
-  // Fetch related products
-  await fetchRelatedProducts();
-} catch (e) {
-  handleError(e, 'Failed to load product');
-} finally {
-  loading.value = false;
-}
 };
 
 await fetchProduct();
@@ -508,64 +508,96 @@ const applyPromocode = () => {
 
 .add-to-cart {
   width: 100%;
-  padding: 1rem 2rem;
+  padding: 0.85rem 1.5rem;
   background: var(--color-gold);
   color: white;
   border: none;
   border-radius: 8px;
   font-family: var(--font-body);
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 500;
+  letter-spacing: 0.3px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
 }
 
 .add-to-cart:hover {
-  background: #b88b2a;
+  background: #c9a227;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
+}
+
+.add-to-cart:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
 }
 
 .remove-from-cart {
   width: 100%;
-  padding: 1rem 2rem;
-  background: #dc2626;
-  color: white;
-  border: none;
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  color: #b91c1c;
+  border: 1.5px solid #e5e5e5;
   border-radius: 8px;
   font-family: var(--font-body);
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  margin-bottom: 1rem;
+  transition: all 0.25s ease;
 }
 
 .remove-from-cart:hover {
-  background: #b91c1c;
-  transform: translateY(-2px);
+  border-color: #b91c1c;
+  background: #fef2f2;
+}
+
+.remove-from-cart:active {
+  background: #fee2e2;
 }
 
 .checkout-btn {
   width: 100%;
-  padding: 1rem 2rem;
-  background: #23262a;
+  padding: 0.85rem 1.5rem;
+  background: #1f2937;
   color: white;
   border: none;
   border-radius: 8px;
   font-family: var(--font-body);
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 500;
+  letter-spacing: 0.3px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   text-decoration: none;
   text-align: center;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   box-sizing: border-box;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.checkout-btn::after {
+  content: '→';
+  font-size: 1rem;
+  transition: transform 0.2s ease;
 }
 
 .checkout-btn:hover {
-  background: #3a3f45;
+  background: #374151;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.checkout-btn:hover::after {
+  transform: translateX(3px);
+}
+
+.checkout-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .title-decoration {
@@ -615,17 +647,19 @@ const applyPromocode = () => {
   }
 
   .add-to-cart {
-    width: auto;
-    min-width: 200px;
-    margin: 0 auto;
-    display: block;
+    width: 100%;
+    min-width: unset;
+    margin: 0;
+  }
+
+  .remove-from-cart {
+    width: 100%;
   }
 
   .checkout-btn {
-    width: auto;
-    min-width: 200px;
-    margin: 0 auto;
-    display: block;
+    width: 100%;
+    min-width: unset;
+    margin: 0;
   }
 }
 

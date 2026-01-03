@@ -350,28 +350,22 @@ const handleSubmit = async () => {
     // Get new order number from order number API
     const orderNumber = await fetchOrderNumber(config.public.authApiKey);
 
-    // Build order payload with order number
+    // Build order payload with order number and user ID
     const orderData = buildOrderPayload(form, cartItems.value, total.value, shippingCost, {
       useSameAddressForBilling: useSameAddressForBilling.value,
       orderNumber,
+      customerId: authStore.currentUser?.id ?? null,
     });
 
     console.log('Sending order data to Strapi:', orderData);
     // Create order in Strapi
-    /*
     const result = await create('orders', orderData);
     console.log('Order created successfully:', result);
-
-    const orderDataWithId = {
-      ...orderData,
-      orderId: result.data.id,
-    };
-    */
 
     /*
     const mollieResponse = await $fetch('/api/mollie/create-payment', {
       method: 'POST',
-      body: { orderData: orderDataWithId },
+      body: orderData,
     });
 
     if (mollieResponse.success && mollieResponse.checkoutUrl) {
@@ -380,7 +374,7 @@ const handleSubmit = async () => {
     } else {
       throw new Error('Failed to create Mollie payment');
     }
-    */
+      */
   })
     .catch((error) => {
       console.error('Payment failed:', error);

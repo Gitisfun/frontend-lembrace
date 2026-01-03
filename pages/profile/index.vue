@@ -234,21 +234,25 @@ onMounted(async () => {
 
 .logout-btn {
   width: 100%;
-  padding: 1rem;
+  padding: 0.75rem 1.5rem;
   background: transparent;
-  border: 2px solid #e53e3e;
-  color: #e53e3e;
+  color: #b91c1c;
+  border: 1.5px solid #e5e5e5;
   border-radius: 8px;
   font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
 .logout-btn:hover {
-  background: #e53e3e;
-  color: white;
+  border-color: #b91c1c;
+  background: #fef2f2;
+}
+
+.logout-btn:active {
+  background: #fee2e2;
 }
 
 @media (max-width: 768px) {

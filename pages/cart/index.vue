@@ -153,22 +153,30 @@ const handleCheckout = () => {
 
 .checkout-btn {
   width: 100%;
-  padding: 1rem;
+  padding: 0.85rem 1.5rem;
   background: var(--color-gold);
   color: white;
   border: none;
   border-radius: 8px;
   font-family: var(--font-body);
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 500;
+  letter-spacing: 0.3px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
   margin-top: 1.5rem;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
 }
 
 .checkout-btn:hover {
-  background: #b88b2a;
+  background: #c9a227;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
+}
+
+.checkout-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
 }
 
 .empty-cart {
@@ -187,17 +195,27 @@ const handleCheckout = () => {
 
 .continue-shopping {
   display: inline-block;
-  padding: 1rem 2rem;
+  padding: 0.85rem 1.5rem;
   background: var(--color-gold);
   color: white;
   text-decoration: none;
   border-radius: 8px;
-  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
 }
 
 .continue-shopping:hover {
-  background: #b88b2a;
+  background: #c9a227;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
+}
+
+.continue-shopping:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
 }
 
 @media (max-width: 1024px) {
@@ -242,8 +260,8 @@ const handleCheckout = () => {
   }
 
   .checkout-btn {
-    font-size: 1rem;
-    padding: 0.9rem;
+    font-size: 0.9rem;
+    padding: 0.8rem 1.25rem;
   }
 }
 </style>

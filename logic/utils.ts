@@ -67,13 +67,14 @@ interface CartItem {
 interface BuildOrderOptions {
   useSameAddressForBilling?: boolean;
   orderNumber?: string;
+  customerId?: number | null;
 }
 
 /**
  * Builds an order payload for submission to the API
  */
 export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], totalPrice: number, shippingCost: number, options: BuildOrderOptions = {}) => {
-  const { useSameAddressForBilling = true, orderNumber } = options;
+  const { useSameAddressForBilling = true, orderNumber, customerId = null } = options;
 
   if (!orderNumber) {
     throw new Error('Order number is required');
@@ -105,6 +106,7 @@ export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], 
     orderStatus: 'pending',
     totalPrice,
     shippingCost,
+    customerId,
     customerInfo: {
       firstname: form.firstName,
       lastname: form.lastName,
