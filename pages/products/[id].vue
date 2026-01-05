@@ -49,6 +49,9 @@
           <RichcontentViewer v-if="product?.description_detailed" :content="product.description_detailed" />
         </div>
 
+        <!-- Material Selector -->
+        <ProductMaterialSelector v-if="product?.materials && product.materials.length > 0" v-model="selectedMaterial" :materials="product.materials" />
+
         <!-- Product Meta -->
 
         <!-- Action Buttons -->
@@ -95,6 +98,7 @@ import { useApiError } from '~/composables/useApiError';
 import InputCounter from '~/components/input/InputCounter.vue';
 import RichcontentViewer from '~/components/richcontent/RichcontentViewer.vue';
 import ProductCard from '~/components/product/ProductCard.vue';
+import ProductMaterialSelector from '~/components/product/MaterialSelector.vue';
 import { useGlobalStore } from '~/stores/global';
 
 const { t } = useI18n();
@@ -111,6 +115,7 @@ const product = ref(null);
 const selectedImage = ref(null);
 const relatedProducts = ref([]);
 const promocode = ref('');
+const selectedMaterial = ref(null);
 
 const quantity = ref(1);
 const showMaxItemsMessage = ref(false);
@@ -163,7 +168,7 @@ const fetchProduct = async () => {
     error.value = null;
 
     const { data: response } = await findOne('products', route.params.id, {
-      populate: ['image', 'subcategory'],
+      populate: ['image', 'subcategory', 'materials'],
     });
     product.value = response;
 
@@ -200,7 +205,7 @@ const selectImage = (image) => {
 
 const addToCart = () => {
   if (!product.value) return;
-  const success = globalStore.addToCart(product.value, quantity.value);
+  const success = globalStore.addToCart(product.value, quantity.value, selectedMaterial.value);
   if (!success) {
     showMaxItemsMessage.value = true;
     setTimeout(() => {

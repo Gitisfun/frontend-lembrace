@@ -3,6 +3,9 @@
     <NuxtImg :src="item.image" :alt="item.name" width="120" height="120" format="webp" provider="strapi" class="product-image" />
     <div class="item-details">
       <h3 class="item-name">{{ item.name }}</h3>
+      <div v-if="item.material" class="item-material">
+        <span class="material-swatch" :style="{ backgroundColor: item.material.color }"></span>
+      </div>
     </div>
     <div class="item-quantity">
       <button @click="updateQuantity(item.amount - 1)" class="quantity-btn" :disabled="item.amount <= 1">−</button>
@@ -68,6 +71,26 @@ const updateQuantity = (newQuantity) => {
   font-family: var(--font-primary);
   font-size: 1.2rem;
   color: var(--color-text);
+}
+
+.item-material {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.material-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.material-name {
+  font-size: 0.9rem;
+  color: #666;
 }
 
 .item-quantity {

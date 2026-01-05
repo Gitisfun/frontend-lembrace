@@ -11,6 +11,7 @@
           <span class="option-title">{{ option.title }}</span>
           <span v-if="option.details" class="option-details">{{ option.details }}</span>
         </div>
+        <span v-if="showValue" class="option-price">{{ formatPrice(option.value) }}</span>
       </label>
     </div>
     <div v-if="error" class="error-message">
@@ -21,6 +22,8 @@
 </template>
 
 <script setup>
+import { formatPrice } from '~/logic/utils';
+
 defineProps({
   modelValue: {
     type: String,
@@ -34,6 +37,10 @@ defineProps({
   label: {
     type: String,
     default: '',
+  },
+  showValue: {
+    type: Boolean,
+    default: false,
   },
   required: {
     type: Boolean,
@@ -131,6 +138,13 @@ defineEmits(['update:modelValue']);
 .option-details {
   font-size: 0.9rem;
   color: #666;
+}
+
+.option-price {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
 }
 
 .error-message {

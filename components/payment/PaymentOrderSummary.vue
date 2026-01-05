@@ -5,6 +5,9 @@
       <div v-for="item in items" :key="item.id" class="summary-item">
         <div class="item-info">
           <span class="item-name">{{ item.name }}</span>
+          <div v-if="item.material" class="item-material">
+            <span class="material-swatch" :style="{ backgroundColor: item.material.color }"></span>
+          </div>
           <span class="item-quantity">x{{ item.amount }}</span>
         </div>
         <span class="item-price">€{{ item.calculatedPrice.toFixed(2) }}</span>
@@ -86,6 +89,25 @@ const total = computed(() => props.subtotal + props.shippingCost);
 
 .item-name {
   font-weight: 500;
+}
+
+.item-material {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.material-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.material-name {
+  font-size: 0.85rem;
+  color: #666;
 }
 
 .item-quantity {

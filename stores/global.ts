@@ -16,6 +16,13 @@ interface StrapiImage {
   };
 }
 
+interface Material {
+  id: number;
+  documentId: string;
+  name: string;
+  color: string;
+}
+
 interface CartItem {
   id: string | number;
   name: string;
@@ -24,6 +31,7 @@ interface CartItem {
   amount: number;
   calculatedPrice: number;
   image: string;
+  material: Material | null;
 }
 
 interface Product {
@@ -34,6 +42,7 @@ interface Product {
   discount?: number;
   amount?: number;
   image: StrapiImage[] | StrapiImage | string;
+  materials?: Material[];
 }
 
 // Helper to extract image URL from various formats
@@ -75,7 +84,7 @@ export const useGlobalStore = defineStore('global', {
   },
 
   actions: {
-    addToCart(product: Product, amount = 1): boolean {
+    addToCart(product: Product, amount = 1, material: Material | null = null): boolean {
       const productId = product.documentId || product.id;
       const existingItem = this.cart.find((item) => item.id === productId);
 
@@ -94,6 +103,10 @@ export const useGlobalStore = defineStore('global', {
       if (existingItem) {
         existingItem.amount += amount;
         existingItem.calculatedPrice = calculatePrice(existingItem.price, existingItem.discount, existingItem.amount);
+        // Update material if provided
+        if (material) {
+          existingItem.material = material;
+        }
       } else {
         const discount = product.discount || 0;
 
@@ -105,6 +118,7 @@ export const useGlobalStore = defineStore('global', {
           amount,
           calculatedPrice: calculatePrice(product.price, discount, amount),
           image: extractImageUrl(product.image),
+          material,
         });
       }
 

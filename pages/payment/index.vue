@@ -121,10 +121,10 @@
         <div class="form-section">
           <h3>{{ $t('payment.delivery.title') }}</h3>
 
-          <!-- Loading State for Logged-in Users -->
-          <UiFormSkeleton v-if="isAuthenticated && isLoadingProfile && !isProfileLoaded" type="options" :count="2" />
+          <!-- Loading State -->
+          <UiFormSkeleton v-if="isLoadingDeliveryOptions" type="options" :count="2" />
 
-          <InputRadioGroup v-else v-model="form.deliveryMethod" :options="deliveryOptions" required />
+          <InputRadioGroup v-else v-model="form.deliveryMethod" :options="deliveryOptions" required show-value />
         </div>
 
         <div class="form-actions">
@@ -157,7 +157,7 @@ useSeoMeta({
   robots: 'noindex, nofollow',
 });
 
-const { create } = useStrapi();
+const { create, find } = useStrapi();
 const globalStore = useGlobalStore();
 const authStore = useAuthStore();
 const { fetchUserProfile, createAddress, isLoading: isLoadingProfile } = useUserProfile();
@@ -210,8 +210,47 @@ const billingAddressOptions = computed(() => [
 // Cart data
 const cartItems = computed(() => globalStore.cartItems);
 const subtotal = computed(() => globalStore.cartTotal);
-const shippingCost = 2.5;
-const total = computed(() => subtotal.value + shippingCost);
+
+// Delivery options from Strapi
+const deliveryOptionsData = ref([]);
+const isLoadingDeliveryOptions = ref(true);
+
+const fetchDeliveryOptions = async () => {
+  try {
+    isLoadingDeliveryOptions.value = true;
+    const { data } = await find('delivery-options', {
+      sort: ['price:asc'],
+    });
+    deliveryOptionsData.value = data || [];
+
+    // Auto-select default delivery option, or first one if no default
+    if (deliveryOptionsData.value.length > 0) {
+      const defaultOption = deliveryOptionsData.value.find((option) => option.isDefault);
+      form.deliveryMethod = defaultOption?.price ?? deliveryOptionsData.value[0].price;
+    }
+  } catch (e) {
+    console.error('Failed to fetch delivery options:', e);
+  } finally {
+    isLoadingDeliveryOptions.value = false;
+  }
+};
+
+// Transform delivery options for InputRadioGroup
+const deliveryOptions = computed(() =>
+  deliveryOptionsData.value.map((option) => ({
+    value: option.price,
+    title: option.name,
+    details: option.description,
+  }))
+);
+
+// Calculate shipping cost based on selected delivery method
+const shippingCost = computed(() => {
+  const cost = form.deliveryMethod;
+  return typeof cost === 'number' ? cost : 0;
+});
+
+const total = computed(() => subtotal.value + shippingCost.value);
 
 // Form
 const form = reactive(createPaymentFormData());
@@ -237,12 +276,6 @@ const billingAddressErrors = computed(() => ({
   city: billingErrors.billingCity,
   country: billingErrors.billingCountry,
 }));
-
-// Delivery options
-const deliveryOptions = computed(() => [
-  { value: 'standard', title: t('payment.delivery.standard'), details: t('payment.delivery.standardTime') },
-  { value: 'express', title: t('payment.delivery.express'), details: t('payment.delivery.expressTime') },
-]);
 
 // Update form field and clear validation
 const updateField = (fieldName, value) => {
@@ -351,11 +384,13 @@ const handleSubmit = async () => {
     const orderNumber = await fetchOrderNumber(config.public.authApiKey);
 
     // Build order payload with order number and user ID
-    const orderData = buildOrderPayload(form, cartItems.value, total.value, shippingCost, {
+    const orderData = buildOrderPayload(form, cartItems.value, total.value, shippingCost.value, {
       useSameAddressForBilling: useSameAddressForBilling.value,
       orderNumber,
       customerId: authStore.currentUser?.id ?? null,
     });
+
+    console.log('Order data:', orderData);
 
     console.log('Sending order data to Strapi:', orderData);
     // Create order in Strapi
@@ -387,6 +422,9 @@ const handleSubmit = async () => {
 
 // Load user data on mount
 onMounted(async () => {
+  // Fetch delivery options
+  fetchDeliveryOptions();
+
   if (authStore.isAuthenticated) {
     await fetchUserProfile();
     prefillUserData();

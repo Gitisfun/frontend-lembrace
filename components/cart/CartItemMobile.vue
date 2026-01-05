@@ -6,6 +6,9 @@
       </div>
       <div class="item-main-info">
         <h3 class="item-name">{{ item.name }}</h3>
+        <div v-if="item.material" class="item-material">
+          <span class="material-swatch" :style="{ backgroundColor: item.material.color }"></span>
+        </div>
         <div class="item-price">€{{ item.calculatedPrice.toFixed(2) }}</div>
       </div>
       <button @click="$emit('remove')" class="remove-btn" aria-label="Remove item">
@@ -82,8 +85,28 @@ const updateQuantity = (newQuantity) => {
   font-family: var(--font-primary);
   font-size: 1.1rem;
   color: var(--color-text);
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.25rem;
   line-height: 1.3;
+}
+
+.item-material {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.35rem;
+}
+
+.material-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.material-name {
+  font-size: 0.85rem;
+  color: #666;
 }
 
 .item-price {

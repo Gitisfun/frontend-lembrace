@@ -139,6 +139,9 @@
       "placeholder": "Enter promocode",
       "apply": "Apply"
     },
+    "material": {
+      "label": "Material"
+    },
     "relatedProducts": "You might also like"
   },
   "payment": {

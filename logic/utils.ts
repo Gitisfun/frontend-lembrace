@@ -54,6 +54,13 @@ interface PaymentFormData {
   deliveryMethod: string;
 }
 
+interface Material {
+  id: number;
+  documentId: string;
+  name: string;
+  color: string;
+}
+
 interface CartItem {
   id: string | number;
   documentId?: string;
@@ -62,6 +69,7 @@ interface CartItem {
   price: number;
   discount?: number;
   calculatedPrice: number;
+  material?: Material | null;
 }
 
 interface BuildOrderOptions {
@@ -122,6 +130,7 @@ export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], 
       price: item.price,
       discount: item.discount || 0,
       calculatedPrice: item.calculatedPrice,
+      materialName: item.material?.name,
     })),
   };
 };

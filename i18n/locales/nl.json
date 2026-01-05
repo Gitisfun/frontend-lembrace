@@ -139,6 +139,9 @@
       "placeholder": "Voer promotiecode in",
       "apply": "Toepassen"
     },
+    "material": {
+      "label": "Materiaal"
+    },
     "relatedProducts": "Dit vind je misschien ook leuk"
   },
   "payment": {

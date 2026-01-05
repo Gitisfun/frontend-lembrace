@@ -26,11 +26,13 @@
         </div>
         <div class="summary-row">
           <span>{{ $t('cart.shipping') }}</span>
-          <span>€{{ shippingCost.toFixed(2) }}</span>
+          <span v-if="isLoadingShipping" class="price-skeleton"></span>
+          <span v-else>€{{ shippingCost.toFixed(2) }}</span>
         </div>
         <div class="summary-row total">
           <span>{{ $t('cart.total') }}</span>
-          <span>€{{ total.toFixed(2) }}</span>
+          <span v-if="isLoadingShipping" class="price-skeleton"></span>
+          <span v-else>€{{ total.toFixed(2) }}</span>
         </div>
         <UiButton variant="primary" full-width :text="$t('cart.checkout')" class="checkout-btn" @click="handleCheckout" />
       </div>
@@ -39,7 +41,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { useMediaQuery } from '@vueuse/core';
 import { useGlobalStore } from '~/stores/global';
 import { useToast } from '~/composables/useToast';
@@ -49,6 +51,7 @@ import CartItemMobile from '~/components/cart/CartItemMobile.vue';
 const { t } = useI18n();
 const localePath = useLocalePath();
 const { success: toastSuccess } = useToast();
+const { find } = useStrapi();
 
 // SEO Meta
 useSeoMeta({
@@ -62,9 +65,32 @@ useSeoMeta({
 const globalStore = useGlobalStore();
 const cartItems = computed(() => globalStore.cartItems);
 
-const shippingCost = 2.5;
+// Fetch default shipping cost from delivery options
+const shippingCost = ref(0);
+const isLoadingShipping = ref(true);
+
+const fetchDefaultShippingCost = async () => {
+  try {
+    isLoadingShipping.value = true;
+    const { data } = await find('delivery-options');
+
+    if (data && data.length > 0) {
+      const defaultOption = data.find((option) => option.isDefault);
+      shippingCost.value = defaultOption?.price ?? data[0].price;
+    }
+  } catch (e) {
+    console.error('Failed to fetch delivery options:', e);
+  } finally {
+    isLoadingShipping.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchDefaultShippingCost();
+});
+
 const subtotal = computed(() => globalStore.cartTotal);
-const total = computed(() => subtotal.value + shippingCost);
+const total = computed(() => subtotal.value + shippingCost.value);
 
 const isMobile = useMediaQuery('(max-width: 768px)');
 
@@ -149,6 +175,25 @@ const handleCheckout = () => {
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   font-weight: 600;
   font-size: 1.2rem;
+}
+
+.price-skeleton {
+  display: inline-block;
+  width: 50px;
+  height: 1em;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .checkout-btn {
