@@ -47,7 +47,18 @@ export const useAuthentication = () => {
   });
 
   /**
+   * Check if user has admin role
+   */
+  const hasAdminRole = (userData: any): boolean => {
+    if (!userData?.user_roles || !Array.isArray(userData.user_roles)) {
+      return false;
+    }
+    return userData.user_roles.some((role: any) => role.roles?.name?.toLowerCase() === 'admin');
+  };
+
+  /**
    * Login with email and password
+   * Admin users are not allowed to login as customers
    */
   const login = async (data: LoginData, setError?: AuthErrorHandler): Promise<{ success: boolean; data?: any; token?: string; showResendVerification?: boolean }> => {
     try {
@@ -61,6 +72,14 @@ export const useAuthentication = () => {
       });
 
       if (response.success && response.data) {
+        // Check if user has admin role - admins cannot login as customers
+        if (hasAdminRole(response.data)) {
+          const errorMessage = t('auth.login.adminNotAllowed');
+          setError?.(errorMessage);
+          toastError(errorMessage);
+          return { success: false };
+        }
+
         toastSuccess(t('auth.login.success'));
         return { success: true, data: response.data, token: response.token };
       } else {

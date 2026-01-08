@@ -67,6 +67,20 @@
     "resetPassword": {
       "title": "Reset Password | L'embrace",
       "description": "Create a new password for your L'embrace account."
+    },
+    "admin": {
+      "login": {
+        "title": "Admin Login | L'embrace",
+        "description": "Sign in to the L'embrace admin panel."
+      },
+      "dashboard": {
+        "title": "Admin Dashboard | L'embrace",
+        "description": "Manage your L'embrace store from the admin dashboard."
+      },
+      "orders": {
+        "title": "Orders | Admin | L'embrace",
+        "description": "View and manage all orders in the L'embrace admin panel."
+      }
     }
   },
   "nav": {
@@ -322,7 +336,9 @@
       "processing": "Processing",
       "shipped": "Shipped",
       "delivered": "Delivered",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "paid": "Paid",
+      "refunded": "Refunded"
     }
   },
   "language": {
@@ -352,6 +368,7 @@
       "success": "Successfully logged in!",
       "error": "Invalid email or password. Please try again.",
       "notVerified": "Email address has not been verified. Please check your inbox.",
+      "adminNotAllowed": "Admin accounts cannot login here. Please use the admin portal.",
       "resendVerification": "Resend Verification Email",
       "resending": "Sending...",
       "resendCooldown": "Resend in {seconds}s",
@@ -468,6 +485,116 @@
         "both": "Billing & Shipping"
       },
       "loadingProfile": "Loading profile..."
+    }
+  },
+  "admin": {
+    "login": {
+      "badge": "Administration",
+      "title": "Admin Access",
+      "subtitle": "Sign in with your administrator credentials",
+      "submit": "Sign In",
+      "submitting": "Signing in...",
+      "success": "Successfully logged in to admin panel!",
+      "error": "Invalid email or password. Please try again.",
+      "notVerified": "Email address has not been verified.",
+      "noAdminAccess": "Access denied. Administrator privileges required.",
+      "backToSite": "Back to website",
+      "allRightsReserved": "All rights reserved."
+    },
+    "nav": {
+      "main": "Main",
+      "dashboard": "Dashboard",
+      "management": "Management",
+      "products": "Products",
+      "orders": "Orders",
+      "customers": "Customers",
+      "settings": "Settings"
+    },
+    "theme": {
+      "light": "Light Mode",
+      "dark": "Dark Mode"
+    },
+    "sidebar": {
+      "collapse": "Collapse sidebar",
+      "expand": "Expand sidebar"
+    },
+    "role": "Administrator",
+    "comingSoon": "Soon",
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Welcome to your admin dashboard",
+      "viewSite": "View Site",
+      "welcomeTitle": "Welcome back, {name}!",
+      "welcomeMessage": "Here's an overview of your store. More features are coming soon to help you manage products, orders, and customers.",
+      "stats": {
+        "products": "Products",
+        "orders": "Orders",
+        "customers": "Customers",
+        "revenue": "Revenue"
+      },
+      "info": {
+        "title": "Admin Panel Under Development",
+        "message": "This admin panel is currently being developed. Product management, order tracking, and customer management features will be available soon."
+      }
+    },
+    "orders": {
+      "title": "Orders",
+      "subtitle": "View and manage all customer orders",
+      "refresh": "Refresh",
+      "refreshed": "Orders refreshed",
+      "loading": "Loading orders...",
+      "errorTitle": "Failed to load orders",
+      "errorMessage": "There was an error fetching the orders. Please try again.",
+      "retry": "Try Again",
+      "emptyTitle": "No orders yet",
+      "emptyMessage": "When customers place orders, they will appear here.",
+      "searchPlaceholder": "Search orders, name, or email...",
+      "allStatuses": "All Statuses",
+      "sortByDate": "Sort by date",
+      "newestFirst": "Newest first",
+      "oldestFirst": "Oldest first",
+      "noResults": "No orders found",
+      "noResultsMessage": "Try adjusting your search or filter criteria.",
+      "clearFilters": "Clear Filters",
+      "showing": "Showing",
+      "of": "of",
+      "ordersCount": "orders",
+      "perPage": "Per page:",
+      "firstPage": "First page",
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
+      "lastPage": "Last page",
+      "totalOrders": "Total Orders",
+      "totalRevenue": "Total Revenue",
+      "pendingOrders": "Pending",
+      "item": "item",
+      "items": "items",
+      "shipping": "shipping",
+      "orderDetails": "Order Details",
+      "customerInfo": "Customer",
+      "shippingAddress": "Shipping Address",
+      "billingAddress": "Billing Address",
+      "orderedItems": "Ordered Items",
+      "qty": "Qty",
+      "each": "each",
+      "subtotal": "Subtotal",
+      "shippingCost": "Shipping",
+      "total": "Total",
+      "statusHistory": "History",
+      "viewDetails": "View Details",
+      "backToOrders": "Back to orders",
+      "time": "Time",
+      "loadingOrder": "Loading order...",
+      "orderNotFound": "Order not found",
+      "orderNotFoundDesc": "The order you're looking for doesn't exist or has been removed.",
+      "table": {
+        "order": "Order",
+        "customer": "Customer",
+        "items": "Items",
+        "total": "Total",
+        "status": "Status",
+        "date": "Date"
+      }
     }
   }
 }

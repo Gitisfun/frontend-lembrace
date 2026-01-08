@@ -67,6 +67,20 @@
     "resetPassword": {
       "title": "Wachtwoord Herstellen | L'embrace",
       "description": "Maak een nieuw wachtwoord aan voor je L'embrace account."
+    },
+    "admin": {
+      "login": {
+        "title": "Admin Login | L'embrace",
+        "description": "Log in op het L'embrace beheerpaneel."
+      },
+      "dashboard": {
+        "title": "Admin Dashboard | L'embrace",
+        "description": "Beheer je L'embrace winkel vanuit het admin dashboard."
+      },
+      "orders": {
+        "title": "Bestellingen | Admin | L'embrace",
+        "description": "Bekijk en beheer alle bestellingen in het L'embrace beheerpaneel."
+      }
     }
   },
   "nav": {
@@ -322,7 +336,9 @@
       "processing": "In behandeling",
       "shipped": "Verzonden",
       "delivered": "Bezorgd",
-      "cancelled": "Geannuleerd"
+      "cancelled": "Geannuleerd",
+      "paid": "Betaald",
+      "refunded": "Terugbetaald"
     }
   },
   "language": {
@@ -352,6 +368,7 @@
       "success": "Succesvol ingelogd!",
       "error": "Ongeldig e-mailadres of wachtwoord. Probeer het opnieuw.",
       "notVerified": "E-mailadres is nog niet geverifieerd. Controleer je inbox.",
+      "adminNotAllowed": "Beheerdersaccounts kunnen hier niet inloggen. Gebruik het beheerdersportaal.",
       "resendVerification": "Verificatie e-mail opnieuw versturen",
       "resending": "Versturen...",
       "resendCooldown": "Opnieuw versturen in {seconds}s",
@@ -468,6 +485,116 @@
         "both": "Facturatie & Levering"
       },
       "loadingProfile": "Profiel laden..."
+    }
+  },
+  "admin": {
+    "login": {
+      "badge": "Administratie",
+      "title": "Admin Toegang",
+      "subtitle": "Log in met je beheerdersgegevens",
+      "submit": "Inloggen",
+      "submitting": "Bezig met inloggen...",
+      "success": "Succesvol ingelogd op het beheerpaneel!",
+      "error": "Ongeldig e-mailadres of wachtwoord. Probeer het opnieuw.",
+      "notVerified": "E-mailadres is nog niet geverifieerd.",
+      "noAdminAccess": "Toegang geweigerd. Beheerdersrechten zijn vereist.",
+      "backToSite": "Terug naar website",
+      "allRightsReserved": "Alle rechten voorbehouden."
+    },
+    "nav": {
+      "main": "Hoofd",
+      "dashboard": "Dashboard",
+      "management": "Beheer",
+      "products": "Producten",
+      "orders": "Bestellingen",
+      "customers": "Klanten",
+      "settings": "Instellingen"
+    },
+    "theme": {
+      "light": "Lichte Modus",
+      "dark": "Donkere Modus"
+    },
+    "sidebar": {
+      "collapse": "Zijbalk inklappen",
+      "expand": "Zijbalk uitklappen"
+    },
+    "role": "Beheerder",
+    "comingSoon": "Binnenkort",
+    "dashboard": {
+      "title": "Dashboard",
+      "subtitle": "Welkom op je admin dashboard",
+      "viewSite": "Bekijk Site",
+      "welcomeTitle": "Welkom terug, {name}!",
+      "welcomeMessage": "Hier is een overzicht van je winkel. Meer functies komen binnenkort om je te helpen producten, bestellingen en klanten te beheren.",
+      "stats": {
+        "products": "Producten",
+        "orders": "Bestellingen",
+        "customers": "Klanten",
+        "revenue": "Omzet"
+      },
+      "info": {
+        "title": "Beheerpaneel In Ontwikkeling",
+        "message": "Dit beheerpaneel is momenteel in ontwikkeling. Productbeheer, ordertracking en klantenbeheer functies zijn binnenkort beschikbaar."
+      }
+    },
+    "orders": {
+      "title": "Bestellingen",
+      "subtitle": "Bekijk en beheer alle klantbestellingen",
+      "refresh": "Vernieuwen",
+      "refreshed": "Bestellingen vernieuwd",
+      "loading": "Bestellingen laden...",
+      "errorTitle": "Kon bestellingen niet laden",
+      "errorMessage": "Er is een fout opgetreden bij het ophalen van de bestellingen. Probeer het opnieuw.",
+      "retry": "Opnieuw Proberen",
+      "emptyTitle": "Nog geen bestellingen",
+      "emptyMessage": "Wanneer klanten bestellingen plaatsen, verschijnen ze hier.",
+      "searchPlaceholder": "Zoek bestellingen, naam of e-mail...",
+      "allStatuses": "Alle Statussen",
+      "sortByDate": "Sorteer op datum",
+      "newestFirst": "Nieuwste eerst",
+      "oldestFirst": "Oudste eerst",
+      "noResults": "Geen bestellingen gevonden",
+      "noResultsMessage": "Probeer je zoek- of filtercriteria aan te passen.",
+      "clearFilters": "Filters Wissen",
+      "showing": "Toont",
+      "of": "van",
+      "ordersCount": "bestellingen",
+      "perPage": "Per pagina:",
+      "firstPage": "Eerste pagina",
+      "previousPage": "Vorige pagina",
+      "nextPage": "Volgende pagina",
+      "lastPage": "Laatste pagina",
+      "totalOrders": "Totaal Bestellingen",
+      "totalRevenue": "Totale Omzet",
+      "pendingOrders": "In Afwachting",
+      "item": "item",
+      "items": "items",
+      "shipping": "verzending",
+      "orderDetails": "Bestelgegevens",
+      "customerInfo": "Klant",
+      "shippingAddress": "Verzendadres",
+      "billingAddress": "Factuuradres",
+      "orderedItems": "Bestelde Items",
+      "qty": "Aantal",
+      "each": "per stuk",
+      "subtotal": "Subtotaal",
+      "shippingCost": "Verzendkosten",
+      "total": "Totaal",
+      "statusHistory": "Geschiedenis",
+      "viewDetails": "Bekijk Details",
+      "backToOrders": "Terug naar bestellingen",
+      "time": "Tijd",
+      "loadingOrder": "Bestelling laden...",
+      "orderNotFound": "Bestelling niet gevonden",
+      "orderNotFoundDesc": "De bestelling die je zoekt bestaat niet of is verwijderd.",
+      "table": {
+        "order": "Bestelling",
+        "customer": "Klant",
+        "items": "Items",
+        "total": "Totaal",
+        "status": "Status",
+        "date": "Datum"
+      }
     }
   }
 }

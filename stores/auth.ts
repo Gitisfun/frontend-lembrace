@@ -36,6 +36,15 @@ export interface UserContact {
   deleted_at?: string | null;
 }
 
+// User role format from API
+export interface UserRole {
+  id: string;
+  role_id: string;
+  roles: {
+    name: string;
+  };
+}
+
 interface User {
   id: string | number;
   email: string;
@@ -45,12 +54,18 @@ interface User {
   status: string;
   phone?: string;
   address?: LocalUserAddress;
+  user_roles?: UserRole[];
 }
 
 interface AuthState {
+  // Customer authentication
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  // Admin authentication (separate from customer)
+  adminUser: User | null;
+  adminToken: string | null;
+  isAdminAuthenticated: boolean;
   // Legacy local storage (kept for backward compatibility)
   phone: string;
   address: LocalUserAddress;
@@ -70,9 +85,14 @@ const defaultAddress: LocalUserAddress = {
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
+    // Customer
     user: null,
     token: null,
     isAuthenticated: false,
+    // Admin
+    adminUser: null,
+    adminToken: null,
+    isAdminAuthenticated: false,
     // Legacy
     phone: '',
     address: { ...defaultAddress },
@@ -82,6 +102,7 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   getters: {
+    // Customer getters
     currentUser: (state) => state.user,
     userFullName: (state) => {
       if (!state.user) return '';
@@ -91,6 +112,22 @@ export const useAuthStore = defineStore('auth', {
       if (!state.user) return '';
       const first = state.user.first_name?.[0] || '';
       const last = state.user.last_name?.[0] || '';
+      return `${first}${last}`.toUpperCase();
+    },
+    // Customer role getters
+    userRoles: (state) => state.user?.user_roles || [],
+    userRoleNames: (state) => (state.user?.user_roles || []).map((r) => r.roles.name.toLowerCase()),
+    hasRole: (state) => (roleName: string) => (state.user?.user_roles || []).some((r) => r.roles.name.toLowerCase() === roleName.toLowerCase()),
+    // Admin getters
+    currentAdminUser: (state) => state.adminUser,
+    adminFullName: (state) => {
+      if (!state.adminUser) return '';
+      return `${state.adminUser.first_name} ${state.adminUser.last_name}`.trim();
+    },
+    adminInitials: (state) => {
+      if (!state.adminUser) return '';
+      const first = state.adminUser.first_name?.[0] || '';
+      const last = state.adminUser.last_name?.[0] || '';
       return `${first}${last}`.toUpperCase();
     },
     // Legacy getters
@@ -127,6 +164,19 @@ export const useAuthStore = defineStore('auth', {
       this.address = { ...defaultAddress };
       this.addresses = [];
       this.contact = null;
+    },
+
+    // Admin authentication actions
+    adminLogin(user: User, token: string) {
+      this.adminUser = user;
+      this.adminToken = token;
+      this.isAdminAuthenticated = true;
+    },
+
+    adminLogout() {
+      this.adminUser = null;
+      this.adminToken = null;
+      this.isAdminAuthenticated = false;
     },
 
     updateUser(userData: Partial<User>) {
