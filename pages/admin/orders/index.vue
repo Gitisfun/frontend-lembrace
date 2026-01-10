@@ -30,7 +30,7 @@
         <OrdersNoResults v-if="filteredOrders.length === 0" @clearFilters="clearFilters" />
 
         <!-- Orders Table -->
-        <OrdersTable v-if="filteredOrders.length > 0" :orders="paginatedOrders" :strapiUrl="config.public.strapiUrl" />
+        <OrdersTable v-if="filteredOrders.length > 0" :orders="paginatedOrders" :strapiUrl="config.public.strapiUrl" :unreadCounts="adminUnreadStore.counts" />
 
         <!-- Pagination -->
         <OrdersPagination v-if="filteredOrders.length > 0" v-model:currentPage="currentPage" v-model:pageSize="pageSize" :totalItems="filteredOrders.length" :totalPages="totalPages" />
@@ -42,6 +42,8 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import { useToast } from '~/composables/useToast';
+import { useAuthStore } from '~/stores/auth';
+import { useAdminUnreadMessagesStore } from '~/stores/adminUnreadMessages';
 import AdminLayout from '~/components/admin/AdminLayout.vue';
 import AdminHeader from '~/components/admin/AdminHeader.vue';
 import AdminActionButton from '~/components/admin/AdminActionButton.vue';
@@ -63,6 +65,8 @@ const { t } = useI18n();
 const { find } = useStrapi();
 const config = useRuntimeConfig();
 const { success: toastSuccess } = useToast();
+const authStore = useAuthStore();
+const adminUnreadStore = useAdminUnreadMessagesStore();
 
 // State
 const orders = ref([]);
@@ -195,6 +199,9 @@ const fetchOrders = async () => {
 
 const refreshOrders = async () => {
   await fetchOrders();
+  if (authStore.adminUser?.id) {
+    await adminUnreadStore.fetchUnreadCounts(String(authStore.adminUser.id));
+  }
   if (!hasError.value) {
     toastSuccess(t('admin.orders.refreshed'));
   }
@@ -202,6 +209,9 @@ const refreshOrders = async () => {
 
 // Fetch orders on mount
 await fetchOrders();
+if (authStore.adminUser?.id) {
+  await adminUnreadStore.fetchUnreadCounts(String(authStore.adminUser.id));
+}
 </script>
 
 <style scoped>

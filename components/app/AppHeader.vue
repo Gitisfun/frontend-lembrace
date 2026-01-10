@@ -38,6 +38,7 @@
         <NuxtLink v-if="authStore.isAuthenticated" :to="localePath('/profile')" class="profile-icon" :title="authStore.userFullName">
           <div class="profile-icon-wrapper">
             <IconUser :size="24" />
+            <span v-if="totalUnreadCount > 0" class="unread-counter">{{ totalUnreadCount > 99 ? '99+' : totalUnreadCount }}</span>
           </div>
         </NuxtLink>
         <NuxtLink v-else :to="localePath('/login')" class="login-btn">
@@ -52,6 +53,8 @@
 <script setup>
 import { useGlobalStore } from '~/stores/global';
 import { useAuthStore } from '~/stores/auth';
+import { useUnreadMessagesStore } from '~/stores/unreadMessages';
+import { useToast } from '~/composables/useToast';
 import { formatPrice } from '~/logic/utils';
 
 const { t } = useI18n();
@@ -60,9 +63,56 @@ const localePath = useLocalePath();
 const isMenuOpen = ref(false);
 const globalStore = useGlobalStore();
 const authStore = useAuthStore();
+const unreadStore = useUnreadMessagesStore();
+const { info: toastInfo } = useToast();
 const cartCount = computed(() => globalStore.cartItemCount);
 const favoritesCount = computed(() => globalStore.favoriteItems.length);
 const formattedCartTotal = computed(() => formatPrice(globalStore.cartTotal));
+
+// Unread messages count from store
+const totalUnreadCount = computed(() => unreadStore.totalUnread);
+
+// Callback for new unread messages
+const onNewMessages = (count) => {
+  toastInfo(t('orders.chat.newUnreadMessage', { count }), {
+    action: {
+      label: t('orders.chat.viewMessages'),
+      onClick: () => navigateTo(localePath('/orders'))
+    }
+  });
+};
+
+// Watch for authentication changes
+watch(
+  () => authStore.isAuthenticated,
+  (isAuth) => {
+    if (isAuth && authStore.user?.id) {
+      unreadStore.fetchUnreadCounts(String(authStore.user.id), onNewMessages);
+    } else {
+      unreadStore.reset();
+    }
+  },
+  { immediate: true }
+);
+
+// Refresh unread counts periodically (every 30 seconds)
+let unreadInterval;
+onMounted(() => {
+  if (authStore.isAuthenticated && authStore.user?.id) {
+    unreadStore.fetchUnreadCounts(String(authStore.user.id), onNewMessages);
+  }
+  unreadInterval = setInterval(() => {
+    if (authStore.isAuthenticated && authStore.user?.id) {
+      unreadStore.fetchUnreadCounts(String(authStore.user.id), onNewMessages);
+    }
+  }, 30000);
+});
+
+onUnmounted(() => {
+  if (unreadInterval) {
+    clearInterval(unreadInterval);
+  }
+});
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -316,6 +366,25 @@ const closeMenu = () => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.unread-counter {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  padding: 0 4px;
 }
 
 .login-btn {

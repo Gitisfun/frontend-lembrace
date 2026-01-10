@@ -5,6 +5,7 @@
       <NuxtPage />
     </NuxtLayout>
     <UiToastContainer />
+    <UiConfirmDialog />
   </div>
 </template>
 

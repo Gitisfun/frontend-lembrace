@@ -1,19 +1,31 @@
 import { ref } from 'vue';
 
+interface ToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 interface Toast {
   id: number;
   message: string;
-  type: 'success' | 'error' | 'info' | 'warning';
+  type: 'success' | 'error' | 'info' | 'warning' | 'message';
   duration: number;
+  action?: ToastAction;
+}
+
+interface ToastOptions {
+  duration?: number;
+  action?: ToastAction;
 }
 
 const toasts = ref<Toast[]>([]);
 let toastId = 0;
 
 export const useToast = () => {
-  const addToast = (message: string, type: Toast['type'] = 'info', duration = 4000) => {
+  const addToast = (message: string, type: Toast['type'] = 'info', options: ToastOptions = {}) => {
+    const { duration = 4000, action } = options;
     const id = ++toastId;
-    toasts.value.push({ id, message, type, duration });
+    toasts.value.push({ id, message, type, duration, action });
 
     if (duration > 0) {
       setTimeout(() => {
@@ -31,10 +43,30 @@ export const useToast = () => {
     }
   };
 
-  const success = (message: string, duration?: number) => addToast(message, 'success', duration);
-  const error = (message: string, duration?: number) => addToast(message, 'error', duration);
-  const info = (message: string, duration?: number) => addToast(message, 'info', duration);
-  const warning = (message: string, duration?: number) => addToast(message, 'warning', duration);
+  const success = (message: string, options?: ToastOptions | number) => {
+    const opts = typeof options === 'number' ? { duration: options } : options;
+    return addToast(message, 'success', opts);
+  };
+
+  const error = (message: string, options?: ToastOptions | number) => {
+    const opts = typeof options === 'number' ? { duration: options } : options;
+    return addToast(message, 'error', opts);
+  };
+
+  const info = (message: string, options?: ToastOptions | number) => {
+    const opts = typeof options === 'number' ? { duration: options } : options;
+    return addToast(message, 'info', opts);
+  };
+
+  const warning = (message: string, options?: ToastOptions | number) => {
+    const opts = typeof options === 'number' ? { duration: options } : options;
+    return addToast(message, 'warning', opts);
+  };
+
+  const messageToast = (message: string, options?: ToastOptions | number) => {
+    const opts = typeof options === 'number' ? { duration: options } : options;
+    return addToast(message, 'message', opts);
+  };
 
   return {
     toasts,
@@ -44,5 +76,6 @@ export const useToast = () => {
     error,
     info,
     warning,
+    message: messageToast,
   };
 };

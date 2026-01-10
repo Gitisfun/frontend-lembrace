@@ -80,6 +80,18 @@
       "orders": {
         "title": "Bestellingen | Admin | L'embrace",
         "description": "Bekijk en beheer alle bestellingen in het L'embrace beheerpaneel."
+      },
+      "messages": {
+        "title": "Berichten | Admin | L'embrace",
+        "description": "Bekijk bestellingen met ongelezen berichten in het L'embrace beheerpaneel."
+      },
+      "products": {
+        "title": "Producten | Admin | L'embrace",
+        "description": "Bekijk en beheer alle producten in het L'embrace beheerpaneel."
+      },
+      "customers": {
+        "title": "Klanten | Admin | L'embrace",
+        "description": "Bekijk alle klanten in het L'embrace beheerpaneel."
       }
     }
   },
@@ -273,7 +285,13 @@
     "error": "Er is een fout opgetreden",
     "retry": "Opnieuw proberen",
     "goHome": "Naar homepagina",
-    "optional": "(optioneel)"
+    "optional": "(optioneel)",
+    "confirm": "Bevestigen",
+    "cancel": "Annuleren",
+    "yes": "Ja",
+    "no": "Nee",
+    "delete": "Verwijderen",
+    "areYouSure": "Weet je het zeker?"
   },
   "errors": {
     "general": {
@@ -339,6 +357,44 @@
       "cancelled": "Geannuleerd",
       "paid": "Betaald",
       "refunded": "Terugbetaald"
+    },
+    "detail": {
+      "loading": "Bestelling laden...",
+      "notFound": "Bestelling niet gevonden",
+      "notFoundDesc": "De bestelling die je zoekt bestaat niet of je hebt geen toegang om deze te bekijken.",
+      "backToOrders": "Terug naar Mijn Bestellingen",
+      "orderedItems": "Bestelde Artikelen",
+      "each": "per stuk",
+      "summary": "Besteloverzicht",
+      "subtotal": "Subtotaal",
+      "deliveryCost": "Verzendkosten",
+      "contactInfo": "Contactgegevens",
+      "name": "Naam",
+      "email": "E-mail",
+      "phone": "Telefoon",
+      "deliveryAddress": "Bezorgadres",
+      "billingAddress": "Factuuradres"
+    },
+    "chat": {
+      "sectionTitle": "Hulp Nodig?",
+      "title": "Chat met Ons",
+      "startChat": "Chat met de Winkel",
+      "connected": "Verbonden",
+      "disconnected": "Niet verbonden",
+      "connect": "Start Chat",
+      "connectPrompt": "Klik op de knop hieronder om met ons te chatten over je bestelling.",
+      "noMessages": "Nog geen berichten. Begin het gesprek!",
+      "placeholder": "Typ je bericht...",
+      "online": "online",
+      "isTyping": "is aan het typen...",
+      "areTyping": "zijn aan het typen...",
+      "close": "Chat sluiten",
+      "read": "Gelezen",
+      "unreadMessages": "{count} ongelezen bericht(en)",
+      "youHaveUnread": "Je hebt {count} ongelezen bericht(en)",
+      "newUnreadMessage": "Je hebt {count} nieuw(e) bericht(en)",
+      "viewMessages": "Bekijk Bestellingen",
+      "you": "Jij"
     }
   },
   "language": {
@@ -504,6 +560,7 @@
     "nav": {
       "main": "Hoofd",
       "dashboard": "Dashboard",
+      "messages": "Berichten",
       "management": "Beheer",
       "products": "Producten",
       "orders": "Bestellingen",
@@ -594,7 +651,137 @@
         "total": "Totaal",
         "status": "Status",
         "date": "Datum"
+      },
+      "chat": {
+        "title": "Bestelchat",
+        "connected": "Verbonden",
+        "disconnected": "Niet verbonden",
+        "online": "online",
+        "connectPrompt": "Verbind om te chatten over deze bestelling",
+        "noMessages": "Nog geen berichten. Start het gesprek!",
+        "placeholder": "Typ een bericht...",
+        "connect": "Verbinden met Chat",
+        "isTyping": "is aan het typen...",
+        "areTyping": "zijn aan het typen...",
+        "read": "Gelezen",
+        "unreadMessages": "{count} ongelezen bericht(en)",
+        "newUnreadMessage": "Je hebt {count} nieuw(e) bericht(en)",
+        "viewMessages": "Bekijk Berichten",
+        "you": "Jij"
+      },
+      "guestOrder": {
+        "title": "Gastbestelling",
+        "message": "Deze klant heeft besteld zonder account. Chat is niet beschikbaar voor gastbestellingen."
+      },
+      "processingBanner": {
+        "title": "Betaling Ontvangen",
+        "description": "Deze bestelling is betaald. Start de verwerking om te bereiden voor verzending.",
+        "button": "Start Verwerking",
+        "confirmTitle": "Verwerking Starten",
+        "confirmMessage": "Weet je zeker dat je de verwerking van deze bestelling wilt starten? De klant wordt op de hoogte gebracht van de statuswijziging."
+      },
+      "shippingBanner": {
+        "title": "Klaar voor Verzending",
+        "description": "Deze bestelling is klaar om verzonden te worden. Markeer als verzonden zodra het pakket onderweg is.",
+        "button": "Markeer als Verzonden",
+        "confirmTitle": "Bestelling Verzenden",
+        "confirmMessage": "Weet je zeker dat je deze bestelling als verzonden wilt markeren? De klant wordt op de hoogte gebracht dat de bestelling onderweg is."
+      },
+      "manualStatus": {
+        "title": "Bestelstatus Wijzigen",
+        "description": "Pas de bestelstatus handmatig aan indien nodig. Gebruik dit voor uitzonderingen of correcties.",
+        "selectPlaceholder": "Selecteer nieuwe status...",
+        "button": "Status Bijwerken",
+        "confirmTitle": "Bestelstatus Wijzigen",
+        "confirmMessage": "Weet je zeker dat je de status wilt wijzigen naar {status}? De klant kan op de hoogte worden gebracht van deze wijziging.",
+        "confirmButton": "Status Wijzigen"
       }
+    },
+    "messages": {
+      "title": "Ongelezen Berichten",
+      "subtitle": "Bestellingen met ongelezen klantberichten",
+      "emptyTitle": "Geen ongelezen berichten",
+      "emptyMessage": "Je bent helemaal bij! Alle klantberichten zijn gelezen.",
+      "infoBanner": "Je hebt {count} ongelezen bericht(en) bij deze bestellingen"
+    },
+    "products": {
+      "title": "Producten",
+      "subtitle": "Bekijk en beheer alle producten",
+      "refresh": "Vernieuwen",
+      "refreshed": "Producten vernieuwd",
+      "loading": "Producten laden...",
+      "errorTitle": "Kon producten niet laden",
+      "errorMessage": "Er is een fout opgetreden bij het ophalen van de producten. Probeer het opnieuw.",
+      "retry": "Opnieuw Proberen",
+      "emptyTitle": "Nog geen producten",
+      "emptyMessage": "Producten toegevoegd in Strapi verschijnen hier.",
+      "searchPlaceholder": "Zoek producten, categorie of beschrijving...",
+      "noResults": "Geen producten gevonden",
+      "noResultsMessage": "Probeer je zoek- of filtercriteria aan te passen.",
+      "clearFilters": "Filters Wissen",
+      "productsCount": "producten",
+      "allCategories": "Alle Categorieën",
+      "allSubcategories": "Alle Subcategorieën",
+      "allStock": "Alle Voorraadniveaus",
+      "inStock": "Op Voorraad (>5)",
+      "lowStock": "Lage Voorraad (1-5)",
+      "outOfStock": "Uitverkocht",
+      "hasDiscount": "Heeft Korting",
+      "sortBy": {
+        "name": "Naam",
+        "price": "Prijs",
+        "category": "Categorie",
+        "subcategory": "Subcategorie"
+      },
+      "sortDirection": "Sorteerrichting",
+      "ascending": "A-Z / Laag-Hoog",
+      "descending": "Z-A / Hoog-Laag",
+      "table": {
+        "image": "Afbeelding",
+        "name": "Naam",
+        "category": "Categorie",
+        "price": "Prijs",
+        "stock": "Voorraad",
+        "discount": "Korting"
+      },
+      "editInStrapi": "Bewerken in Strapi"
+    },
+    "customers": {
+      "title": "Klanten",
+      "subtitle": "Bekijk alle geregistreerde klanten",
+      "refresh": "Vernieuwen",
+      "refreshed": "Klanten vernieuwd",
+      "loading": "Klanten laden...",
+      "errorTitle": "Kon klanten niet laden",
+      "errorMessage": "Er is een fout opgetreden bij het ophalen van de klanten. Probeer het opnieuw.",
+      "retry": "Opnieuw Proberen",
+      "emptyTitle": "Nog geen klanten",
+      "emptyMessage": "Wanneer klanten een account aanmaken en bestellingen plaatsen, verschijnen ze hier.",
+      "searchPlaceholder": "Zoek op naam, e-mail of telefoon...",
+      "noResults": "Geen klanten gevonden",
+      "noResultsMessage": "Probeer je zoekcriteria aan te passen.",
+      "clearFilters": "Zoekopdracht Wissen",
+      "customersCount": "klanten",
+      "table": {
+        "customer": "Klant",
+        "email": "E-mail",
+        "phone": "Telefoon",
+        "orders": "Bestellingen",
+        "totalSpent": "Totaal Besteed",
+        "lastOrder": "Laatste Bestelling"
+      },
+      "orderHistory": "Bestelgeschiedenis",
+      "viewOrder": "Bekijk",
+      "sortHint": "Klik op Klant, E-mail, Totaal Besteed of Laatste Bestelling kolommen om de tabel te sorteren"
+    },
+    "pagination": {
+      "showing": "Toont",
+      "of": "van",
+      "perPage": "Per pagina:",
+      "firstPage": "Eerste pagina",
+      "previousPage": "Vorige pagina",
+      "nextPage": "Volgende pagina",
+      "lastPage": "Laatste pagina"
     }
   }
 }

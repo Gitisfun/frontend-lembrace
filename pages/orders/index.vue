@@ -15,15 +15,27 @@
 
       <div v-else class="orders-list">
         <div v-for="order in orders" :key="order.id" class="order-card">
+          <!-- Unread Messages Banner -->
+          <div v-if="getOrderUnreadCount(order.orderNumber) > 0" class="unread-banner">
+            <IconMail :size="16" />
+            <span>{{ $t('orders.chat.unreadMessages', { count: getOrderUnreadCount(order.orderNumber) }) }}</span>
+          </div>
+
           <div class="order-header">
             <div class="order-info">
               <span class="order-number">{{ $t('orders.orderNumber') }}: {{ order.orderNumber }}</span>
               <span class="order-time">{{ formatTime(order.orderDate) }}</span>
               <span class="order-date">{{ formatDate(order.orderDate) }}</span>
             </div>
-            <span class="order-status" :class="order.orderStatus">
-              {{ $t(`orders.status.${order.orderStatus}`) }}
-            </span>
+            <div class="order-header-right">
+              <span v-if="getOrderUnreadCount(order.orderNumber) > 0" class="unread-badge">
+                <IconMail :size="14" />
+                {{ getOrderUnreadCount(order.orderNumber) }}
+              </span>
+              <span class="order-status" :class="order.orderStatus">
+                {{ $t(`orders.status.${order.orderStatus}`) }}
+              </span>
+            </div>
           </div>
 
           <div class="order-items">
@@ -44,6 +56,7 @@
               <span class="total-label">{{ $t('orders.total') }}:</span>
               <span class="total-value">{{ formatPrice(order.totalPrice) }}</span>
             </div>
+            <UiButton variant="outline-gold" size="sm" class="view-details-btn" :to="localePath(`/orders/${order.documentId}`)" :text="$t('orders.viewDetails')" arrow />
           </div>
         </div>
       </div>
@@ -58,11 +71,14 @@
 <script setup>
 import { ref } from 'vue';
 import { useAuthStore } from '~/stores/auth';
+import { useUnreadMessagesStore } from '~/stores/unreadMessages';
 import { formatPrice } from '~/logic/utils';
+import IconMail from '~/components/icon/IconMail.vue';
 
 const { t, locale } = useI18n();
 const localePath = useLocalePath();
 const authStore = useAuthStore();
+const unreadStore = useUnreadMessagesStore();
 const { find } = useStrapi();
 const config = useRuntimeConfig();
 const orders = ref([]);
@@ -109,6 +125,7 @@ const fetchContent = async () => {
           },
         },
       },
+      sort: ['orderDate:desc'],
     });
     orders.value = response.data;
     console.log('response');
@@ -125,6 +142,16 @@ const fetchContent = async () => {
 console.log('fetchContent');
 
 await fetchContent();
+
+// Fetch unread counts using store
+if (authStore.user?.id) {
+  await unreadStore.fetchUnreadCounts(String(authStore.user.id));
+}
+
+// Get unread count for a specific order from store
+const getOrderUnreadCount = (orderNumber) => {
+  return unreadStore.getUnreadByRoom(orderNumber);
+};
 
 // Format date based on locale
 const formatDate = (dateString) => {
@@ -281,6 +308,23 @@ const orders = ref([
   animation: fadeInUp 0.5s ease forwards;
 }
 
+.unread-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-bottom: 1px solid #f59e0b;
+  color: #92400e;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.unread-banner svg {
+  flex-shrink: 0;
+}
+
 .order-header {
   display: flex;
   justify-content: space-between;
@@ -348,6 +392,29 @@ const orders = ref([
   color: #c62828;
 }
 
+.order-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.unread-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #92400e;
+}
+
+.unread-badge svg {
+  flex-shrink: 0;
+}
+
 .order-items {
   padding: 1rem 1.25rem;
 }
@@ -409,6 +476,7 @@ const orders = ref([
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   padding: 1rem 1.25rem;
   background: #fafafa;
   border-top: 1px solid #eee;
@@ -418,7 +486,7 @@ const orders = ref([
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
+  flex: 1;
 }
 
 .total-label {
@@ -455,6 +523,11 @@ const orders = ref([
     align-items: stretch;
   }
 
+  .order-footer :deep(.btn) {
+    width: 100%;
+    justify-content: center;
+  }
+
   .order-total {
     justify-content: space-between;
   }
@@ -485,5 +558,10 @@ const orders = ref([
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.order-footer :deep(.view-details-btn) {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.78rem;
 }
 </style>

@@ -18,6 +18,10 @@
               <div class="order-number-wrapper">
                 <IconChevronRight class="expand-icon" :class="{ rotated: expandedOrderId === order.id }" :size="16" />
                 <span class="order-number">{{ order.orderNumber }}</span>
+                <span v-if="getOrderUnreadCount(order.orderNumber) > 0" class="unread-badge">
+                  <IconMail :size="12" />
+                  {{ getOrderUnreadCount(order.orderNumber) }}
+                </span>
               </div>
             </td>
             <td class="customer-cell">
@@ -53,6 +57,12 @@
           <tr v-show="expandedOrderId === order.id" class="details-row">
             <td colspan="6">
               <div class="inline-details-content">
+                <!-- Unread Messages Banner -->
+                <div v-if="getOrderUnreadCount(order.orderNumber) > 0" class="unread-banner">
+                  <IconMail :size="18" />
+                  <span>{{ $t('admin.orders.chat.unreadMessages', { count: getOrderUnreadCount(order.orderNumber) }) }}</span>
+                </div>
+
                 <!-- Actions Bar -->
                 <div class="details-actions">
                   <NuxtLink :to="`/admin/orders/${order.documentId}`" class="view-details-btn" @click.stop>
@@ -87,6 +97,7 @@ import OrderStatusTimeline from '~/components/admin/OrderStatusTimeline.vue';
 import OrderStatusBadge from '~/components/admin/OrderStatusBadge.vue';
 import IconChevronRight from '~/components/icon/IconChevronRight.vue';
 import IconEye from '~/components/icon/IconEye.vue';
+import IconMail from '~/components/icon/IconMail.vue';
 
 const props = defineProps({
   orders: {
@@ -97,6 +108,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  unreadCounts: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 const { locale } = useI18n();
@@ -105,6 +120,11 @@ const expandedOrderId = ref(null);
 
 const toggleOrderDetails = (orderId) => {
   expandedOrderId.value = expandedOrderId.value === orderId ? null : orderId;
+};
+
+const getOrderUnreadCount = (orderNumber) => {
+  const item = props.unreadCounts.find((u) => u.roomName === orderNumber);
+  return item?.unreadCount || 0;
 };
 
 const getItemImage = (item) => {
@@ -207,6 +227,23 @@ const formatTime = (dateString) => {
   font-weight: 600;
   color: var(--admin-text);
   transition: color 0.3s ease;
+}
+
+.unread-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  background: #f59e0b;
+  color: white;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+.unread-badge svg {
+  flex-shrink: 0;
 }
 
 .customer-info {
@@ -338,6 +375,26 @@ const formatTime = (dateString) => {
   padding: 1.5rem;
   background: var(--admin-details-bg);
   border-top: 1px solid var(--admin-border-light);
+}
+
+.unread-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(251, 191, 36, 0.15) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 8px;
+  color: var(--admin-text);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.unread-banner svg {
+  color: #f59e0b;
+  flex-shrink: 0;
 }
 
 /* Details Actions Bar */

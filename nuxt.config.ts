@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     public: {
       authApiKey: process.env.AUTH_API_KEY || '',
       strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337',
+      chatApiBase: process.env.CHAT_API_BASE || 'http://localhost:3003',
     },
   },
 

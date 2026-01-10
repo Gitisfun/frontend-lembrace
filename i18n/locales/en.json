@@ -80,6 +80,18 @@
       "orders": {
         "title": "Orders | Admin | L'embrace",
         "description": "View and manage all orders in the L'embrace admin panel."
+      },
+      "messages": {
+        "title": "Messages | Admin | L'embrace",
+        "description": "View orders with unread messages in the L'embrace admin panel."
+      },
+      "products": {
+        "title": "Products | Admin | L'embrace",
+        "description": "View and manage all products in the L'embrace admin panel."
+      },
+      "customers": {
+        "title": "Customers | Admin | L'embrace",
+        "description": "View all customers in the L'embrace admin panel."
       }
     }
   },
@@ -273,7 +285,13 @@
     "error": "An error occurred",
     "retry": "Try again",
     "goHome": "Go to homepage",
-    "optional": "(optional)"
+    "optional": "(optional)",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No",
+    "delete": "Delete",
+    "areYouSure": "Are you sure?"
   },
   "errors": {
     "general": {
@@ -339,6 +357,44 @@
       "cancelled": "Cancelled",
       "paid": "Paid",
       "refunded": "Refunded"
+    },
+    "detail": {
+      "loading": "Loading order...",
+      "notFound": "Order not found",
+      "notFoundDesc": "The order you're looking for doesn't exist or you don't have access to view it.",
+      "backToOrders": "Back to My Orders",
+      "orderedItems": "Ordered Items",
+      "each": "each",
+      "summary": "Order Summary",
+      "subtotal": "Subtotal",
+      "deliveryCost": "Delivery Cost",
+      "contactInfo": "Contact Information",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "deliveryAddress": "Delivery Address",
+      "billingAddress": "Billing Address"
+    },
+    "chat": {
+      "sectionTitle": "Need Help?",
+      "title": "Chat with Us",
+      "startChat": "Chat with the Store",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "connect": "Start Chat",
+      "connectPrompt": "Click the button below to start chatting with us about your order.",
+      "noMessages": "No messages yet. Start the conversation!",
+      "placeholder": "Type your message...",
+      "online": "online",
+      "isTyping": "is typing...",
+      "areTyping": "are typing...",
+      "close": "Close chat",
+      "read": "Read",
+      "unreadMessages": "{count} unread message(s)",
+      "youHaveUnread": "You have {count} unread message(s)",
+      "newUnreadMessage": "You have {count} new message(s)",
+      "viewMessages": "View Orders",
+      "you": "You"
     }
   },
   "language": {
@@ -504,6 +560,7 @@
     "nav": {
       "main": "Main",
       "dashboard": "Dashboard",
+      "messages": "Messages",
       "management": "Management",
       "products": "Products",
       "orders": "Orders",
@@ -594,7 +651,137 @@
         "total": "Total",
         "status": "Status",
         "date": "Date"
+      },
+      "chat": {
+        "title": "Order Chat",
+        "connected": "Connected",
+        "disconnected": "Disconnected",
+        "online": "online",
+        "connectPrompt": "Connect to start chatting about this order",
+        "noMessages": "No messages yet. Start the conversation!",
+        "placeholder": "Type a message...",
+        "connect": "Connect to Chat",
+        "isTyping": "is typing...",
+        "areTyping": "are typing...",
+        "read": "Read",
+        "unreadMessages": "{count} unread message(s)",
+        "newUnreadMessage": "You have {count} new message(s)",
+        "viewMessages": "View Messages",
+        "you": "You"
+      },
+      "guestOrder": {
+        "title": "Guest Order",
+        "message": "This customer placed an order without an account. Chat is not available for guest orders."
+      },
+      "processingBanner": {
+        "title": "Payment Received",
+        "description": "This order has been paid. Start processing to prepare it for shipping.",
+        "button": "Start Processing",
+        "confirmTitle": "Start Processing Order",
+        "confirmMessage": "Are you sure you want to start processing this order? The customer will be notified about the status change."
+      },
+      "shippingBanner": {
+        "title": "Ready to Ship",
+        "description": "This order is ready to be shipped. Mark it as shipped once the package is on its way.",
+        "button": "Mark as Shipped",
+        "confirmTitle": "Ship Order",
+        "confirmMessage": "Are you sure you want to mark this order as shipped? The customer will be notified that their order is on its way."
+      },
+      "manualStatus": {
+        "title": "Change Order Status",
+        "description": "Manually update the order status if needed. Use this for exceptions or corrections.",
+        "selectPlaceholder": "Select new status...",
+        "button": "Update Status",
+        "confirmTitle": "Change Order Status",
+        "confirmMessage": "Are you sure you want to change the status to {status}? The customer may be notified about this change.",
+        "confirmButton": "Change Status"
       }
+    },
+    "messages": {
+      "title": "Unread Messages",
+      "subtitle": "Orders with unread customer messages",
+      "emptyTitle": "No unread messages",
+      "emptyMessage": "You're all caught up! All customer messages have been read.",
+      "infoBanner": "You have {count} unread message(s) across these orders"
+    },
+    "products": {
+      "title": "Products",
+      "subtitle": "View and manage all products",
+      "refresh": "Refresh",
+      "refreshed": "Products refreshed",
+      "loading": "Loading products...",
+      "errorTitle": "Failed to load products",
+      "errorMessage": "There was an error fetching the products. Please try again.",
+      "retry": "Try Again",
+      "emptyTitle": "No products yet",
+      "emptyMessage": "Products added in Strapi will appear here.",
+      "searchPlaceholder": "Search products, category, or description...",
+      "noResults": "No products found",
+      "noResultsMessage": "Try adjusting your search or filter criteria.",
+      "clearFilters": "Clear Filters",
+      "productsCount": "products",
+      "allCategories": "All Categories",
+      "allSubcategories": "All Subcategories",
+      "allStock": "All Stock Levels",
+      "inStock": "In Stock (>5)",
+      "lowStock": "Low Stock (1-5)",
+      "outOfStock": "Out of Stock",
+      "hasDiscount": "Has Discount",
+      "sortBy": {
+        "name": "Name",
+        "price": "Price",
+        "category": "Category",
+        "subcategory": "Subcategory"
+      },
+      "sortDirection": "Sort direction",
+      "ascending": "A-Z / Low-High",
+      "descending": "Z-A / High-Low",
+      "table": {
+        "image": "Image",
+        "name": "Name",
+        "category": "Category",
+        "price": "Price",
+        "stock": "Stock",
+        "discount": "Discount"
+      },
+      "editInStrapi": "Edit in Strapi"
+    },
+    "customers": {
+      "title": "Customers",
+      "subtitle": "View all registered customers",
+      "refresh": "Refresh",
+      "refreshed": "Customers refreshed",
+      "loading": "Loading customers...",
+      "errorTitle": "Failed to load customers",
+      "errorMessage": "There was an error fetching the customers. Please try again.",
+      "retry": "Try Again",
+      "emptyTitle": "No customers yet",
+      "emptyMessage": "When customers create an account and place orders, they will appear here.",
+      "searchPlaceholder": "Search by name, email, or phone...",
+      "noResults": "No customers found",
+      "noResultsMessage": "Try adjusting your search criteria.",
+      "clearFilters": "Clear Search",
+      "customersCount": "customers",
+      "table": {
+        "customer": "Customer",
+        "email": "Email",
+        "phone": "Phone",
+        "orders": "Orders",
+        "totalSpent": "Total Spent",
+        "lastOrder": "Last Order"
+      },
+      "orderHistory": "Order History",
+      "viewOrder": "View",
+      "sortHint": "Click on Customer, Email, Total Spent, or Last Order columns to sort the table"
+    },
+    "pagination": {
+      "showing": "Showing",
+      "of": "of",
+      "perPage": "Per page:",
+      "firstPage": "First page",
+      "previousPage": "Previous page",
+      "nextPage": "Next page",
+      "lastPage": "Last page"
     }
   }
 }

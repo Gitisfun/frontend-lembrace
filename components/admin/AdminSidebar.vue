@@ -26,6 +26,16 @@
               <span class="nav-text">{{ $t('admin.nav.dashboard') }}</span>
             </NuxtLink>
           </li>
+          <li>
+            <NuxtLink :to="localePath('/admin/messages')" class="nav-link" :class="{ active: isActive('/admin/messages') }" :title="isCollapsed ? $t('admin.nav.messages') : undefined">
+              <div class="nav-icon-wrapper">
+                <IconMail :size="18" />
+                <span v-if="totalUnread > 0" class="unread-badge">{{ totalUnread > 99 ? '99+' : totalUnread }}</span>
+              </div>
+              <span class="nav-text">{{ $t('admin.nav.messages') }}</span>
+              <span v-if="totalUnread > 0 && !isCollapsed" class="unread-count">{{ totalUnread }}</span>
+            </NuxtLink>
+          </li>
         </ul>
       </div>
 
@@ -33,11 +43,10 @@
         <span class="nav-section-title">{{ $t('admin.nav.management') }}</span>
         <ul class="nav-list">
           <li>
-            <span class="nav-link disabled" :title="isCollapsed ? $t('admin.nav.products') : undefined">
+            <NuxtLink :to="localePath('/admin/products')" class="nav-link" :class="{ active: isActive('/admin/products') }" :title="isCollapsed ? $t('admin.nav.products') : undefined">
               <IconShoppingBag :size="18" />
               <span class="nav-text">{{ $t('admin.nav.products') }}</span>
-              <span class="coming-soon">{{ $t('admin.comingSoon') }}</span>
-            </span>
+            </NuxtLink>
           </li>
           <li>
             <NuxtLink :to="localePath('/admin/orders')" class="nav-link" :class="{ active: isActive('/admin/orders') }" :title="isCollapsed ? $t('admin.nav.orders') : undefined">
@@ -46,11 +55,10 @@
             </NuxtLink>
           </li>
           <li>
-            <span class="nav-link disabled" :title="isCollapsed ? $t('admin.nav.customers') : undefined">
+            <NuxtLink :to="localePath('/admin/customers')" class="nav-link" :class="{ active: isActive('/admin/customers') }" :title="isCollapsed ? $t('admin.nav.customers') : undefined">
               <IconUsers :size="18" />
               <span class="nav-text">{{ $t('admin.nav.customers') }}</span>
-              <span class="coming-soon">{{ $t('admin.comingSoon') }}</span>
-            </span>
+            </NuxtLink>
           </li>
         </ul>
       </div>
@@ -90,6 +98,7 @@
 
 <script setup>
 import { useAuthStore } from '~/stores/auth';
+import { useAdminUnreadMessagesStore } from '~/stores/adminUnreadMessages';
 import { useToast } from '~/composables/useToast';
 import { useAdminTheme } from '~/composables/useAdminTheme';
 import { useAdminSidebar } from '~/composables/useAdminSidebar';
@@ -97,6 +106,7 @@ import IconLayers from '~/components/icon/IconLayers.vue';
 import IconChevronLeft from '~/components/icon/IconChevronLeft.vue';
 import IconChevronRight from '~/components/icon/IconChevronRight.vue';
 import IconDashboard from '~/components/icon/IconDashboard.vue';
+import IconMail from '~/components/icon/IconMail.vue';
 import IconShoppingBag from '~/components/icon/IconShoppingBag.vue';
 import IconDocument from '~/components/icon/IconDocument.vue';
 import IconUsers from '~/components/icon/IconUsers.vue';
@@ -108,9 +118,41 @@ const { t } = useI18n();
 const localePath = useLocalePath();
 const route = useRoute();
 const authStore = useAuthStore();
-const { success: toastSuccess } = useToast();
+const adminUnreadStore = useAdminUnreadMessagesStore();
+const { success: toastSuccess, message: toastMessage } = useToast();
 const { isLight, isDark, toggleTheme } = useAdminTheme();
 const { isCollapsed, toggleSidebar } = useAdminSidebar();
+
+// Computed total unread messages
+const totalUnread = computed(() => adminUnreadStore.totalUnread);
+
+// Fetch unread counts on mount and periodically
+let unreadInterval = null;
+
+const fetchUnreadCounts = async () => {
+  if (authStore.adminUser?.id) {
+    await adminUnreadStore.fetchUnreadCounts(String(authStore.adminUser.id), (count) => {
+      toastMessage(t('admin.orders.chat.newUnreadMessage', { count }), {
+        action: {
+          label: t('admin.orders.chat.viewMessages'),
+          onClick: () => navigateTo(localePath('/admin/messages'))
+        }
+      });
+    });
+  }
+};
+
+onMounted(async () => {
+  await fetchUnreadCounts();
+  // Refresh every 30 seconds
+  unreadInterval = setInterval(fetchUnreadCounts, 30000);
+});
+
+onUnmounted(() => {
+  if (unreadInterval) {
+    clearInterval(unreadInterval);
+  }
+});
 
 // Check if a route is active (exact match for dashboard, starts with for sub-pages)
 const isActive = (path) => {
@@ -410,6 +452,52 @@ const handleLogout = () => {
 }
 
 .collapsed .coming-soon {
+  display: none;
+}
+
+.nav-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.unread-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border-radius: 8px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
+}
+
+.unread-count {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.collapsed .unread-count {
   display: none;
 }
 
