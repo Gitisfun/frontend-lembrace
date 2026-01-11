@@ -4,7 +4,7 @@
     <div class="items-list">
       <div v-for="item in items" :key="item.id" class="item-row">
         <div class="item-image">
-          <img :src="getItemImage(item)" :alt="item.name" />
+          <NuxtImg :src="getItemImageUrl(item)" :alt="item.name" width="50" height="50" format="webp" provider="strapi" />
         </div>
         <div class="item-info">
           <span class="item-name">{{ item.name }}</span>
@@ -56,19 +56,15 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  strapiUrl: {
-    type: String,
-    required: true,
-  },
 });
 
 const subtotal = computed(() => props.totalPrice - props.shippingCost);
 
-const getItemImage = (item) => {
+// Get item image URL path for NuxtImg strapi provider
+const getItemImageUrl = (item) => {
   const image = item.productId?.image?.[0];
   if (image) {
-    const imageUrl = image.formats?.thumbnail?.url || image.url;
-    return `${props.strapiUrl}${imageUrl}`;
+    return image.formats?.thumbnail?.url || image.url;
   }
   return '/placeholder-product.png';
 };

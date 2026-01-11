@@ -20,7 +20,7 @@
               <div class="product-image-wrapper">
                 <IconChevronRight class="expand-icon" :class="{ rotated: expandedProductId === product.id }" :size="16" />
                 <div class="product-image">
-                  <img :src="getProductImage(product)" :alt="product.name" />
+                  <NuxtImg :src="getProductImageUrl(product)" :alt="product.name" width="50" height="50" format="webp" provider="strapi" />
                 </div>
               </div>
             </td>
@@ -224,12 +224,13 @@ const updateStock = async (product) => {
   }
 };
 
-const getProductImage = (product) => {
+// Get product image URL path for NuxtImg strapi provider
+const getProductImageUrl = (product) => {
   const image = product.image?.[0] || product.image;
   if (image) {
     const imageUrl = image.formats?.thumbnail?.url || image.url;
     if (imageUrl) {
-      return `${props.strapiUrl}${imageUrl}`;
+      return imageUrl;
     }
   }
   return '/placeholder-product.png';

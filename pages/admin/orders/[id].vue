@@ -64,7 +64,7 @@
           <OrderDetailCards :customer="order.customerInfo" :shippingAddress="order.shippingAddress" :billingAddress="order.billingAddress" />
 
           <!-- Order Items -->
-          <OrderItemsList :items="order.items" :totalPrice="order.totalPrice" :shippingCost="order.shippingCost" :strapiUrl="config.public.strapiUrl" />
+          <OrderItemsList :items="order.items" :totalPrice="order.totalPrice" :shippingCost="order.shippingCost" />
 
           <!-- Status History -->
           <OrderStatusTimeline :statusLogs="order.statusLogs" />

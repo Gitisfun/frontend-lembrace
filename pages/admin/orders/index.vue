@@ -30,7 +30,7 @@
         <OrdersNoResults v-if="filteredOrders.length === 0" @clearFilters="clearFilters" />
 
         <!-- Orders Table -->
-        <OrdersTable v-if="filteredOrders.length > 0" :orders="paginatedOrders" :strapiUrl="config.public.strapiUrl" :unreadCounts="adminUnreadStore.counts" />
+        <OrdersTable v-if="filteredOrders.length > 0" :orders="paginatedOrders" :unreadCounts="adminUnreadStore.counts" />
 
         <!-- Pagination -->
         <OrdersPagination v-if="filteredOrders.length > 0" v-model:currentPage="currentPage" v-model:pageSize="pageSize" :totalItems="filteredOrders.length" :totalPages="totalPages" />

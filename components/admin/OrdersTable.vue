@@ -34,7 +34,7 @@
               <div class="items-preview">
                 <div class="item-images">
                   <div v-for="(item, index) in order.items.slice(0, 3)" :key="item.id" class="item-thumb" :style="{ zIndex: 3 - index }">
-                    <img :src="getItemImage(item)" :alt="item.name" />
+                    <NuxtImg :src="getItemImageUrl(item)" :alt="item.name" width="40" height="40" format="webp" provider="strapi" />
                   </div>
                   <div v-if="order.items.length > 3" class="more-items">+{{ order.items.length - 3 }}</div>
                 </div>
@@ -75,7 +75,7 @@
                 <OrderDetailCards :customer="order.customerInfo" :shippingAddress="order.shippingAddress" :billingAddress="order.billingAddress" />
 
                 <!-- Order Items -->
-                <OrderItemsList :items="order.items" :totalPrice="order.totalPrice" :shippingCost="order.shippingCost" :strapiUrl="strapiUrl" />
+                <OrderItemsList :items="order.items" :totalPrice="order.totalPrice" :shippingCost="order.shippingCost" />
 
                 <!-- Status History -->
                 <OrderStatusTimeline :statusLogs="order.statusLogs" />
@@ -104,10 +104,6 @@ const props = defineProps({
     type: Array,
     required: true,
   },
-  strapiUrl: {
-    type: String,
-    required: true,
-  },
   unreadCounts: {
     type: Array,
     default: () => [],
@@ -127,11 +123,11 @@ const getOrderUnreadCount = (orderNumber) => {
   return item?.unreadCount || 0;
 };
 
-const getItemImage = (item) => {
+// Get item image URL path for NuxtImg strapi provider
+const getItemImageUrl = (item) => {
   const image = item.productId?.image?.[0];
   if (image) {
-    const imageUrl = image.formats?.thumbnail?.url || image.url;
-    return `${props.strapiUrl}${imageUrl}`;
+    return image.formats?.thumbnail?.url || image.url;
   }
   return '/placeholder-product.png';
 };

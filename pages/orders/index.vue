@@ -41,7 +41,7 @@
           <div class="order-items">
             <div v-for="item in order.items" :key="item.id" class="order-item">
               <div class="item-image">
-                <img :src="getItemImage(item)" :alt="item.name" />
+                <NuxtImg :src="getItemImageUrl(item)" :alt="item.name" width="60" height="60" format="webp" provider="strapi" />
               </div>
               <div class="item-details">
                 <span class="item-name">{{ item.name }}</span>
@@ -83,12 +83,11 @@ const { find } = useStrapi();
 const config = useRuntimeConfig();
 const orders = ref([]);
 
-// Get item image URL from product relation
-const getItemImage = (item) => {
+// Get item image URL path for NuxtImg strapi provider
+const getItemImageUrl = (item) => {
   const image = item.productId?.image?.[0];
   if (image) {
-    const imageUrl = image.formats?.thumbnail?.url || image.url;
-    return `${config.public.strapiUrl}${imageUrl}`;
+    return image.formats?.thumbnail?.url || image.url;
   }
   return '/placeholder-product.png';
 };
