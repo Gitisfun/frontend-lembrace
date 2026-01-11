@@ -22,15 +22,15 @@
             <IconChevronDown :size="14" class="dropdown-chevron" />
           </NuxtLink>
           <div class="dropdown-menu">
-            <NuxtLink :to="localePath('/products')" class="dropdown-item">
+            <NuxtLink :to="localePath('/products')" class="dropdown-item" :class="{ active: $route.path.includes('/products') && !$route.query.subcategory }">
               {{ $t('nav.allProducts') }}
             </NuxtLink>
             <div v-for="category in categories" :key="category.id" class="dropdown-category">
               <div class="dropdown-category-title">{{ category.label }}</div>
-              <NuxtLink :to="{ path: localePath('/products'), query: { subcategory: `all_${category.id}` } }" class="dropdown-item">
+              <NuxtLink :to="{ path: localePath('/products'), query: { subcategory: `all_${category.id}` } }" class="dropdown-item" :class="{ active: $route.query.subcategory === `all_${category.id}` }">
                 {{ $t('nav.allCategory') }}
               </NuxtLink>
-              <NuxtLink v-for="subcategory in category.subcategories" :key="subcategory.id" :to="{ path: localePath('/products'), query: { subcategory: subcategory.id } }" class="dropdown-item">
+              <NuxtLink v-for="subcategory in category.subcategories" :key="subcategory.id" :to="{ path: localePath('/products'), query: { subcategory: subcategory.id } }" class="dropdown-item" :class="{ active: $route.query.subcategory === String(subcategory.id) }">
                 {{ subcategory.label }}
               </NuxtLink>
             </div>
@@ -45,17 +45,24 @@
           </div>
           <div class="submenu" :class="{ open: isProductsSubmenuOpen }">
             <div class="submenu-items-row">
-              <NuxtLink :to="localePath('/products')" class="submenu-item" @click="closeMenu">
+              <NuxtLink :to="localePath('/products')" class="submenu-item" :class="{ active: $route.path.includes('/products') && !$route.query.subcategory }" @click="closeMenu">
                 {{ $t('nav.allProducts') }}
               </NuxtLink>
             </div>
             <div v-for="category in categories" :key="category.id" class="submenu-category">
               <div class="submenu-category-title">{{ category.label }}</div>
               <div class="submenu-items-row">
-                <NuxtLink :to="{ path: localePath('/products'), query: { subcategory: `all_${category.id}` } }" class="submenu-item subcategory-item" @click="closeMenu">
+                <NuxtLink :to="{ path: localePath('/products'), query: { subcategory: `all_${category.id}` } }" class="submenu-item subcategory-item" :class="{ active: $route.query.subcategory === `all_${category.id}` }" @click="closeMenu">
                   {{ $t('nav.allCategory') }}
                 </NuxtLink>
-                <NuxtLink v-for="subcategory in category.subcategories" :key="subcategory.id" :to="{ path: localePath('/products'), query: { subcategory: subcategory.id } }" class="submenu-item subcategory-item" @click="closeMenu">
+                <NuxtLink
+                  v-for="subcategory in category.subcategories"
+                  :key="subcategory.id"
+                  :to="{ path: localePath('/products'), query: { subcategory: subcategory.id } }"
+                  class="submenu-item subcategory-item"
+                  :class="{ active: $route.query.subcategory === String(subcategory.id) }"
+                  @click="closeMenu"
+                >
                   {{ subcategory.label }}
                 </NuxtLink>
               </div>
@@ -208,9 +215,16 @@ onUnmounted(() => {
   }
 });
 
+const route = useRoute();
+
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
-  if (!isMenuOpen.value) {
+  if (isMenuOpen.value) {
+    // Auto-open products submenu if on products page
+    if (route.path.includes('/products')) {
+      isProductsSubmenuOpen.value = true;
+    }
+  } else {
     isProductsSubmenuOpen.value = false;
   }
 };
@@ -582,6 +596,12 @@ const toggleProductsSubmenu = () => {
   color: #d88c00;
 }
 
+.dropdown-item.active {
+  background: linear-gradient(to right, rgba(252, 234, 187, 0.4), rgba(248, 181, 0, 0.2));
+  color: #b37400;
+  font-weight: 500;
+}
+
 .dropdown-category {
   margin-top: 0.5rem;
   padding-top: 0.5rem;
@@ -763,6 +783,13 @@ const toggleProductsSubmenu = () => {
   .submenu-item:hover {
     background: rgba(216, 140, 0, 0.15);
     color: #d88c00;
+  }
+
+  .submenu-item.active {
+    background: linear-gradient(to right, rgba(252, 234, 187, 0.6), rgba(248, 181, 0, 0.35));
+    color: #b37400;
+    border-color: rgba(248, 181, 0, 0.4);
+    font-weight: 500;
   }
 
   .submenu-category {
