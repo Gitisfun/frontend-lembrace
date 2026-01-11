@@ -257,21 +257,29 @@ const applyPromocode = () => {
 .product-details {
   padding: 4rem 2rem;
   min-height: calc(100vh - 70px);
+  overflow-x: hidden;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .product-container {
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4rem;
   align-items: start;
+  box-sizing: border-box;
 }
 
 .product-gallery {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .product-image {
@@ -281,6 +289,7 @@ const applyPromocode = () => {
   overflow: hidden;
   background: white;
   border: 1px solid #e8d8b4;
+  width: 100%;
 }
 
 .favorite-btn-position {
@@ -312,6 +321,7 @@ const applyPromocode = () => {
   border: 2px solid transparent;
   transition: all 0.3s ease;
   background: white;
+  flex-shrink: 0;
 }
 
 .thumbnail:hover {
@@ -334,21 +344,26 @@ const applyPromocode = () => {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  min-width: 0;
+  width: 100%;
 }
 
 .product-name {
   font-family: 'Playfair Display', serif;
-  font-size: 2.5rem;
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
   color: var(--color-text);
   margin: 0;
   font-weight: 500;
   letter-spacing: 0.5px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .price-section {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .price-container {
@@ -359,14 +374,14 @@ const applyPromocode = () => {
 }
 
 .original-price {
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 3vw, 1.5rem);
   color: #e74c3c;
   text-decoration: line-through;
   font-weight: 400;
 }
 
 .product-price {
-  font-size: 2rem;
+  font-size: clamp(1.25rem, 4vw, 2rem);
   color: black;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -380,6 +395,7 @@ const applyPromocode = () => {
   border-radius: 0.5rem;
   font-weight: 600;
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 .product-description {
@@ -387,6 +403,8 @@ const applyPromocode = () => {
   font-size: 1rem;
   line-height: 1.6;
   color: var(--color-text);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .product-meta {
@@ -424,6 +442,7 @@ const applyPromocode = () => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  width: 100%;
 }
 
 .cart-quantity-indicator {
@@ -449,10 +468,12 @@ const applyPromocode = () => {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+  width: 100%;
 }
 
 .promocode-input {
   flex: 1;
+  min-width: 0;
   padding: 0.8rem 1rem;
   border: 1px solid #e8d8b4;
   border-radius: 8px;
@@ -460,6 +481,7 @@ const applyPromocode = () => {
   font-size: 1rem;
   background: white;
   transition: border-color 0.3s ease;
+  box-sizing: border-box;
 }
 
 .promocode-input:focus {
@@ -547,19 +569,11 @@ const applyPromocode = () => {
 
 @media (max-width: 768px) {
   .product-details {
-    padding: 2rem 1rem;
+    padding: 1.5rem 1rem;
   }
 
-  .product-name {
-    font-size: 2rem;
-  }
-
-  .product-price {
-    font-size: 1.5rem;
-  }
-
-  .original-price {
-    font-size: 1.2rem;
+  .product-info {
+    gap: 1.5rem;
   }
 
   .thumbnail {
@@ -569,6 +583,78 @@ const applyPromocode = () => {
 
   .image-thumbnails {
     gap: 0.25rem;
+  }
+
+  .promocode-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .promocode-input {
+    width: 100%;
+  }
+
+  .related-products-section {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .related-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-details {
+    padding: 1rem 0.75rem;
+  }
+
+  .product-image {
+    border-radius: 12px;
+  }
+
+  .thumbnail {
+    width: 50px;
+    height: 50px;
+    border-radius: 6px;
+  }
+
+  .product-info {
+    gap: 1rem;
+  }
+
+  .price-section {
+    gap: 0.5rem;
+  }
+
+  .discount-badge {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.6rem;
+  }
+
+  .soldout-alert,
+  .max-items-message,
+  .quantity-adjusted-message {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .related-products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .section-title {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
   }
 }
 
@@ -588,6 +674,8 @@ const applyPromocode = () => {
 .related-products-section {
   margin-top: 4rem;
   padding-top: 2rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .section-title {
@@ -602,27 +690,12 @@ const applyPromocode = () => {
 
 .related-products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
   gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-}
-
-@media (max-width: 768px) {
-  .related-products-section {
-    margin-top: 3rem;
-    padding-top: 1.5rem;
-  }
-
-  .section-title {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .related-products-grid {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-  }
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @keyframes fadeIn {
