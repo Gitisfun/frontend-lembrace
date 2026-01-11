@@ -565,7 +565,9 @@
       "products": "Products",
       "orders": "Orders",
       "customers": "Customers",
-      "settings": "Settings"
+      "settings": "Settings",
+      "viewSite": "View Site",
+      "strapi": "Strapi CMS"
     },
     "theme": {
       "light": "Light Mode",
@@ -756,6 +758,7 @@
       "title": "Products",
       "subtitle": "View and manage all products",
       "refresh": "Refresh",
+      "addProduct": "Add Product",
       "refreshed": "Products refreshed",
       "loading": "Loading products...",
       "errorTitle": "Failed to load products",

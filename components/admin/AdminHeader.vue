@@ -4,13 +4,29 @@
       <h1 class="page-title">{{ title }}</h1>
       <p v-if="subtitle" class="page-subtitle">{{ subtitle }}</p>
     </div>
-    <div v-if="$slots.actions" class="header-right">
+    <div class="header-right">
       <slot name="actions" />
+      <AdminActionButton :to="localePath('/')" target="_blank">
+        <template #icon>
+          <IconGlobe :size="16" />
+        </template>
+        {{ $t('admin.dashboard.viewSite') }}
+      </AdminActionButton>
+      <AdminActionButton :href="strapiAdminUrl" target="_blank">
+        <template #icon>
+          <IconCms :size="16" />
+        </template>
+        {{ $t('admin.nav.strapi') }}
+      </AdminActionButton>
     </div>
   </header>
 </template>
 
 <script setup>
+import AdminActionButton from '~/components/admin/AdminActionButton.vue';
+import IconGlobe from '~/components/icon/IconGlobe.vue';
+import IconCms from '~/components/icon/IconCms.vue';
+
 defineProps({
   title: {
     type: String,
@@ -21,6 +37,12 @@ defineProps({
     default: '',
   },
 });
+
+const config = useRuntimeConfig();
+const localePath = useLocalePath();
+
+// Strapi admin URL
+const strapiAdminUrl = computed(() => `${config.public.strapiUrl}/admin`);
 </script>
 
 <style scoped>
@@ -56,11 +78,21 @@ defineProps({
   transition: color 0.3s ease;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 @media (max-width: 768px) {
   .admin-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+  }
+
+  .header-right {
+    flex-wrap: wrap;
   }
 }
 </style>

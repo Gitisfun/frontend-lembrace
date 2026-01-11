@@ -33,7 +33,6 @@
                 <span v-if="totalUnread > 0" class="unread-badge">{{ totalUnread > 99 ? '99+' : totalUnread }}</span>
               </div>
               <span class="nav-text">{{ $t('admin.nav.messages') }}</span>
-              <span v-if="totalUnread > 0 && !isCollapsed" class="unread-count">{{ totalUnread }}</span>
             </NuxtLink>
           </li>
         </ul>
@@ -66,6 +65,18 @@
       <div class="nav-section">
         <span class="nav-section-title">{{ $t('admin.nav.settings') }}</span>
         <ul class="nav-list">
+          <li>
+            <NuxtLink :to="localePath('/')" target="_blank" class="nav-link" :title="isCollapsed ? $t('admin.nav.viewSite') : undefined">
+              <IconGlobe :size="18" />
+              <span class="nav-text">{{ $t('admin.nav.viewSite') }}</span>
+            </NuxtLink>
+          </li>
+          <li>
+            <a :href="strapiAdminUrl" target="_blank" rel="noopener noreferrer" class="nav-link" :title="isCollapsed ? $t('admin.nav.strapi') : undefined">
+              <IconCms :size="18" />
+              <span class="nav-text">{{ $t('admin.nav.strapi') }}</span>
+            </a>
+          </li>
           <li>
             <button class="nav-link theme-toggle" @click="toggleTheme" :title="isCollapsed ? (isDark ? $t('admin.theme.light') : $t('admin.theme.dark')) : undefined">
               <!-- Moon icon for dark mode (current state) -->
@@ -113,8 +124,15 @@ import IconUsers from '~/components/icon/IconUsers.vue';
 import IconMoon from '~/components/icon/IconMoon.vue';
 import IconSun from '~/components/icon/IconSun.vue';
 import IconLogout from '~/components/icon/IconLogout.vue';
+import IconExternalLink from '~/components/icon/IconExternalLink.vue';
+import IconGlobe from '~/components/icon/IconGlobe.vue';
+import IconCms from '~/components/icon/IconCms.vue';
 
 const { t } = useI18n();
+const config = useRuntimeConfig();
+
+// Strapi admin URL
+const strapiAdminUrl = computed(() => `${config.public.strapiUrl}/admin`);
 const localePath = useLocalePath();
 const route = useRoute();
 const authStore = useAuthStore();
@@ -135,8 +153,8 @@ const fetchUnreadCounts = async () => {
       toastMessage(t('admin.orders.chat.newUnreadMessage', { count }), {
         action: {
           label: t('admin.orders.chat.viewMessages'),
-          onClick: () => navigateTo(localePath('/admin/messages'))
-        }
+          onClick: () => navigateTo(localePath('/admin/messages')),
+        },
       });
     });
   }
@@ -479,26 +497,6 @@ const handleLogout = () => {
   justify-content: center;
   line-height: 1;
   box-shadow: 0 2px 4px rgba(239, 68, 68, 0.4);
-}
-
-.unread-count {
-  margin-left: auto;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  border-radius: 10px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.collapsed .unread-count {
-  display: none;
 }
 
 .sidebar-footer {

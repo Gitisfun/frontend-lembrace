@@ -8,27 +8,15 @@
           </template>
           {{ $t('admin.dashboard.refresh') }}
         </AdminActionButton>
-        <AdminActionButton :to="localePath('/')" target="_blank">
-          <template #icon>
-            <IconExternalLink :size="16" />
-          </template>
-          {{ $t('admin.dashboard.viewSite') }}
-        </AdminActionButton>
       </template>
     </AdminHeader>
 
     <div class="dashboard-content">
-      <!-- Welcome Card -->
-      <DashboardWelcomeCard :title="$t('admin.dashboard.welcomeTitle', { name: authStore.adminUser?.first_name || 'Admin' })" :message="$t('admin.dashboard.welcomeMessage')" />
-
       <!-- Loading State -->
       <AdminLoadingState v-if="isLoading" :message="$t('admin.dashboard.loading')" />
 
       <!-- Stats Content -->
       <div v-else class="stats-sections">
-        <!-- Orders Needing Action Banner -->
-        <DashboardActionBanner v-if="stats.ordersNeedingAction > 0" :title="$t('admin.dashboard.actionNeeded')" :description="$t('admin.dashboard.actionNeededDesc', { count: stats.ordersNeedingAction })" :link-text="$t('admin.dashboard.viewOrders')" :to="localePath('/admin/orders')" />
-
         <!-- Revenue Stats -->
         <DashboardStatsSection :title="$t('admin.dashboard.sections.revenue')">
           <template #icon>
@@ -220,17 +208,14 @@ import AdminActionButton from '~/components/admin/AdminActionButton.vue';
 import AdminLoadingState from '~/components/admin/AdminLoadingState.vue';
 
 // Dashboard Components
-import DashboardWelcomeCard from '~/components/admin/DashboardWelcomeCard.vue';
 import DashboardStatCard from '~/components/admin/DashboardStatCard.vue';
 import DashboardStatsSection from '~/components/admin/DashboardStatsSection.vue';
-import DashboardActionBanner from '~/components/admin/DashboardActionBanner.vue';
 import DashboardStatusBreakdown from '~/components/admin/DashboardStatusBreakdown.vue';
 import DashboardBestSellers from '~/components/admin/DashboardBestSellers.vue';
 import DashboardRevenueChart from '~/components/admin/DashboardRevenueChart.vue';
 import DashboardOrdersChart from '~/components/admin/DashboardOrdersChart.vue';
 
 // Icons
-import IconExternalLink from '~/components/icon/IconExternalLink.vue';
 import IconRefresh from '~/components/icon/IconRefresh.vue';
 import IconDollarSign from '~/components/icon/IconDollarSign.vue';
 import IconTrendingUp from '~/components/icon/IconTrendingUp.vue';

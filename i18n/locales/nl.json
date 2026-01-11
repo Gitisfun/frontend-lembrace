@@ -565,7 +565,9 @@
       "products": "Producten",
       "orders": "Bestellingen",
       "customers": "Klanten",
-      "settings": "Instellingen"
+      "settings": "Instellingen",
+      "viewSite": "Bekijk Site",
+      "strapi": "Strapi CMS"
     },
     "theme": {
       "light": "Lichte Modus",
@@ -756,6 +758,7 @@
       "title": "Producten",
       "subtitle": "Bekijk en beheer alle producten",
       "refresh": "Vernieuwen",
+      "addProduct": "Product Toevoegen",
       "refreshed": "Producten vernieuwd",
       "loading": "Producten laden...",
       "errorTitle": "Kon producten niet laden",

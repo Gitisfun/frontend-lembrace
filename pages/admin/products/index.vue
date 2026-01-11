@@ -2,6 +2,12 @@
   <AdminLayout>
     <AdminHeader :title="$t('admin.products.title')" :subtitle="$t('admin.products.subtitle')">
       <template #actions>
+        <AdminActionButton :href="strapiProductCreateUrl" target="_blank">
+          <template #icon>
+            <IconPlus :size="16" />
+          </template>
+          {{ $t('admin.products.addProduct') }}
+        </AdminActionButton>
         <AdminActionButton @click="refreshProducts" :disabled="isLoading" :loading="isLoading">
           <template #icon>
             <IconRefresh :size="16" />
@@ -63,6 +69,7 @@ import ProductsFiltersBar from '~/components/admin/ProductsFiltersBar.vue';
 import ProductsNoResults from '~/components/admin/ProductsNoResults.vue';
 import ProductsTable from '~/components/admin/ProductsTable.vue';
 import IconRefresh from '~/components/icon/IconRefresh.vue';
+import IconPlus from '~/components/icon/IconPlus.vue';
 
 definePageMeta({
   layout: false,
@@ -73,6 +80,11 @@ const { t } = useI18n();
 const { find } = useStrapi();
 const config = useRuntimeConfig();
 const { success: toastSuccess } = useToast();
+
+// Strapi product create URL
+const strapiProductCreateUrl = computed(() => {
+  return `${config.public.strapiUrl}/admin/content-manager/collection-types/api::product.product/create`;
+});
 
 // State
 const products = ref([]);
