@@ -382,7 +382,7 @@ const formatDate = (dateString) => {
 /* Orders Detail Row */
 .orders-detail-row td {
   padding: 0 !important;
-  background: var(--admin-surface-alt);
+  background: linear-gradient(135deg, rgba(212, 167, 98, 0.05) 0%, rgba(212, 167, 98, 0.1) 100%);
 }
 
 .orders-detail-content {

@@ -27,12 +27,12 @@
             </NuxtLink>
           </li>
           <li>
-            <NuxtLink :to="localePath('/admin/messages')" class="nav-link" :class="{ active: isActive('/admin/messages') }" :title="isCollapsed ? $t('admin.nav.messages') : undefined">
+            <NuxtLink :to="localePath('/admin/messages')" class="nav-link" :class="{ active: isActive('/admin/messages') }" :title="isCollapsed ? $t('admin.nav.notifications') : undefined">
               <div class="nav-icon-wrapper">
                 <IconMail :size="18" />
                 <span v-if="totalUnread > 0" class="unread-badge">{{ totalUnread > 99 ? '99+' : totalUnread }}</span>
               </div>
-              <span class="nav-text">{{ $t('admin.nav.messages') }}</span>
+              <span class="nav-text">{{ $t('admin.nav.notifications') }}</span>
             </NuxtLink>
           </li>
         </ul>
@@ -42,15 +42,15 @@
         <span class="nav-section-title">{{ $t('admin.nav.management') }}</span>
         <ul class="nav-list">
           <li>
-            <NuxtLink :to="localePath('/admin/products')" class="nav-link" :class="{ active: isActive('/admin/products') }" :title="isCollapsed ? $t('admin.nav.products') : undefined">
-              <IconShoppingBag :size="18" />
-              <span class="nav-text">{{ $t('admin.nav.products') }}</span>
-            </NuxtLink>
-          </li>
-          <li>
             <NuxtLink :to="localePath('/admin/orders')" class="nav-link" :class="{ active: isActive('/admin/orders') }" :title="isCollapsed ? $t('admin.nav.orders') : undefined">
               <IconDocument :size="18" />
               <span class="nav-text">{{ $t('admin.nav.orders') }}</span>
+            </NuxtLink>
+          </li>
+          <li>
+            <NuxtLink :to="localePath('/admin/products')" class="nav-link" :class="{ active: isActive('/admin/products') }" :title="isCollapsed ? $t('admin.nav.products') : undefined">
+              <IconShoppingBag :size="18" />
+              <span class="nav-text">{{ $t('admin.nav.products') }}</span>
             </NuxtLink>
           </li>
           <li>
@@ -84,6 +84,12 @@
               <!-- Sun icon for light mode (current state) -->
               <IconSun v-else :size="18" />
               <span class="nav-text">{{ isDark ? $t('admin.theme.light') : $t('admin.theme.dark') }}</span>
+            </button>
+          </li>
+          <li>
+            <button class="nav-link language-toggle" @click="switchLanguage" :title="isCollapsed ? $t('admin.language.switch') : undefined">
+              <span class="language-icon">{{ currentLocale.toUpperCase() }}</span>
+              <span class="nav-text">{{ $t('admin.language.switch') }}</span>
             </button>
           </li>
         </ul>
@@ -128,8 +134,10 @@ import IconExternalLink from '~/components/icon/IconExternalLink.vue';
 import IconGlobe from '~/components/icon/IconGlobe.vue';
 import IconCms from '~/components/icon/IconCms.vue';
 
-const { t } = useI18n();
+const { t, locale, locales, setLocale } = useI18n();
 const config = useRuntimeConfig();
+const switchLocalePath = useSwitchLocalePath();
+const router = useRouter();
 
 // Strapi admin URL
 const strapiAdminUrl = computed(() => `${config.public.strapiUrl}/admin`);
@@ -191,6 +199,20 @@ const handleLogout = () => {
   authStore.adminLogout();
   toastSuccess(t('auth.profile.logoutSuccess'));
   navigateTo(localePath('/admin/login'));
+};
+
+// Language switching
+const currentLocale = computed(() => locale.value);
+
+const switchLanguage = async () => {
+  // Get available locales and find the next one
+  const availableLocales = locales.value.map((l) => l.code);
+  const currentIndex = availableLocales.indexOf(locale.value);
+  const nextIndex = (currentIndex + 1) % availableLocales.length;
+  const nextLocale = availableLocales[nextIndex];
+
+  await setLocale(nextLocale);
+  await router.push(switchLocalePath(nextLocale));
 };
 </script>
 
@@ -456,6 +478,24 @@ const handleLogout = () => {
 
 .nav-link.theme-toggle {
   cursor: pointer;
+}
+
+.nav-link.language-toggle {
+  cursor: pointer;
+}
+
+.language-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-gold);
+  background: rgba(212, 167, 98, 0.15);
+  border-radius: 4px;
+  letter-spacing: -0.5px;
 }
 
 .coming-soon {

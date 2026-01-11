@@ -153,9 +153,9 @@ const changeStatus = async () => {
   justify-content: center;
   gap: 0.5rem;
   padding: 0.625rem 1.25rem;
-  background: var(--admin-surface-alt);
-  color: var(--admin-text);
-  border: 1px solid var(--admin-border);
+  background: linear-gradient(135deg, var(--color-gold, #d4a762) 0%, var(--color-gold-dark, #b8956f) 100%);
+  color: white;
+  border: none;
   border-radius: 8px;
   font-family: var(--font-body);
   font-size: 0.875rem;
@@ -167,20 +167,23 @@ const changeStatus = async () => {
 }
 
 .status-changer-button:hover:not(:disabled) {
-  background: var(--admin-border);
-  border-color: var(--admin-border-hover, #9ca3af);
+  background: linear-gradient(135deg, var(--color-gold-dark, #b8956f) 0%, #a07d5a 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 167, 98, 0.3);
 }
 
 .status-changer-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .status-changer-loading {
   width: 14px;
   height: 14px;
-  border: 2px solid rgba(107, 114, 128, 0.3);
-  border-top-color: var(--admin-text-muted);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }

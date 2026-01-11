@@ -85,6 +85,10 @@
         "title": "Berichten | Admin | L'embrace",
         "description": "Bekijk bestellingen met ongelezen berichten in het L'embrace beheerpaneel."
       },
+      "notifications": {
+        "title": "Meldingen | Admin | L'embrace",
+        "description": "Bekijk meldingen, berichten en waarschuwingen in het L'embrace beheerpaneel."
+      },
       "products": {
         "title": "Producten | Admin | L'embrace",
         "description": "Bekijk en beheer alle producten in het L'embrace beheerpaneel."
@@ -100,7 +104,12 @@
     "products": "Producten",
     "about": "Over ons",
     "contact": "Contact",
-    "login": "Inloggen"
+    "login": "Inloggen",
+    "favorites": "Favorieten",
+    "cart": "Winkelwagen",
+    "profile": "Mijn Profiel",
+    "allProducts": "Alle Producten",
+    "allCategory": "Alles"
   },
   "footer": {
     "tagline": "Elegantie in elk detail – met de hand gemaakt voor jou."
@@ -158,6 +167,7 @@
     "soldOut": "Sorry, dit item is momenteel uitverkocht",
     "maxItems": "Je hebt al het maximaal beschikbare aantal aan je winkelwagen toegevoegd",
     "quantityAdjusted": "Aantal aangepast aan maximaal beschikbare voorraad",
+    "inCart": "{count} in je winkelwagen",
     "addToCart": "Toevoegen aan winkelwagen",
     "removeFromCart": "Verwijderen uit winkelwagen",
     "checkout": "Ga naar afrekenen",
@@ -560,7 +570,7 @@
     "nav": {
       "main": "Hoofd",
       "dashboard": "Dashboard",
-      "messages": "Berichten",
+      "notifications": "Meldingen",
       "management": "Beheer",
       "products": "Producten",
       "orders": "Bestellingen",
@@ -572,6 +582,9 @@
     "theme": {
       "light": "Lichte Modus",
       "dark": "Donkere Modus"
+    },
+    "language": {
+      "switch": "Taal Wijzigen"
     },
     "sidebar": {
       "collapse": "Zijbalk inklappen",
@@ -754,6 +767,19 @@
       "emptyMessage": "Je bent helemaal bij! Alle klantberichten zijn gelezen.",
       "infoBanner": "Je hebt {count} ongelezen bericht(en) bij deze bestellingen"
     },
+    "notifications": {
+      "title": "Meldingen",
+      "subtitle": "Berichten en waarschuwingen die aandacht vereisen",
+      "refreshed": "Meldingen vernieuwd",
+      "messages": {
+        "title": "Ongelezen Berichten",
+        "empty": "Geen ongelezen berichten"
+      },
+      "outOfStock": {
+        "title": "Uitverkochte Producten",
+        "empty": "Alle producten zijn op voorraad"
+      }
+    },
     "products": {
       "title": "Producten",
       "subtitle": "Bekijk en beheer alle producten",
@@ -795,7 +821,20 @@
         "stock": "Voorraad",
         "discount": "Korting"
       },
-      "editInStrapi": "Bewerken in Strapi"
+      "editInStrapi": "Bewerken in Strapi",
+      "stock": {
+        "title": "Voorraadbeheer",
+        "currentStock": "Huidige Voorraad",
+        "addStock": "Voorraad Toevoegen",
+        "newStock": "Nieuwe Voorraad",
+        "quantity": "Aantal",
+        "updateButton": "Voorraad Bijwerken",
+        "confirmTitle": "Voorraad Bijwerken",
+        "confirmMessage": "Voorraad voor {name} bijwerken van {current} naar {new} (+{add})?",
+        "confirmButton": "Bijwerken",
+        "success": "Voorraad bijgewerkt voor {name}",
+        "error": "Kon voorraad niet bijwerken"
+      }
     },
     "customers": {
       "title": "Klanten",

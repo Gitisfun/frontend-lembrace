@@ -363,7 +363,7 @@ const formatTime = (dateString) => {
 
 /* Inline Details Row */
 .details-row {
-  background: var(--admin-details-bg);
+  background: linear-gradient(135deg, rgba(212, 167, 98, 0.05) 0%, rgba(212, 167, 98, 0.1) 100%);
 }
 
 .details-row td {
@@ -373,8 +373,8 @@ const formatTime = (dateString) => {
 
 .inline-details-content {
   padding: 1.5rem;
-  background: var(--admin-details-bg);
-  border-top: 1px solid var(--admin-border-light);
+  background: transparent;
+  border-top: 1px solid rgba(212, 167, 98, 0.2);
 }
 
 .unread-banner {

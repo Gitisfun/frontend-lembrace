@@ -26,7 +26,15 @@ defineProps({
 .summary-item {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 0.25rem;
+  flex: 1;
+  padding: 1rem;
+  background: var(--admin-surface);
+  border-radius: 8px;
+  text-align: center;
+  transition: background 0.3s ease;
 }
 
 .summary-label {

@@ -5,12 +5,86 @@
         <IconMenu :size="24" />
       </div>
       <nav class="nav-left" :class="{ 'mobile-menu-open': isMenuOpen }">
-        <NuxtLink :to="localePath('/')" class="nav-item" @click="closeMenu" :class="{ active: $route.path === '/' || $route.path === localePath('/') }">{{ $t('nav.home') }}</NuxtLink>
-        <NuxtLink :to="localePath('/products')" class="nav-item" @click="closeMenu" :class="{ active: $route.path.includes('/products') }">{{ $t('nav.products') }}</NuxtLink>
-        <!--
-          <NuxtLink :to="localePath('/about')" class="nav-item" @click="closeMenu" :class="{ active: $route.path.includes('/about') }">{{ $t('nav.about') }}</NuxtLink>
-        -->
-        <NuxtLink :to="localePath('/contact')" class="nav-item" @click="closeMenu" :class="{ active: $route.path.includes('/contact') }">{{ $t('nav.contact') }}</NuxtLink>
+        <!-- Mobile Language Switcher -->
+        <div class="mobile-language-switcher mobile-only">
+          <UiLanguageSwitcher />
+        </div>
+        <!-- Mobile Menu Divider -->
+        <div class="mobile-menu-divider mobile-only"></div>
+        <NuxtLink :to="localePath('/')" class="nav-item" @click="closeMenu" :class="{ active: $route.path === '/' || $route.path === localePath('/') }">
+          <IconHome :size="20" class="nav-icon" />
+          <span>{{ $t('nav.home') }}</span>
+        </NuxtLink>
+        <!-- Desktop Products with Dropdown -->
+        <div class="nav-item-dropdown desktop-only">
+          <NuxtLink :to="localePath('/products')" class="nav-item" :class="{ active: $route.path.includes('/products') }">
+            <span>{{ $t('nav.products') }}</span>
+            <IconChevronDown :size="14" class="dropdown-chevron" />
+          </NuxtLink>
+          <div class="dropdown-menu">
+            <NuxtLink :to="localePath('/products')" class="dropdown-item">
+              {{ $t('nav.allProducts') }}
+            </NuxtLink>
+            <div v-for="category in categories" :key="category.id" class="dropdown-category">
+              <div class="dropdown-category-title">{{ category.label }}</div>
+              <NuxtLink :to="{ path: localePath('/products'), query: { subcategory: `all_${category.id}` } }" class="dropdown-item">
+                {{ $t('nav.allCategory') }}
+              </NuxtLink>
+              <NuxtLink v-for="subcategory in category.subcategories" :key="subcategory.id" :to="{ path: localePath('/products'), query: { subcategory: subcategory.id } }" class="dropdown-item">
+                {{ subcategory.label }}
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+        <!-- Mobile Products with Submenu -->
+        <div class="nav-item-with-submenu mobile-only">
+          <div class="nav-item" @click="toggleProductsSubmenu" :class="{ active: $route.path.includes('/products') }">
+            <IconShoppingBag :size="20" class="nav-icon" />
+            <span>{{ $t('nav.products') }}</span>
+            <IconChevronDown :size="18" class="submenu-chevron" :class="{ rotated: isProductsSubmenuOpen }" />
+          </div>
+          <div class="submenu" :class="{ open: isProductsSubmenuOpen }">
+            <div class="submenu-items-row">
+              <NuxtLink :to="localePath('/products')" class="submenu-item" @click="closeMenu">
+                {{ $t('nav.allProducts') }}
+              </NuxtLink>
+            </div>
+            <div v-for="category in categories" :key="category.id" class="submenu-category">
+              <div class="submenu-category-title">{{ category.label }}</div>
+              <div class="submenu-items-row">
+                <NuxtLink :to="{ path: localePath('/products'), query: { subcategory: `all_${category.id}` } }" class="submenu-item subcategory-item" @click="closeMenu">
+                  {{ $t('nav.allCategory') }}
+                </NuxtLink>
+                <NuxtLink v-for="subcategory in category.subcategories" :key="subcategory.id" :to="{ path: localePath('/products'), query: { subcategory: subcategory.id } }" class="submenu-item subcategory-item" @click="closeMenu">
+                  {{ subcategory.label }}
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+        </div>
+        <NuxtLink :to="localePath('/cart')" class="nav-item mobile-only" @click="closeMenu" :class="{ active: $route.path.includes('/cart') }">
+          <IconCart :size="20" class="nav-icon" />
+          <span>{{ $t('nav.cart') }}</span>
+          <span class="mobile-counter" v-if="cartCount > 0">{{ cartCount }}</span>
+        </NuxtLink>
+        <NuxtLink :to="localePath('/favorites')" class="nav-item mobile-only" @click="closeMenu" :class="{ active: $route.path.includes('/favorites') }">
+          <IconHeart :size="20" class="nav-icon" />
+          <span>{{ $t('nav.favorites') }}</span>
+          <span class="mobile-counter" v-if="favoritesCount > 0">{{ favoritesCount }}</span>
+        </NuxtLink>
+        <NuxtLink v-if="authStore.isAuthenticated" :to="localePath('/profile')" class="nav-item mobile-only" @click="closeMenu" :class="{ active: $route.path.includes('/profile') }">
+          <IconUser :size="20" class="nav-icon" />
+          <span>{{ $t('nav.profile') }}</span>
+          <span class="mobile-counter unread" v-if="totalUnreadCount > 0">{{ totalUnreadCount > 99 ? '99+' : totalUnreadCount }}</span>
+        </NuxtLink>
+        <NuxtLink v-else :to="localePath('/login')" class="nav-item mobile-only" @click="closeMenu" :class="{ active: $route.path.includes('/login') }">
+          <IconLogin :size="20" class="nav-icon" />
+          <span>{{ $t('nav.login') }}</span>
+        </NuxtLink>
+        <NuxtLink :to="localePath('/contact')" class="nav-item" @click="closeMenu" :class="{ active: $route.path.includes('/contact') }">
+          <IconMail :size="20" class="nav-icon" />
+          <span>{{ $t('nav.contact') }}</span>
+        </NuxtLink>
       </nav>
       <NuxtLink to="/" class="logo-link">
         <div class="logo-block">
@@ -59,8 +133,11 @@ import { formatPrice } from '~/logic/utils';
 
 const { t } = useI18n();
 const localePath = useLocalePath();
+const { find } = useStrapi();
 
 const isMenuOpen = ref(false);
+const isProductsSubmenuOpen = ref(false);
+const categories = ref([]);
 const globalStore = useGlobalStore();
 const authStore = useAuthStore();
 const unreadStore = useUnreadMessagesStore();
@@ -68,6 +145,23 @@ const { info: toastInfo } = useToast();
 const cartCount = computed(() => globalStore.cartItemCount);
 const favoritesCount = computed(() => globalStore.favoriteItems.length);
 const formattedCartTotal = computed(() => formatPrice(globalStore.cartTotal));
+
+// Fetch categories for submenu
+const fetchCategories = async () => {
+  try {
+    const response = await find('categories', {
+      populate: ['subcategories'],
+    });
+    categories.value = response.data || [];
+  } catch (error) {
+    console.error('Failed to fetch categories:', error);
+  }
+};
+
+// Fetch categories on mount
+onMounted(() => {
+  fetchCategories();
+});
 
 // Unread messages count from store
 const totalUnreadCount = computed(() => unreadStore.totalUnread);
@@ -77,8 +171,8 @@ const onNewMessages = (count) => {
   toastInfo(t('orders.chat.newUnreadMessage', { count }), {
     action: {
       label: t('orders.chat.viewMessages'),
-      onClick: () => navigateTo(localePath('/orders'))
-    }
+      onClick: () => navigateTo(localePath('/orders')),
+    },
   });
 };
 
@@ -116,10 +210,18 @@ onUnmounted(() => {
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
+  if (!isMenuOpen.value) {
+    isProductsSubmenuOpen.value = false;
+  }
 };
 
 const closeMenu = () => {
   isMenuOpen.value = false;
+  isProductsSubmenuOpen.value = false;
+};
+
+const toggleProductsSubmenu = () => {
+  isProductsSubmenuOpen.value = !isProductsSubmenuOpen.value;
 };
 </script>
 
@@ -253,6 +355,11 @@ const closeMenu = () => {
 
 .language-switcher-desktop {
   margin-right: 0.5rem;
+}
+
+/* Mobile language switcher - hidden on desktop */
+.mobile-language-switcher {
+  display: none;
 }
 
 .cart-icon {
@@ -409,6 +516,93 @@ const closeMenu = () => {
   background: rgba(212, 175, 55, 0.05);
 }
 
+/* Mobile-only items - hidden on desktop */
+.mobile-only {
+  display: none;
+}
+
+/* Hide nav icons on desktop */
+.nav-icon {
+  display: none;
+}
+
+/* Desktop dropdown */
+.nav-item-dropdown {
+  position: relative;
+}
+
+.nav-item-dropdown .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.dropdown-chevron {
+  transition: transform 0.2s ease;
+}
+
+.nav-item-dropdown:hover .dropdown-chevron {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 200px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  padding: 0.75rem 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  z-index: 1000;
+  margin-top: 0.5rem;
+}
+
+.nav-item-dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+}
+
+.dropdown-item {
+  display: block;
+  padding: 0.6rem 1.25rem;
+  color: #333;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.dropdown-item:hover {
+  background: rgba(216, 140, 0, 0.08);
+  color: #d88c00;
+}
+
+.dropdown-category {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.dropdown-category:first-of-type {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.dropdown-category-title {
+  padding: 0.4rem 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 @media (max-width: 768px) {
   .header-content {
     padding: 1rem;
@@ -424,16 +618,19 @@ const closeMenu = () => {
     left: 0;
     width: 100%;
     height: 100vh;
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(10px);
     flex-direction: column;
-    padding: 5rem 2rem 0 2rem;
-    gap: 1.5rem;
+    padding: 5rem 1.25rem 2rem 1.25rem;
+    gap: 0.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transform: translateX(-100%);
     opacity: 0;
     transition: all 0.3s ease;
     z-index: 1000;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
   }
 
   .nav-left.mobile-menu-open {
@@ -441,14 +638,188 @@ const closeMenu = () => {
     opacity: 1;
   }
 
-  .nav-item {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    font-size: 1.2rem;
+  /* Show nav icons on mobile */
+  .nav-icon {
+    display: block;
+    flex-shrink: 0;
   }
 
-  .nav-item:last-child {
-    border-bottom: none;
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    background: rgba(0, 0, 0, 0.02);
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .nav-item:hover {
+    background: rgba(216, 140, 0, 0.08);
+  }
+
+  .nav-item.active {
+    background: linear-gradient(to right, rgba(252, 234, 187, 0.3), rgba(248, 181, 0, 0.15));
+  }
+
+  .nav-item.active::after {
+    display: none;
+  }
+
+  .nav-item > span:not(.mobile-counter) {
+    flex: 1;
+  }
+
+  /* Show mobile-only items */
+  .mobile-only {
+    display: flex;
+  }
+
+  .nav-item.mobile-only {
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* Hide desktop-only items on mobile */
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Hide desktop language switcher on mobile */
+  .language-switcher-desktop {
+    display: none;
+  }
+
+  /* Mobile language switcher - positioned top right of menu */
+  .mobile-language-switcher {
+    display: block;
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+  }
+
+  /* Mobile menu golden gradient divider */
+  .mobile-menu-divider {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, #fceabb, #f8b500, #fceabb);
+    margin-bottom: 0.5rem;
+    border-radius: 1px;
+  }
+
+  /* Products submenu */
+  .nav-item-with-submenu {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nav-item-with-submenu .nav-item {
+    cursor: pointer;
+  }
+
+  .submenu-chevron {
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+    margin-left: auto;
+  }
+
+  .submenu-chevron.rotated {
+    transform: rotate(180deg);
+  }
+
+  .submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 12px;
+    margin-top: 0.5rem;
+    padding: 0;
+  }
+
+  .submenu.open {
+    max-height: 600px;
+    padding: 0.75rem;
+  }
+
+  .submenu-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 0.9rem;
+    color: #555;
+    text-decoration: none;
+    font-size: 0.9rem;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    white-space: nowrap;
+  }
+
+  .submenu-item:hover {
+    background: rgba(216, 140, 0, 0.15);
+    color: #d88c00;
+  }
+
+  .submenu-category {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .submenu-category:first-of-type {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .submenu-category-title {
+    display: block;
+    width: 100%;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+  }
+
+  .submenu-items-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .subcategory-item {
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+  }
+
+  .mobile-counter {
+    background: linear-gradient(to right, #fceabb, #f8b500);
+    color: #000;
+    border-radius: 12px;
+    min-width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 0 6px;
+    flex-shrink: 0;
+    margin-right: 0;
+  }
+
+  .mobile-counter.unread {
+    background: #ef4444;
+    color: white;
   }
 
   .favorites-icon {

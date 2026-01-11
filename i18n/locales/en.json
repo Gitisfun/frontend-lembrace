@@ -85,6 +85,10 @@
         "title": "Messages | Admin | L'embrace",
         "description": "View orders with unread messages in the L'embrace admin panel."
       },
+      "notifications": {
+        "title": "Notifications | Admin | L'embrace",
+        "description": "View notifications, messages and alerts in the L'embrace admin panel."
+      },
       "products": {
         "title": "Products | Admin | L'embrace",
         "description": "View and manage all products in the L'embrace admin panel."
@@ -100,7 +104,12 @@
     "products": "Products",
     "about": "About",
     "contact": "Contact",
-    "login": "Login"
+    "login": "Login",
+    "favorites": "Favorites",
+    "cart": "Cart",
+    "profile": "My Profile",
+    "allProducts": "All Products",
+    "allCategory": "All"
   },
   "footer": {
     "tagline": "Elegance in every detail – handcrafted for you."
@@ -158,6 +167,7 @@
     "soldOut": "Sorry, this item is currently sold out",
     "maxItems": "You have already added the maximum available quantity to your cart",
     "quantityAdjusted": "Quantity adjusted to maximum available stock",
+    "inCart": "{count} in your cart",
     "addToCart": "Add to Cart",
     "removeFromCart": "Remove from Cart",
     "checkout": "Proceed to Checkout",
@@ -560,7 +570,7 @@
     "nav": {
       "main": "Main",
       "dashboard": "Dashboard",
-      "messages": "Messages",
+      "notifications": "Notifications",
       "management": "Management",
       "products": "Products",
       "orders": "Orders",
@@ -572,6 +582,9 @@
     "theme": {
       "light": "Light Mode",
       "dark": "Dark Mode"
+    },
+    "language": {
+      "switch": "Switch Language"
     },
     "sidebar": {
       "collapse": "Collapse sidebar",
@@ -754,6 +767,19 @@
       "emptyMessage": "You're all caught up! All customer messages have been read.",
       "infoBanner": "You have {count} unread message(s) across these orders"
     },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Messages and alerts requiring attention",
+      "refreshed": "Notifications refreshed",
+      "messages": {
+        "title": "Unread Messages",
+        "empty": "No unread messages"
+      },
+      "outOfStock": {
+        "title": "Out of Stock Products",
+        "empty": "All products are in stock"
+      }
+    },
     "products": {
       "title": "Products",
       "subtitle": "View and manage all products",
@@ -795,7 +821,20 @@
         "stock": "Stock",
         "discount": "Discount"
       },
-      "editInStrapi": "Edit in Strapi"
+      "editInStrapi": "Edit in Strapi",
+      "stock": {
+        "title": "Stock Management",
+        "currentStock": "Current Stock",
+        "addStock": "Add Stock",
+        "newStock": "New Stock",
+        "quantity": "Quantity",
+        "updateButton": "Update Stock",
+        "confirmTitle": "Update Stock",
+        "confirmMessage": "Update stock for {name} from {current} to {new} (+{add})?",
+        "confirmButton": "Update",
+        "success": "Stock updated for {name}",
+        "error": "Failed to update stock"
+      }
     },
     "customers": {
       "title": "Customers",

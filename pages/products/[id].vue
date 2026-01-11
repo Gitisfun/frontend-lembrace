@@ -58,6 +58,12 @@
         <div class="product-actions">
           <div v-if="product?.amount === 0" class="soldout-alert">{{ $t('product.soldOut') }}</div>
           <template v-else>
+            <!-- Cart Quantity Indicator -->
+            <div v-if="cartQuantity > 0" class="cart-quantity-indicator">
+              <IconCart :size="18" />
+              <span>{{ $t('product.inCart', { count: cartQuantity }) }}</span>
+            </div>
+
             <InputCounter v-if="product?.amount" v-model="quantity" :max="product.amount" :product-id="product.documentId || product.id" />
 
             <!-- Max Items Message -->
@@ -99,6 +105,7 @@ import InputCounter from '~/components/input/InputCounter.vue';
 import RichcontentViewer from '~/components/richcontent/RichcontentViewer.vue';
 import ProductCard from '~/components/product/ProductCard.vue';
 import ProductMaterialSelector from '~/components/product/MaterialSelector.vue';
+import IconCart from '~/components/icon/IconCart.vue';
 import { useGlobalStore } from '~/stores/global';
 
 const { t } = useI18n();
@@ -128,6 +135,13 @@ const isInCart = computed(() => {
   if (!product.value) return false;
   const productId = product.value.documentId || product.value.id;
   return globalStore.cartItems.some((item) => item.id === productId);
+});
+
+const cartQuantity = computed(() => {
+  if (!product.value) return 0;
+  const productId = product.value.documentId || product.value.id;
+  const cartItem = globalStore.cartItems.find((item) => item.id === productId);
+  return cartItem?.amount || 0;
 });
 
 const isFavorite = computed(() => {
@@ -410,6 +424,25 @@ const applyPromocode = () => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.cart-quantity-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, rgba(212, 167, 98, 0.15) 0%, rgba(212, 167, 98, 0.25) 100%);
+  border: 1px solid rgba(212, 167, 98, 0.3);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-gold-dark, #b8956f);
+}
+
+.cart-quantity-indicator svg {
+  color: var(--color-gold, #d4a762);
 }
 
 .promocode-section {

@@ -86,9 +86,23 @@ useSeoMeta({
   twitterDescription: () => t('seo.products.description'),
 });
 
-// Filter states
+// Get query params for initial filter state
+const route = useRoute();
+
+// Helper to parse subcategory from query (handles both numeric IDs and 'all_X' format)
+const parseSubcategoryQuery = (value) => {
+  if (!value) return [];
+  const strValue = String(value);
+  if (strValue.startsWith('all_')) {
+    return [strValue]; // Keep as string for "all_X" format
+  }
+  return [Number(value)];
+};
+
+// Filter states - initialize from query params if present
 const searchQuery = ref('');
-const selectedSubcategories = ref([]);
+const initialSubcategory = parseSubcategoryQuery(route.query.subcategory);
+const selectedSubcategories = ref(initialSubcategory);
 const showDiscounted = ref(false);
 const currentPage = ref(1);
 const itemsPerPage = 12;
@@ -258,6 +272,16 @@ const clearFilters = () => {
   showDiscounted.value = false;
   handleFilterChange();
 };
+
+// Watch for route query changes (e.g., from mobile menu navigation)
+watch(
+  () => route.query.subcategory,
+  (newSubcategory) => {
+    selectedSubcategories.value = parseSubcategoryQuery(newSubcategory);
+    currentPage.value = 1;
+    refresh();
+  }
+);
 </script>
 
 <style scoped>
