@@ -313,6 +313,7 @@ if (authStore.adminUser?.id && adminUnreadStore.counts.length === 0) {
 /* Order Summary Header */
 .order-summary-header {
   display: flex;
+  justify-content: space-around;
   gap: 2rem;
   padding-bottom: 1.5rem;
   margin-bottom: 1.5rem;
