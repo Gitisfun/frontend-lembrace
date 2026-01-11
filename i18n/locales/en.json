@@ -109,7 +109,8 @@
     "cart": "Cart",
     "profile": "My Profile",
     "allProducts": "All Products",
-    "allCategory": "All"
+    "allCategory": "All",
+    "logout": "Logout"
   },
   "footer": {
     "tagline": "Elegance in every detail – handcrafted for you."

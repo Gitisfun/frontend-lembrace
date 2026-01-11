@@ -109,7 +109,8 @@
     "cart": "Winkelwagen",
     "profile": "Mijn Profiel",
     "allProducts": "Alle Producten",
-    "allCategory": "Alles"
+    "allCategory": "Alles",
+    "logout": "Uitloggen"
   },
   "footer": {
     "tagline": "Elegantie in elk detail – met de hand gemaakt voor jou."

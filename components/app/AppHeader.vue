@@ -84,7 +84,7 @@
           <span>{{ $t('nav.profile') }}</span>
           <span class="mobile-counter unread" v-if="totalUnreadCount > 0">{{ totalUnreadCount > 99 ? '99+' : totalUnreadCount }}</span>
         </NuxtLink>
-        <NuxtLink v-else :to="localePath('/login')" class="nav-item mobile-only" @click="closeMenu" :class="{ active: $route.path.includes('/login') }">
+        <NuxtLink v-if="!authStore.isAuthenticated" :to="localePath('/login')" class="nav-item mobile-only" @click="closeMenu" :class="{ active: $route.path.includes('/login') }">
           <IconLogin :size="20" class="nav-icon" />
           <span>{{ $t('nav.login') }}</span>
         </NuxtLink>
@@ -92,6 +92,10 @@
           <IconMail :size="20" class="nav-icon" />
           <span>{{ $t('nav.contact') }}</span>
         </NuxtLink>
+        <button v-if="authStore.isAuthenticated" class="nav-item mobile-only logout-btn-mobile" @click="handleLogout">
+          <IconLogout :size="20" class="nav-icon" />
+          <span>{{ $t('nav.logout') }}</span>
+        </button>
       </nav>
       <NuxtLink to="/" class="logo-link">
         <div class="logo-block">
@@ -236,6 +240,12 @@ const closeMenu = () => {
 
 const toggleProductsSubmenu = () => {
   isProductsSubmenuOpen.value = !isProductsSubmenuOpen.value;
+};
+
+const handleLogout = () => {
+  closeMenu();
+  authStore.logout();
+  navigateTo(localePath('/'));
 };
 </script>
 
@@ -703,6 +713,26 @@ const toggleProductsSubmenu = () => {
     gap: 0.75rem;
   }
 
+  /* Logout button mobile */
+  .logout-btn-mobile {
+    cursor: pointer;
+    font-family: var(--font-primary);
+    color: #666;
+    border: none;
+    margin-top: 0.5rem;
+    background: rgba(239, 68, 68, 0.08);
+    text-align: left;
+  }
+
+  .logout-btn-mobile:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+  }
+
+  .logout-btn-mobile .nav-icon {
+    color: #ef4444;
+  }
+
   /* Hide desktop-only items on mobile */
   .desktop-only {
     display: none !important;
@@ -767,17 +797,18 @@ const toggleProductsSubmenu = () => {
   }
 
   .submenu-item {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    padding: 0.5rem 0.9rem;
+    width: 100%;
+    padding: 0.65rem 0.9rem;
     color: #555;
     text-decoration: none;
     font-size: 0.9rem;
-    border-radius: 20px;
+    border-radius: 10px;
     transition: all 0.2s ease;
     background: rgba(255, 255, 255, 0.8);
     border: 1px solid rgba(0, 0, 0, 0.06);
-    white-space: nowrap;
+    box-sizing: border-box;
   }
 
   .submenu-item:hover {
@@ -818,13 +849,12 @@ const toggleProductsSubmenu = () => {
 
   .submenu-items-row {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
+    flex-direction: column;
+    gap: 0.35rem;
   }
 
   .subcategory-item {
-    padding-left: 0.9rem;
-    padding-right: 0.9rem;
+    margin-left: 0;
   }
 
   .mobile-counter {
