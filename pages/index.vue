@@ -138,6 +138,8 @@ await fetchContent();
   position: relative;
   background-blend-mode: overlay;
   opacity: 0.95;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .hero::before {

@@ -247,11 +247,14 @@ await fetchOrder();
   padding: 2rem 1rem;
   display: flex;
   justify-content: center;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .order-detail-container {
   max-width: 800px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 /* Loading State */

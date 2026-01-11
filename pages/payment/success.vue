@@ -209,9 +209,12 @@ const printOrder = () => {
 <style scoped>
 .success-page {
   max-width: 800px;
+  width: 100%;
   margin: 0 auto;
   padding: 4rem 2rem;
   min-height: calc(100vh - 70px);
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .success-container {
@@ -219,6 +222,8 @@ const printOrder = () => {
   border-radius: 16px;
   padding: 3rem;
   box-shadow: var(--shadow-soft);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .success-header {
@@ -413,6 +418,51 @@ const printOrder = () => {
   .print-btn {
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .success-page {
+    padding: 1rem 0.75rem;
+  }
+
+  .success-container {
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .success-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .order-details h2,
+  .next-steps h2 {
+    font-size: 1.2rem;
+  }
+
+  .order-details {
+    padding: 1.5rem;
+    border-radius: 10px;
+  }
+
+  .step-item {
+    gap: 1rem;
+  }
+
+  .step-number {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+
+  .step-content h3 {
+    font-size: 1rem;
+  }
+
+  .continue-btn,
+  .print-btn {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
   }
 }
 

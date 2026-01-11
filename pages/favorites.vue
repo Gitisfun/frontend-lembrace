@@ -99,11 +99,17 @@ watch(
 .favorites-page {
   padding: 4rem 2rem;
   min-height: calc(100vh - 70px);
+  overflow-x: hidden;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .favorites-container {
   max-width: 1400px;
+  width: 100%;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .favorites-header {
@@ -113,7 +119,7 @@ watch(
 
 .favorites-title {
   font-family: 'Playfair Display', serif;
-  font-size: 2.5rem;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
   color: var(--color-text);
   margin: 0 0 0.5rem 0;
   font-weight: 500;
@@ -129,26 +135,28 @@ watch(
 
 .favorites-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
   gap: 1.5rem;
+  width: 100%;
 }
 
 .loading-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
   gap: 1.5rem;
+  width: 100%;
 }
 
 @media (max-width: 768px) {
   .loading-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
 }
 
 @media (max-width: 480px) {
   .loading-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -192,15 +200,15 @@ watch(
 
 @media (max-width: 768px) {
   .favorites-page {
-    padding: 2rem 1rem;
+    padding: 1.5rem 1rem;
   }
 
-  .favorites-title {
-    font-size: 2rem;
+  .favorites-header {
+    margin-bottom: 2rem;
   }
 
   .favorites-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
 
@@ -215,8 +223,13 @@ watch(
 }
 
 @media (max-width: 480px) {
+  .favorites-page {
+    padding: 1rem 0.75rem;
+  }
+
   .favorites-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
 }
 </style>

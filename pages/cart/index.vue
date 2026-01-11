@@ -113,9 +113,12 @@ const handleCheckout = () => {
 <style scoped>
 .cart-page {
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   padding: 4rem 2rem;
   min-height: calc(100vh - 70px);
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .cart-title {
@@ -129,6 +132,8 @@ const handleCheckout = () => {
   display: grid;
   grid-template-columns: 1fr 300px;
   gap: 2rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .cart-items {
@@ -226,7 +231,7 @@ const handleCheckout = () => {
 
 @media (max-width: 768px) {
   .cart-page {
-    padding: 2rem 1rem;
+    padding: 1.5rem 1rem;
   }
 
   .cart-items {
@@ -253,6 +258,27 @@ const handleCheckout = () => {
 
   .summary-row.total {
     font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cart-page {
+    padding: 1rem 0.75rem;
+  }
+
+  .cart-items {
+    padding: 0.75rem;
+    border-radius: 12px;
+  }
+
+  .order-summary {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .empty-cart {
+    padding: 2rem 1rem;
+    border-radius: 12px;
   }
 }
 </style>

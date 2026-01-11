@@ -494,15 +494,20 @@ watch(billingAddressChoice, (newChoice) => {
 <style scoped>
 .payment-page {
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   padding: 2rem 1rem;
   min-height: calc(100vh - 70px);
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .payment-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .payment-form {
@@ -510,6 +515,9 @@ watch(billingAddressChoice, (newChoice) => {
   border-radius: 16px;
   padding: 2rem;
   box-shadow: var(--shadow-soft);
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .payment-form h2 {
@@ -564,6 +572,30 @@ watch(billingAddressChoice, (newChoice) => {
 
   .form-section h3 {
     font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-page {
+    padding: 0.75rem;
+  }
+
+  .payment-form {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .payment-form h2 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-section h3 {
+    font-size: 1rem;
+  }
+
+  .form-section {
+    margin-bottom: 1.5rem;
   }
 }
 </style>

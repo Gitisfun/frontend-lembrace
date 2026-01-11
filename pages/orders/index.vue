@@ -240,11 +240,14 @@ const orders = ref([
   padding: 2rem 1rem;
   display: flex;
   justify-content: center;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .orders-container {
   max-width: 700px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .orders-header {
