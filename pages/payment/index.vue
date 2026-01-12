@@ -381,7 +381,7 @@ const handleSubmit = async () => {
     }
 
     // Get new order number from order number API
-    const orderNumber = await fetchOrderNumber(config.public.authApiKey);
+    const orderNumber = await fetchOrderNumber(config.public.authApiKey, config.public.orderNumberApiUrl);
 
     // Build order payload with order number and user ID
     const orderData = buildOrderPayload(form, cartItems.value, total.value, shippingCost.value, {

@@ -15,13 +15,13 @@ export const formatPrice = (price: number) =>
 // Order Number API
 // ============================================================================
 
-const ORDER_NUMBER_API = 'https://order-number-api-912e55947744.herokuapp.com/api/counter';
-
 /**
  * Fetches a new unique order number from the order API
+ * @param apiKey - The API key for authentication
+ * @param apiUrl - The order number API URL (from runtime config)
  */
-export const fetchOrderNumber = async (apiKey: string): Promise<string> => {
-  const response = await $fetch<{ order_number: string }>(ORDER_NUMBER_API, {
+export const fetchOrderNumber = async (apiKey: string, apiUrl: string): Promise<string> => {
+  const response = await $fetch<{ order_number: string }>(apiUrl, {
     method: 'GET',
     headers: {
       'X-API-Key': apiKey,
