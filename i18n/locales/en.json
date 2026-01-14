@@ -405,7 +405,8 @@
       "youHaveUnread": "You have {count} unread message(s)",
       "newUnreadMessage": "You have {count} new message(s)",
       "viewMessages": "View Orders",
-      "you": "You"
+      "you": "You",
+      "send": "Send"
     }
   },
   "language": {
@@ -731,7 +732,8 @@
         "unreadMessages": "{count} unread message(s)",
         "newUnreadMessage": "You have {count} new message(s)",
         "viewMessages": "View Messages",
-        "you": "You"
+        "you": "You",
+        "send": "Send"
       },
       "guestOrder": {
         "title": "Guest Order",

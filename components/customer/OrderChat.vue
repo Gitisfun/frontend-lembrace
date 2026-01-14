@@ -86,6 +86,7 @@
         <input v-model="messageInput" type="text" class="chat-input" :placeholder="$t('orders.chat.placeholder')" @keydown.enter="handleSend" @input="handleTyping" @blur="stopTyping" />
         <button class="send-button" @click="handleSend" :disabled="!messageInput.trim()">
           <IconArrowRight class="send-icon" />
+          <span class="send-text">{{ $t('orders.chat.send') }}</span>
         </button>
       </div>
     </div>
@@ -665,6 +666,14 @@ onUnmounted(() => {
   color: #1a1a1a;
 }
 
+.send-text {
+  display: none;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
 /* Scrollbar */
 .chat-messages::-webkit-scrollbar {
   width: 6px;
@@ -686,7 +695,7 @@ onUnmounted(() => {
 /* Responsive */
 @media (max-width: 768px) {
   .chat-panel {
-    height: 400px;
+    height: 500px;
   }
 
   .chat-header {
@@ -699,6 +708,24 @@ onUnmounted(() => {
 
   .status-text {
     display: none;
+  }
+
+  .chat-input-container {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .send-button {
+    width: 100%;
+    height: 44px;
+  }
+
+  .send-icon {
+    display: none;
+  }
+
+  .send-text {
+    display: inline;
   }
 }
 </style>

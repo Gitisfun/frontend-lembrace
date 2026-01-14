@@ -405,7 +405,8 @@
       "youHaveUnread": "Je hebt {count} ongelezen bericht(en)",
       "newUnreadMessage": "Je hebt {count} nieuw(e) bericht(en)",
       "viewMessages": "Bekijk Bestellingen",
-      "you": "Jij"
+      "you": "Jij",
+      "send": "Verstuur"
     }
   },
   "language": {
@@ -731,7 +732,8 @@
         "unreadMessages": "{count} ongelezen bericht(en)",
         "newUnreadMessage": "Je hebt {count} nieuw(e) bericht(en)",
         "viewMessages": "Bekijk Berichten",
-        "you": "Jij"
+        "you": "Jij",
+        "send": "Verstuur"
       },
       "guestOrder": {
         "title": "Gastbestelling",

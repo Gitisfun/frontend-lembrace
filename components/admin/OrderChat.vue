@@ -45,17 +45,17 @@
           <div v-if="message.type === 'system'" class="message-system-content">
             {{ message.content }}
           </div>
-            <template v-else>
-              <div class="message-header">
-                <span class="message-sender">{{ getDisplaySender(message.sender) }}</span>
-                <span class="message-time">{{ formatTime(message.createdAt) }}</span>
-              </div>
-              <div class="message-content">{{ message.content }}</div>
-              <div v-if="message.sender === username && message.readBy?.length" class="message-read-status">
-                <IconCheck class="read-icon" />
-                <span>{{ $t('admin.orders.chat.read') }}</span>
-              </div>
-            </template>
+          <template v-else>
+            <div class="message-header">
+              <span class="message-sender">{{ getDisplaySender(message.sender) }}</span>
+              <span class="message-time">{{ formatTime(message.createdAt) }}</span>
+            </div>
+            <div class="message-content">{{ message.content }}</div>
+            <div v-if="message.sender === username && message.readBy?.length" class="message-read-status">
+              <IconCheck class="read-icon" />
+              <span>{{ $t('admin.orders.chat.read') }}</span>
+            </div>
+          </template>
         </div>
       </template>
     </div>
@@ -69,6 +69,7 @@
       <input v-model="messageInput" type="text" class="chat-input" :placeholder="$t('admin.orders.chat.placeholder')" @keydown.enter="handleSend" @input="handleTyping" @blur="stopTyping" />
       <button class="send-button" @click="handleSend" :disabled="!messageInput.trim()">
         <IconArrowRight class="send-icon" />
+        <span class="send-text">{{ $t('admin.orders.chat.send') }}</span>
       </button>
     </div>
 
@@ -528,6 +529,13 @@ onUnmounted(() => {
   color: #1a1f2e;
 }
 
+.send-text {
+  display: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1f2e;
+}
+
 .chat-connect {
   padding: 1rem;
   background: var(--admin-surface-alt);
@@ -574,6 +582,30 @@ onUnmounted(() => {
 @media (max-width: 1200px) {
   .chat-container {
     min-height: 400px;
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-container {
+    min-height: 500px;
+  }
+
+  .chat-input-container {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .send-button {
+    width: 100%;
+    height: 44px;
+  }
+
+  .send-icon {
+    display: none;
+  }
+
+  .send-text {
+    display: inline;
   }
 }
 </style>
