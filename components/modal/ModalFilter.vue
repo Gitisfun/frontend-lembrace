@@ -145,6 +145,35 @@ const applyFilters = () => {
   z-index: 1;
 }
 
+.filter-modal-header h2 {
+  font-family: var(--font-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.close-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.close-modal:hover {
+  background: #eee;
+  border-color: #ccc;
+}
+
 .filter-modal-body {
   flex: 1;
   overflow-y: auto;
