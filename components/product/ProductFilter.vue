@@ -4,7 +4,7 @@
 
     <div class="filter-group">
       <h3 class="filter-title">
-        <span class="title-text">Categories</span>
+        <span class="title-text">{{ $t('products.filters.categories') }}</span>
         <div class="title-decoration"></div>
       </h3>
       <div class="filter-options">
@@ -22,12 +22,12 @@
 
     <div class="filter-group">
       <h3 class="filter-title">
-        <span class="title-text">Other</span>
+        <span class="title-text">{{ $t('products.filters.other') }}</span>
         <div class="title-decoration"></div>
       </h3>
       <label class="filter-option">
         <input type="checkbox" v-model="showDiscounted" @change="handleFilterChange" class="filter-checkbox" />
-        <span class="filter-label">Discount</span>
+        <span class="filter-label">{{ $t('products.filters.discounted') }}</span>
       </label>
     </div>
   </div>

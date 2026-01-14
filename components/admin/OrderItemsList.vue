@@ -4,11 +4,11 @@
     <div class="items-list">
       <div v-for="item in items" :key="item.id" class="item-row">
         <div class="item-image">
-          <NuxtImg :src="getItemImageUrl(item)" :alt="item.name" width="50" height="50" format="webp" provider="strapi" />
+          <NuxtImg :src="getItemImageUrl(item)" :alt="getLocalizedProductName(item)" width="50" height="50" format="webp" provider="strapi" />
         </div>
         <div class="item-info">
-          <span class="item-name">{{ item.name }}</span>
-          <span class="item-material" v-if="item.materialName && item.materialName !== '-'">{{ item.materialName }}</span>
+          <span class="item-name">{{ getLocalizedProductName(item) }}</span>
+          <span class="item-material" v-if="item.materialName && item.materialName !== '-'">{{ getLocalizedMaterialName(item) }}</span>
         </div>
         <div class="item-quantity">
           <span class="qty-label">{{ $t('admin.orders.qty') }}:</span>
@@ -42,6 +42,9 @@
 <script setup>
 import { computed } from 'vue';
 import { formatPrice } from '~/logic/utils';
+import { useLocalization } from '~/composables/useLocalization';
+
+const { getLocalizedItem } = useLocalization();
 
 const props = defineProps({
   items: {
@@ -59,6 +62,32 @@ const props = defineProps({
 });
 
 const subtotal = computed(() => props.totalPrice - props.shippingCost);
+
+// Get localized product name from order item
+const getLocalizedProductName = (item) => {
+  if (!item.productId) return item.name || 'Unknown';
+  const localizedProduct = getLocalizedItem(item.productId);
+  return localizedProduct?.name || item.productId.name || item.name || 'Unknown';
+};
+
+// Get localized material name from order item
+const getLocalizedMaterialName = (item) => {
+  if (!item.materialName || item.materialName === '-') return null;
+  if (!item.productId?.materials?.length) return item.materialName;
+
+  // Find the material that matches the stored materialName (by name or localized name)
+  const material = item.productId.materials.find((m) => {
+    if (m.name === item.materialName) return true;
+    // Also check localizations in case the name was stored in a different locale
+    return m.localizations?.some((loc) => loc.name === item.materialName);
+  });
+
+  if (!material) return item.materialName;
+
+  // Localize the found material
+  const localizedMaterial = getLocalizedItem(material);
+  return localizedMaterial?.name || material.name || item.materialName;
+};
 
 // Get item image URL path for NuxtImg strapi provider
 const getItemImageUrl = (item) => {

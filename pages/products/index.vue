@@ -71,9 +71,12 @@ import ProductFilter from '~/components/product/ProductFilter.vue';
 import ProductActiveFilters from '~/components/product/ProductActiveFilters.vue';
 import ProductsPagination from '~/components/product/ProductsPagination.vue';
 import InputSearch from '~/components/input/InputSearch.vue';
+import { useCategories } from '~/composables/useCategories';
+import { useLocalization } from '~/composables/useLocalization';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { find } = useStrapi();
+const { getLocalizedItem, strapiLocale } = useLocalization();
 
 // SEO Meta
 useSeoMeta({
@@ -107,10 +110,11 @@ const showDiscounted = ref(false);
 const currentPage = ref(1);
 const itemsPerPage = 12;
 
-// Fetch filter options
-const { data: categories } = await find('categories', {
-  populate: ['subcategories'],
-});
+// Fetch localized categories with subcategories
+const { categories, fetchCategories, isLoading: isCategoriesLoading } = useCategories();
+
+// Use useAsyncData for proper SSR handling
+await useAsyncData('categories', () => fetchCategories());
 
 // Mobile filter state
 const isFilterOpen = ref(false);
@@ -125,7 +129,7 @@ const injectAllOptions = (categories) => {
   return (
     categories?.map((category) => ({
       ...category,
-      subcategories: [{ id: `all_${category.id}`, name: 'all', label: 'All', category: category.id }, ...category.subcategories],
+      subcategories: [{ id: `all_${category.id}`, name: 'all', label: t('products.filters.all'), category: category.id }, ...(category.subcategories || [])],
     })) || []
   );
 };
@@ -148,7 +152,7 @@ const getCategoryFromSubcategory = (subcategoryId, categories) => {
 
 // Process categories with virtual "all" options
 const processedCategories = computed(() => {
-  return injectAllOptions(categories);
+  return injectAllOptions(categories.value);
 });
 
 // Build filters object
@@ -208,19 +212,30 @@ const {
   status,
   error,
   refresh,
-} = await useAsyncData('products', () =>
-  find('products', {
-    populate: ['image', 'image_background', 'subcategory'],
-    filters: buildFilters(),
-    pagination: {
-      page: currentPage.value,
-      pageSize: itemsPerPage,
-    },
-  })
+} = await useAsyncData(
+  'products',
+  () =>
+    find('products', {
+      locale: strapiLocale.value,
+      populate: ['image', 'image_background', 'subcategory', 'localizations'],
+      filters: buildFilters(),
+      pagination: {
+        page: currentPage.value,
+        pageSize: itemsPerPage,
+      },
+    }),
+  {
+    watch: [() => strapiLocale.value],
+  }
 );
 
-// Ensure products is always an array
-const productList = computed(() => products.value?.data || []);
+// Localized products list (reacts to both data and locale changes)
+const productList = computed(() => {
+  const rawProducts = products.value?.data || [];
+  // Access locale.value to make this computed reactive to locale changes
+  const _ = locale.value;
+  return rawProducts.map((product) => getLocalizedItem(product)).filter(Boolean);
+});
 const totalPages = computed(() => Math.ceil((products.value?.meta?.pagination?.total || 0) / itemsPerPage));
 
 // Handle search input with debounce

@@ -58,6 +58,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue';
 import { useToast } from '~/composables/useToast';
+import { useLocalization } from '~/composables/useLocalization';
 import AdminLayout from '~/components/admin/AdminLayout.vue';
 import AdminHeader from '~/components/admin/AdminHeader.vue';
 import AdminActionButton from '~/components/admin/AdminActionButton.vue';
@@ -76,10 +77,11 @@ definePageMeta({
   middleware: ['admin'],
 });
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { find } = useStrapi();
 const config = useRuntimeConfig();
 const { success: toastSuccess } = useToast();
+const { getLocalizedItem } = useLocalization();
 
 // Strapi product create URL
 const strapiProductCreateUrl = computed(() => {
@@ -87,10 +89,16 @@ const strapiProductCreateUrl = computed(() => {
 });
 
 // State
-const products = ref([]);
+const rawProducts = ref([]);
 const categories = ref([]);
 const isLoading = ref(true);
 const hasError = ref(false);
+
+// Localized products (reacts to both data and locale changes)
+const products = computed(() => {
+  const _ = locale.value; // Make reactive to locale changes
+  return (rawProducts.value || []).map((p) => getLocalizedItem(p)).filter(Boolean);
+});
 
 // Filters & Pagination State
 const searchQuery = ref('');
@@ -241,6 +249,7 @@ const fetchProducts = async () => {
     const response = await find('products', {
       populate: {
         image: true,
+        localizations: true,
         subcategory: {
           populate: ['category'],
         },
@@ -248,7 +257,7 @@ const fetchProducts = async () => {
       sort: ['name:asc'],
     });
 
-    products.value = response.data || [];
+    rawProducts.value = response.data || [];
   } catch (error) {
     console.error('Failed to fetch products:', error);
     hasError.value = true;

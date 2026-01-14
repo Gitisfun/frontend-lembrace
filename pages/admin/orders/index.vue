@@ -164,7 +164,7 @@ const fetchOrders = async () => {
         items: {
           populate: {
             productId: {
-              populate: ['image', 'subcategory', 'materials'],
+              populate: ['image', 'subcategory', 'materials.localizations', 'localizations'],
             },
           },
         },

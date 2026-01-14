@@ -34,7 +34,7 @@
               <div class="items-preview">
                 <div class="item-images">
                   <div v-for="(item, index) in order.items.slice(0, 3)" :key="item.id" class="item-thumb" :style="{ zIndex: 3 - index }">
-                    <NuxtImg :src="getItemImageUrl(item)" :alt="item.name" width="40" height="40" format="webp" provider="strapi" />
+                    <NuxtImg :src="getItemImageUrl(item)" :alt="getLocalizedProductName(item)" width="40" height="40" format="webp" provider="strapi" />
                   </div>
                   <div v-if="order.items.length > 3" class="more-items">+{{ order.items.length - 3 }}</div>
                 </div>
@@ -91,6 +91,7 @@
 <script setup>
 import { ref } from 'vue';
 import { formatPrice } from '~/logic/utils';
+import { useLocalization } from '~/composables/useLocalization';
 import OrderDetailCards from '~/components/admin/OrderDetailCards.vue';
 import OrderItemsList from '~/components/admin/OrderItemsList.vue';
 import OrderStatusTimeline from '~/components/admin/OrderStatusTimeline.vue';
@@ -98,6 +99,8 @@ import OrderStatusBadge from '~/components/admin/OrderStatusBadge.vue';
 import IconChevronRight from '~/components/icon/IconChevronRight.vue';
 import IconEye from '~/components/icon/IconEye.vue';
 import IconMail from '~/components/icon/IconMail.vue';
+
+const { getLocalizedItem } = useLocalization();
 
 const props = defineProps({
   orders: {
@@ -121,6 +124,13 @@ const toggleOrderDetails = (orderId) => {
 const getOrderUnreadCount = (orderNumber) => {
   const item = props.unreadCounts.find((u) => u.roomName === orderNumber);
   return item?.unreadCount || 0;
+};
+
+// Get localized product name from order item
+const getLocalizedProductName = (item) => {
+  if (!item.productId) return item.name || 'Unknown';
+  const localizedProduct = getLocalizedItem(item.productId);
+  return localizedProduct?.name || item.productId.name || item.name || 'Unknown';
 };
 
 // Get item image URL path for NuxtImg strapi provider

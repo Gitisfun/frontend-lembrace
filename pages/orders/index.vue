@@ -41,10 +41,10 @@
           <div class="order-items">
             <div v-for="item in order.items" :key="item.id" class="order-item">
               <div class="item-image">
-                <NuxtImg :src="getItemImageUrl(item)" :alt="item.name" width="60" height="60" format="webp" provider="strapi" />
+                <NuxtImg :src="getItemImageUrl(item)" :alt="getLocalizedProductName(item)" width="60" height="60" format="webp" provider="strapi" />
               </div>
               <div class="item-details">
-                <span class="item-name">{{ item.name }}</span>
+                <span class="item-name">{{ getLocalizedProductName(item) }}</span>
                 <span class="item-quantity">{{ $t('orders.quantity') }}: {{ item.amount }}</span>
               </div>
               <div class="item-price">{{ formatPrice(item.calculatedPrice) }}</div>
@@ -73,15 +73,24 @@ import { ref } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import { useUnreadMessagesStore } from '~/stores/unreadMessages';
 import { formatPrice } from '~/logic/utils';
+import { useLocalization } from '~/composables/useLocalization';
 import IconMail from '~/components/icon/IconMail.vue';
 
 const { t, locale } = useI18n();
+const { getLocalizedItem } = useLocalization();
 const localePath = useLocalePath();
 const authStore = useAuthStore();
 const unreadStore = useUnreadMessagesStore();
 const { find } = useStrapi();
 const config = useRuntimeConfig();
 const orders = ref([]);
+
+// Get localized product name from order item
+const getLocalizedProductName = (item) => {
+  if (!item.productId) return item.name || 'Unknown';
+  const localizedProduct = getLocalizedItem(item.productId);
+  return localizedProduct?.name || item.productId.name || item.name || 'Unknown';
+};
 
 // Get item image URL path for NuxtImg strapi provider
 const getItemImageUrl = (item) => {
@@ -119,7 +128,7 @@ const fetchContent = async () => {
         items: {
           populate: {
             productId: {
-              populate: '*',
+              populate: ['image', 'localizations', 'materials.localizations'],
             },
           },
         },

@@ -140,15 +140,14 @@ import { useGlobalStore } from '~/stores/global';
 import { useAuthStore } from '~/stores/auth';
 import { useUnreadMessagesStore } from '~/stores/unreadMessages';
 import { useToast } from '~/composables/useToast';
+import { useCategories } from '~/composables/useCategories';
 import { formatPrice } from '~/logic/utils';
 
 const { t } = useI18n();
 const localePath = useLocalePath();
-const { find } = useStrapi();
 
 const isMenuOpen = ref(false);
 const isProductsSubmenuOpen = ref(false);
-const categories = ref([]);
 const globalStore = useGlobalStore();
 const authStore = useAuthStore();
 const unreadStore = useUnreadMessagesStore();
@@ -157,17 +156,8 @@ const cartCount = computed(() => globalStore.cartItemCount);
 const favoritesCount = computed(() => globalStore.favoriteItems.length);
 const formattedCartTotal = computed(() => formatPrice(globalStore.cartTotal));
 
-// Fetch categories for submenu
-const fetchCategories = async () => {
-  try {
-    const response = await find('categories', {
-      populate: ['subcategories'],
-    });
-    categories.value = response.data || [];
-  } catch (error) {
-    console.error('Failed to fetch categories:', error);
-  }
-};
+// Fetch localized categories with subcategories
+const { categories, fetchCategories } = useCategories();
 
 // Fetch categories on mount
 onMounted(() => {

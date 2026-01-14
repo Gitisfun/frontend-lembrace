@@ -45,6 +45,7 @@ import { computed, ref, onMounted } from 'vue';
 import { useMediaQuery } from '@vueuse/core';
 import { useGlobalStore } from '~/stores/global';
 import { useToast } from '~/composables/useToast';
+import { useLocalization } from '~/composables/useLocalization';
 import CartItem from '~/components/cart/CartItem.vue';
 import CartItemMobile from '~/components/cart/CartItemMobile.vue';
 
@@ -52,6 +53,7 @@ const { t } = useI18n();
 const localePath = useLocalePath();
 const { success: toastSuccess } = useToast();
 const { find } = useStrapi();
+const { localizeArray } = useLocalization();
 
 // SEO Meta
 useSeoMeta({
@@ -68,15 +70,23 @@ const cartItems = computed(() => globalStore.cartItems);
 // Fetch default shipping cost from delivery options
 const shippingCost = ref(0);
 const isLoadingShipping = ref(true);
+const deliveryOptionsData = ref([]);
+
+// Localized delivery options (reactive to locale changes)
+const localizedDeliveryOptions = localizeArray(deliveryOptionsData);
 
 const fetchDefaultShippingCost = async () => {
   try {
     isLoadingShipping.value = true;
-    const { data } = await find('delivery-options');
+    const { data } = await find('delivery-options', {
+      populate: 'localizations',
+    });
 
-    if (data && data.length > 0) {
-      const defaultOption = data.find((option) => option.isDefault);
-      shippingCost.value = defaultOption?.price ?? data[0].price;
+    deliveryOptionsData.value = data || [];
+
+    if (localizedDeliveryOptions.value.length > 0) {
+      const defaultOption = localizedDeliveryOptions.value.find((option) => option.isDefault);
+      shippingCost.value = defaultOption?.price ?? localizedDeliveryOptions.value[0].price;
     }
   } catch (e) {
     console.error('Failed to fetch delivery options:', e);

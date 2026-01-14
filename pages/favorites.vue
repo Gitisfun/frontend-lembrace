@@ -35,9 +35,10 @@
 <script setup>
 import { useGlobalStore } from '~/stores/global';
 import { useApiError } from '~/composables/useApiError';
+import { useLocalization } from '~/composables/useLocalization';
 import ProductCard from '~/components/product/ProductCard.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const localePath = useLocalePath();
 
 // SEO Meta
@@ -51,10 +52,17 @@ useSeoMeta({
 
 const { find } = useStrapi();
 const globalStore = useGlobalStore();
+const { getLocalizedItem, strapiLocale } = useLocalization();
 
 const loading = ref(true);
 const { error, handleError, clearError } = useApiError();
-const favoriteProducts = ref([]);
+const rawFavoriteProducts = ref([]);
+
+// Localized favorite products (reacts to both data and locale changes)
+const favoriteProducts = computed(() => {
+  const _ = locale.value; // Make reactive to locale changes
+  return (rawFavoriteProducts.value || []).map((p) => getLocalizedItem(p)).filter(Boolean);
+});
 
 // Get favorite product IDs from store
 const favoriteIds = computed(() => globalStore.favoriteItems);
@@ -66,18 +74,19 @@ const fetchFavoriteProducts = async () => {
     clearError();
 
     if (favoriteIds.value.length === 0) {
-      favoriteProducts.value = [];
+      rawFavoriteProducts.value = [];
       return;
     }
 
     const { data: products } = await find('products', {
-      populate: ['image', 'image_background', 'subcategory'],
+      locale: strapiLocale.value,
+      populate: ['image', 'image_background', 'subcategory', 'localizations'],
       filters: {
         documentId: { $in: favoriteIds.value },
       },
     });
 
-    favoriteProducts.value = products || [];
+    rawFavoriteProducts.value = products || [];
   } catch (e) {
     handleError(e, 'Failed to load favorite products');
   } finally {
@@ -92,6 +101,16 @@ watch(
     fetchFavoriteProducts();
   },
   { immediate: true }
+);
+
+// Refetch when locale changes
+watch(
+  () => strapiLocale.value,
+  () => {
+    if (favoriteIds.value.length > 0) {
+      fetchFavoriteProducts();
+    }
+  }
 );
 </script>
 

@@ -125,7 +125,6 @@ export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], 
     billingAddress,
     items: cartItems.map((item) => ({
       productId: item.documentId || item.id,
-      name: item.name,
       amount: item.amount,
       price: item.price,
       discount: item.discount || 0,

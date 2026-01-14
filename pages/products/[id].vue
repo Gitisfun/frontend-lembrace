@@ -101,6 +101,7 @@
 <script setup>
 import { useProductPrice } from '~/composables/useProductPrice';
 import { useApiError } from '~/composables/useApiError';
+import { useLocalization } from '~/composables/useLocalization';
 import InputCounter from '~/components/input/InputCounter.vue';
 import RichcontentViewer from '~/components/richcontent/RichcontentViewer.vue';
 import ProductCard from '~/components/product/ProductCard.vue';
@@ -108,21 +109,34 @@ import ProductMaterialSelector from '~/components/product/MaterialSelector.vue';
 import IconCart from '~/components/icon/IconCart.vue';
 import { useGlobalStore } from '~/stores/global';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const localePath = useLocalePath();
 const { success: toastSuccess, error: toastError } = useToast();
 
 const route = useRoute();
 const { findOne, find } = useStrapi();
 const globalStore = useGlobalStore();
+const { getLocalizedItem, strapiLocale } = useLocalization();
 
 const loading = ref(true);
 const { error, handleError } = useApiError();
-const product = ref(null);
+const rawProduct = ref(null);
+const rawRelatedProducts = ref([]);
 const selectedImage = ref(null);
-const relatedProducts = ref([]);
 const promocode = ref('');
 const selectedMaterial = ref(null);
+
+// Localized product (reacts to both data and locale changes)
+const product = computed(() => {
+  const _ = locale.value; // Make reactive to locale changes
+  return getLocalizedItem(rawProduct.value);
+});
+
+// Localized related products
+const relatedProducts = computed(() => {
+  const _ = locale.value; // Make reactive to locale changes
+  return (rawRelatedProducts.value || []).map((p) => getLocalizedItem(p)).filter(Boolean);
+});
 
 const quantity = ref(1);
 const showMaxItemsMessage = ref(false);
@@ -161,7 +175,8 @@ const toggleFavorite = () => {
 const fetchRelatedProducts = async () => {
   try {
     const { data: relatedResponse } = await find('products', {
-      populate: ['image', 'image_background', 'subcategory'],
+      locale: strapiLocale.value,
+      populate: ['image', 'image_background', 'subcategory', 'localizations'],
       filters: {
         id: { $ne: route.params.id }, // Exclude current product
       },
@@ -170,7 +185,7 @@ const fetchRelatedProducts = async () => {
         pageSize: 4,
       },
     });
-    relatedProducts.value = relatedResponse || [];
+    rawRelatedProducts.value = relatedResponse || [];
   } catch (e) {
     // Silently fail for related products - not critical
   }
@@ -182,9 +197,10 @@ const fetchProduct = async () => {
     error.value = null;
 
     const { data: response } = await findOne('products', route.params.id, {
-      populate: ['image', 'subcategory', 'materials'],
+      locale: strapiLocale.value,
+      populate: ['image', 'subcategory', 'materials', 'localizations'],
     });
-    product.value = response;
+    rawProduct.value = response;
 
     // Set the first image as selected if images exist
     if (product.value?.image && product.value.image.length > 0) {

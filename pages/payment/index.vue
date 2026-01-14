@@ -143,6 +143,7 @@ import { useToast } from '~/composables/useToast';
 import { useFormValidation } from '~/composables/useFormValidation';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
 import { useUserProfile } from '~/composables/useUserProfile';
+import { useLocalization } from '~/composables/useLocalization';
 import { paymentFormSchema, billingAddressSchema, createPaymentFormData } from '~/schemas';
 import { buildOrderPayload, fetchOrderNumber } from '~/logic/utils';
 
@@ -162,6 +163,7 @@ const globalStore = useGlobalStore();
 const authStore = useAuthStore();
 const { fetchUserProfile, createAddress, isLoading: isLoadingProfile } = useUserProfile();
 const { isSubmitting, withSubmit, stopSubmitting } = useSubmitStatus();
+const { localizeArray } = useLocalization();
 const forceValidation = ref(false);
 const isProfileLoaded = ref(false);
 
@@ -215,18 +217,22 @@ const subtotal = computed(() => globalStore.cartTotal);
 const deliveryOptionsData = ref([]);
 const isLoadingDeliveryOptions = ref(true);
 
+// Localized delivery options (reactive to locale changes)
+const localizedDeliveryOptions = localizeArray(deliveryOptionsData);
+
 const fetchDeliveryOptions = async () => {
   try {
     isLoadingDeliveryOptions.value = true;
     const { data } = await find('delivery-options', {
+      populate: 'localizations',
       sort: ['price:asc'],
     });
     deliveryOptionsData.value = data || [];
 
     // Auto-select default delivery option, or first one if no default
-    if (deliveryOptionsData.value.length > 0) {
-      const defaultOption = deliveryOptionsData.value.find((option) => option.isDefault);
-      form.deliveryMethod = defaultOption?.price ?? deliveryOptionsData.value[0].price;
+    if (localizedDeliveryOptions.value.length > 0) {
+      const defaultOption = localizedDeliveryOptions.value.find((option) => option.isDefault);
+      form.deliveryMethod = defaultOption?.price ?? localizedDeliveryOptions.value[0].price;
     }
   } catch (e) {
     console.error('Failed to fetch delivery options:', e);
@@ -235,9 +241,9 @@ const fetchDeliveryOptions = async () => {
   }
 };
 
-// Transform delivery options for InputRadioGroup
+// Transform delivery options for InputRadioGroup (uses localized options)
 const deliveryOptions = computed(() =>
-  deliveryOptionsData.value.map((option) => ({
+  localizedDeliveryOptions.value.map((option) => ({
     value: option.price,
     title: option.name,
     details: option.description,

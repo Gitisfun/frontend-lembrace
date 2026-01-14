@@ -2,7 +2,7 @@
   <!-- Results Count -->
   <div v-if="activeFilterCount > 0" class="active-filters">
     <div v-if="selectedSubcategories.length" class="active-filter-group">
-      <span class="active-filter-label">Subcategories:</span>
+      <span class="active-filter-label">{{ $t('products.filters.categories') }}:</span>
       <span v-for="subcategoryId in selectedSubcategories" :key="subcategoryId" class="active-filter-tag">
         {{ getSubcategoryName(subcategoryId) }}
         <button @click="removeSubcategory(subcategoryId)" class="remove-filter">×</button>
@@ -10,9 +10,9 @@
     </div>
 
     <div v-if="showDiscounted" class="active-filter-group">
-      <span class="active-filter-label">Others:</span>
+      <span class="active-filter-label">{{ $t('products.filters.other') }}:</span>
       <span class="active-filter-tag">
-        On Sale
+        {{ $t('products.filters.discounted') }}
         <button @click="removeDiscounted" class="remove-filter">×</button>
       </span>
     </div>
@@ -20,6 +20,8 @@
 </template>
 
 <script setup>
+const { t } = useI18n();
+
 const props = defineProps({
   categories: {
     type: Array,
@@ -48,7 +50,7 @@ const getSubcategoryName = (id) => {
   if (idStr.startsWith('all_')) {
     const categoryId = idStr.replace('all_', '');
     const category = props.categories.find((cat) => cat.id == categoryId);
-    return category ? `All ${category.label}` : 'All';
+    return category ? `${t('products.filters.all')} ${category.label}` : t('products.filters.all');
   }
 
   // Handle regular subcategories

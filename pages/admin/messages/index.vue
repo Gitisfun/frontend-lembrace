@@ -41,8 +41,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useToast } from '~/composables/useToast';
+import { useLocalization } from '~/composables/useLocalization';
 import { useAuthStore } from '~/stores/auth';
 import { useAdminUnreadMessagesStore } from '~/stores/adminUnreadMessages';
 import AdminLayout from '~/components/admin/AdminLayout.vue';
@@ -62,18 +63,25 @@ definePageMeta({
   middleware: ['admin'],
 });
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { find } = useStrapi();
 const config = useRuntimeConfig();
 const { success: toastSuccess } = useToast();
 const authStore = useAuthStore();
 const adminUnreadStore = useAdminUnreadMessagesStore();
+const { getLocalizedItem } = useLocalization();
 
 // State
 const orders = ref([]);
-const products = ref([]);
+const rawProducts = ref([]);
 const isLoading = ref(true);
 const hasError = ref(false);
+
+// Localized products (reacts to both data and locale changes)
+const products = computed(() => {
+  const _ = locale.value; // Make reactive to locale changes
+  return (rawProducts.value || []).map((p) => getLocalizedItem(p)).filter(Boolean);
+});
 
 // Computed out of stock products
 const outOfStockProducts = computed(() => {
@@ -120,7 +128,7 @@ const fetchOrdersWithUnreadMessages = async () => {
         items: {
           populate: {
             productId: {
-              populate: ['image', 'subcategory', 'materials'],
+              populate: ['image', 'subcategory', 'materials.localizations', 'localizations'],
             },
           },
         },
@@ -164,6 +172,7 @@ const fetchProducts = async () => {
     const response = await find('products', {
       populate: {
         image: true,
+        localizations: true,
         subcategory: {
           populate: ['category'],
         },
@@ -171,7 +180,7 @@ const fetchProducts = async () => {
       sort: ['name:asc'],
     });
 
-    products.value = response.data || [];
+    rawProducts.value = response.data || [];
   } catch (error) {
     console.error('Failed to fetch products:', error);
     throw error;
