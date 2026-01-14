@@ -782,7 +782,7 @@ const handleLogout = () => {
   }
 
   .submenu.open {
-    max-height: 600px;
+    max-height: 2000px;
     padding: 0.75rem;
   }
 
