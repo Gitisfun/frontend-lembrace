@@ -9,56 +9,55 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: 'Order data is required' });
     }
 
-    // Initialize Mollie client with your API key
-    const mollieClient = createMollieClient({
-      apiKey: process.env.MOLLIE_API_KEY || 'test_rqn9NtT4qEDrfj4cfNg5KGvG7NyVAr',
-    });
+    // Validate required fields
+    if (typeof orderData.totalPrice !== 'number' || !orderData.orderNumber) {
+      throw createError({ statusCode: 400, statusMessage: 'Invalid order data' });
+    }
 
-    // Determine the correct site URL for redirects
-    const siteUrl = process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    console.log('Site URL:', siteUrl);
+    const apiKey = process.env.MOLLIE_API_KEY;
+    if (!apiKey) {
+      throw createError({ statusCode: 500, statusMessage: 'Mollie API key not configured' });
+    }
 
-    // Prepare webhook URL only if we have a valid public URL (not localhost)
+    const mollieClient = createMollieClient({ apiKey });
+
+    const siteUrl = process.env.NUXT_PUBLIC_SITE_URL;
     const webhookUrl = siteUrl && !siteUrl.includes('localhost') && !siteUrl.includes('127.0.0.1') ? `${siteUrl}/api/mollie/webhook` : undefined;
 
-    console.log('Webhook URL:', webhookUrl);
-    console.log('Will include webhook:', !!webhookUrl);
-
-    // Build payment object conditionally
     const paymentData: any = {
       amount: {
         currency: 'EUR',
-        value: orderData.totalPrice.toFixed(2), // Mollie expects amount in cents
+        value: orderData.totalPrice.toFixed(2), // Mollie expects decimal format (e.g., "10.00")
       },
       description: `Bestelling ${orderData.orderNumber}`,
-      redirectUrl: `${siteUrl}/payment/success?orderNumber=${orderData.orderNumber}&uniqueOrderNumber=${orderData.unique_order_number}&deliveryMethod=${orderData.deliveryMethod}`,
+      redirectUrl: `${siteUrl}/payment/success?orderNumber=${encodeURIComponent(orderData.orderNumber)}&uniqueOrderNumber=${encodeURIComponent(orderData.unique_order_number)}&deliveryMethod=${encodeURIComponent(orderData.deliveryMethod)}`,
       metadata: {
         orderNumber: orderData.orderNumber,
-        orderId: orderData.orderId, // Strapi order ID
-        uniqueOrderNumber: orderData.unique_order_number, // Unique UUID
+        orderId: orderData.orderId,
         deliveryMethod: orderData.deliveryMethod,
       },
     };
 
-    // Only add webhook URL if we have a valid public URL
     if (webhookUrl) {
       paymentData.webhookUrl = webhookUrl;
     }
 
-    // Create payment with Mollie
     const payment = await mollieClient.payments.create(paymentData);
 
-    // Return the payment URL for redirect
+    const checkoutUrl = payment.getCheckoutUrl();
+    if (!checkoutUrl) {
+      throw createError({ statusCode: 500, statusMessage: 'No checkout URL returned from Mollie' });
+    }
+
     return {
       success: true,
       paymentId: payment.id,
-      checkoutUrl: payment.getCheckoutUrl(),
+      checkoutUrl,
       orderNumber: orderData.orderNumber,
     };
   } catch (error) {
     console.error('Mollie payment creation error:', error);
 
-    // Return more detailed error information
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorDetails = error instanceof Error ? error.stack : undefined;
 

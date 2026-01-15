@@ -12,6 +12,9 @@
         <IconPinterest :size="24" />
       </a>
     </div>
+    <div class="footer-links">
+      <NuxtLink to="/privacy" class="footer-link">{{ $t('footer.privacy') }}</NuxtLink>
+    </div>
   </footer>
 </template>
 
@@ -50,5 +53,24 @@
 
 .social-link:hover svg {
   filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+}
+
+.footer-links {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(51, 51, 51, 0.15);
+}
+
+.footer-link {
+  font-family: var(--font-body, 'Montserrat', sans-serif);
+  font-size: 0.85rem;
+  color: #333;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.footer-link:hover {
+  opacity: 0.7;
+  text-decoration: underline;
 }
 </style>

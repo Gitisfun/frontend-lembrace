@@ -116,6 +116,7 @@
 <script setup>
 import { useAuthStore } from '~/stores/auth';
 import { useAdminUnreadMessagesStore } from '~/stores/adminUnreadMessages';
+import { useNotificationStore } from '~/stores/notifications';
 import { useToast } from '~/composables/useToast';
 import { useAdminTheme } from '~/composables/useAdminTheme';
 import { useAdminSidebar } from '~/composables/useAdminSidebar';
@@ -145,12 +146,17 @@ const localePath = useLocalePath();
 const route = useRoute();
 const authStore = useAuthStore();
 const adminUnreadStore = useAdminUnreadMessagesStore();
+const notificationStore = useNotificationStore();
 const { success: toastSuccess, message: toastMessage } = useToast();
 const { isLight, isDark, toggleTheme } = useAdminTheme();
 const { isCollapsed, toggleSidebar } = useAdminSidebar();
+const { outOfStockCount, fetchOutOfStockCount } = useOutOfStockCount();
 
-// Computed total unread messages
-const totalUnread = computed(() => adminUnreadStore.totalUnread);
+// Computed total unread (messages + notifications + out of stock)
+const totalUnread = computed(() => adminUnreadStore.totalUnread + notificationStore.unreadCount + outOfStockCount.value);
+
+// Track if initial notification load is complete (to avoid showing toast on page load)
+const isInitialLoadComplete = ref(false);
 
 // Fetch unread counts on mount and periodically
 let unreadInterval = null;
@@ -169,15 +175,49 @@ const fetchUnreadCounts = async () => {
 };
 
 onMounted(async () => {
-  await fetchUnreadCounts();
+  await Promise.all([fetchUnreadCounts(), fetchOutOfStockCount()]);
   // Refresh every 30 seconds
-  unreadInterval = setInterval(fetchUnreadCounts, 30000);
+  unreadInterval = setInterval(() => {
+    fetchUnreadCounts();
+    fetchOutOfStockCount();
+  }, 30000);
+
+  // Initialize notification socket for lembrace-dashboard
+  notificationStore.init('lembrace-dashboard');
+
+  // Mark initial load as complete after a short delay to allow fetch to complete
+  setTimeout(() => {
+    isInitialLoadComplete.value = true;
+  }, 1000);
 });
+
+// Watch for new notifications and show toast (only after initial load)
+watch(
+  () => notificationStore.notifications.length,
+  (newLength, oldLength) => {
+    // Only show toast for truly new notifications (after initial load)
+    if (isInitialLoadComplete.value && newLength > oldLength) {
+      // New notification arrived via socket
+      const latestNotification = notificationStore.notifications[0];
+      if (latestNotification && latestNotification.type === 'new_order' && !latestNotification.read) {
+        const orderNumber = latestNotification.payload?.orderNumber || '';
+        toastMessage(t('admin.notifications.newOrderReceived', { orderNumber }), {
+          action: {
+            label: t('admin.notifications.viewOrder'),
+            onClick: () => navigateTo(localePath('/admin/messages')),
+          },
+        });
+      }
+    }
+  }
+);
 
 onUnmounted(() => {
   if (unreadInterval) {
     clearInterval(unreadInterval);
   }
+  // Disconnect notification socket
+  notificationStore.disconnect();
 });
 
 // Check if a route is active (exact match for dashboard, starts with for sub-pages)

@@ -40,7 +40,7 @@ const props = defineProps({
   },
   badgeVariant: {
     type: String,
-    default: 'default', // 'default', 'active', 'warning'
+    default: 'default', // 'default', 'active', 'warning', 'primary'
   },
   successWhenEmpty: {
     type: Boolean,
@@ -63,6 +63,7 @@ const badgeClass = computed(() => {
   return {
     active: props.badgeVariant === 'active',
     warning: props.badgeVariant === 'warning',
+    primary: props.badgeVariant === 'primary',
   };
 });
 </script>
@@ -141,6 +142,12 @@ const badgeClass = computed(() => {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(248, 113, 113, 0.15) 100%);
   border-color: rgba(239, 68, 68, 0.3);
   color: #ef4444;
+}
+
+.section-badge.primary {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(234, 197, 77, 0.15) 100%);
+  border-color: rgba(212, 175, 55, 0.3);
+  color: var(--color-gold, #d4af37);
 }
 
 .section-chevron {

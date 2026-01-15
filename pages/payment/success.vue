@@ -77,8 +77,9 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { sendOrderConfirmationEmail, sendSellerOrderNotification } from '~/logic/email';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const localePath = useLocalePath();
+const emailLocale = computed(() => (locale.value === 'nl' ? 'nl' : 'en'));
 
 // SEO Meta
 useSeoMeta({
@@ -158,7 +159,7 @@ const sendConfirmationEmail = async () => {
         items: order.items,
       };
 
-      await sendOrderConfirmationEmail(orderDataForEmail, orderNumber.value, config.public.strapiUrl);
+      await sendOrderConfirmationEmail(orderDataForEmail, orderNumber.value, config.public.strapiUrl, emailLocale.value);
       emailSent.value = true;
       console.log('Order confirmation email sent successfully');
     }
@@ -192,7 +193,8 @@ const sendSellerNotificationEmailFn = async () => {
         items: order.items,
       };
 
-      await sendSellerOrderNotification(orderDataForEmail, orderNumber.value, config.public.strapiUrl);
+      // Seller notification always in Dutch (admin's preferred language)
+      await sendSellerOrderNotification(orderDataForEmail, orderNumber.value, config.public.strapiUrl, 'info@lembrace.be', 'nl');
       console.log('Seller notification email sent successfully');
     }
   } catch (error) {

@@ -76,13 +76,14 @@ interface BuildOrderOptions {
   useSameAddressForBilling?: boolean;
   orderNumber?: string;
   customerId?: number | null;
+  localeCustomer?: string;
 }
 
 /**
  * Builds an order payload for submission to the API
  */
 export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], totalPrice: number, shippingCost: number, options: BuildOrderOptions = {}) => {
-  const { useSameAddressForBilling = true, orderNumber, customerId = null } = options;
+  const { useSameAddressForBilling = true, orderNumber, customerId = null, localeCustomer = 'en' } = options;
 
   if (!orderNumber) {
     throw new Error('Order number is required');
@@ -115,6 +116,7 @@ export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], 
     totalPrice,
     shippingCost,
     customerId,
+    localeCustomer,
     customerInfo: {
       firstname: form.firstName,
       lastname: form.lastName,
@@ -125,6 +127,7 @@ export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], 
     billingAddress,
     items: cartItems.map((item) => ({
       productId: item.documentId || item.id,
+      name: item.name,
       amount: item.amount,
       price: item.price,
       discount: item.discount || 0,

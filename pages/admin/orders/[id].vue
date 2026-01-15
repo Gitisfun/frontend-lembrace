@@ -70,7 +70,7 @@
           <OrderStatusTimeline :statusLogs="order.statusLogs" />
 
           <!-- Manual Status Change -->
-          <OrderStatusChanger :currentStatus="order.orderStatus" :orderId="route.params.id" @status-changed="fetchOrder" />
+          <OrderStatusChanger :currentStatus="order.orderStatus" :orderId="route.params.id" @status-changed="onStatusChanged" />
         </div>
       </div>
 
@@ -89,9 +89,11 @@
 <script setup>
 import { ref } from 'vue';
 import { formatPrice } from '~/logic/utils';
+import { sendOrderShippedEmail } from '~/logic/email';
 import { useAuthStore } from '~/stores/auth';
 import { useAdminUnreadMessagesStore } from '~/stores/adminUnreadMessages';
 import { useConfirmDialog } from '~/composables/useConfirmDialog';
+import { useToast } from '~/composables/useToast';
 import AdminLayout from '~/components/admin/AdminLayout.vue';
 import AdminHeader from '~/components/admin/AdminHeader.vue';
 import OrderSummaryItem from '~/components/admin/OrderSummaryItem.vue';
@@ -111,14 +113,14 @@ definePageMeta({
   middleware: ['admin'],
 });
 
-const { t } = useI18n();
-const { locale } = useI18n();
+const { t, locale } = useI18n();
 const route = useRoute();
 const { findOne, update } = useStrapi();
 const config = useRuntimeConfig();
 const authStore = useAuthStore();
 const adminUnreadStore = useAdminUnreadMessagesStore();
 const { confirm } = useConfirmDialog();
+const { success: toastSuccess, error: toastError } = useToast();
 
 // State
 const order = ref(null);
@@ -263,6 +265,22 @@ const shipOrder = async () => {
       orderStatus: 'shipped',
     });
 
+    // Send order shipped email to customer
+    try {
+      const customerLocale = order.value.localeCustomer === 'nl' ? 'nl' : 'en';
+      const orderDataForEmail = {
+        customerInfo: order.value.customerInfo,
+        address: order.value.shippingAddress,
+        totalPrice: order.value.totalPrice,
+        shippingCost: order.value.shippingCost,
+      };
+      await sendOrderShippedEmail(orderDataForEmail, order.value.orderNumber, config.public.strapiUrl, customerLocale);
+      toastSuccess(t('admin.orders.shippingBanner.emailSent'));
+    } catch (emailError) {
+      console.error('Failed to send shipping email:', emailError);
+      toastError(t('admin.orders.shippingBanner.emailFailed'));
+    }
+
     // Refresh order data to get updated status and status logs
     await fetchOrder();
   } catch (error) {
@@ -270,6 +288,30 @@ const shipOrder = async () => {
   } finally {
     isUpdatingStatus.value = false;
   }
+};
+
+// Handle manual status change from OrderStatusChanger
+const onStatusChanged = async (newStatus) => {
+  // Send shipping email if status changed to shipped
+  if (newStatus === 'shipped' && order.value) {
+    try {
+      const customerLocale = order.value.localeCustomer === 'nl' ? 'nl' : 'en';
+      const orderDataForEmail = {
+        customerInfo: order.value.customerInfo,
+        address: order.value.shippingAddress,
+        totalPrice: order.value.totalPrice,
+        shippingCost: order.value.shippingCost,
+      };
+      await sendOrderShippedEmail(orderDataForEmail, order.value.orderNumber, config.public.strapiUrl, customerLocale);
+      toastSuccess(t('admin.orders.shippingBanner.emailSent'));
+    } catch (emailError) {
+      console.error('Failed to send shipping email:', emailError);
+      toastError(t('admin.orders.shippingBanner.emailFailed'));
+    }
+  }
+
+  // Refresh order data
+  await fetchOrder();
 };
 
 // Fetch order on mount

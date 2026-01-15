@@ -1,5 +1,5 @@
 import { createMollieClient } from '@mollie/api-client';
-import { sendOrderConfirmationEmail, type OrderData } from '~/logic/email';
+import { sendOrderConfirmationEmail, sendSellerOrderNotification, type OrderData, type EmailLocale } from '~/logic/email';
 
 export default defineEventHandler(async (event) => {
   try {
@@ -56,7 +56,7 @@ export default defineEventHandler(async (event) => {
         },
         query: {
           'filters[unique_order_number][$eq]': uniqueOrderNumber,
-          populate: 'customerInfo,address,items',
+          populate: 'customerInfo,shippingAddress,items',
         },
       });
 
@@ -84,6 +84,7 @@ export default defineEventHandler(async (event) => {
         if (payment.status === 'paid' && updateResponse?.data) {
           try {
             const orderData = updateResponse.data;
+            const customerLocale = (orderData.localeCustomer === 'nl' ? 'nl' : 'en') as EmailLocale;
 
             if (orderData.customerInfo?.email) {
               // Send order confirmation email
@@ -93,11 +94,15 @@ export default defineEventHandler(async (event) => {
                 totalPrice: orderData.totalPrice,
                 shippingCost: orderData.shippingCost,
                 customerInfo: orderData.customerInfo,
-                address: orderData.address,
+                address: orderData.shippingAddress,
                 items: orderData.items,
               };
-              await sendOrderConfirmationEmail(emailOrderData, orderNumber, config.public.strapiUrl);
+              await sendOrderConfirmationEmail(emailOrderData, orderNumber, config.public.strapiUrl, customerLocale);
               console.log(`Order confirmation email sent to ${orderData.customerInfo.email}`);
+
+              // Send seller notification email (always in Dutch)
+              await sendSellerOrderNotification(emailOrderData, orderNumber, config.public.strapiUrl, 'info@lembrace.be', 'nl');
+              console.log('Seller notification email sent');
             }
           } catch (emailError) {
             console.error('Failed to send order confirmation email:', emailError);

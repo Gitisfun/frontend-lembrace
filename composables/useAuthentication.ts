@@ -1,5 +1,5 @@
 import { useToast } from '~/composables/useToast';
-import { sendPasswordResetEmail, sendWelcomeVerificationEmail, sendResendVerificationEmail } from '~/logic/email';
+import { sendPasswordResetEmail, sendWelcomeVerificationEmail, sendResendVerificationEmail, type EmailLocale } from '~/logic/email';
 
 const API_BASE = 'https://sundrops-api-345f2765b0ea.herokuapp.com/api/auth';
 
@@ -38,8 +38,9 @@ type AuthErrorHandler = (message: string) => void;
 
 export const useAuthentication = () => {
   const config = useRuntimeConfig();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { success: toastSuccess, error: toastError } = useToast();
+  const emailLocale = computed(() => (locale.value === 'nl' ? 'nl' : 'en') as EmailLocale);
 
   const getHeaders = () => ({
     'Content-Type': 'application/json',
@@ -124,7 +125,7 @@ export const useAuthentication = () => {
       try {
         const tokenResponse = await getVerificationToken(data.email);
         if (tokenResponse?.email_verification_token) {
-          await sendWelcomeVerificationEmail(data.email, `${data.firstName} ${data.lastName}`, tokenResponse.email_verification_token, config.public.strapiUrl);
+          await sendWelcomeVerificationEmail(data.email, `${data.firstName} ${data.lastName}`, tokenResponse.email_verification_token, config.public.strapiUrl, emailLocale.value);
         }
       } catch (emailError) {
         console.error('Failed to send verification email:', emailError);
@@ -154,7 +155,7 @@ export const useAuthentication = () => {
       });
 
       if (tokenResponse?.data?.password_reset_token) {
-        await sendPasswordResetEmail(email, tokenResponse.data.password_reset_token, config.public.strapiUrl);
+        await sendPasswordResetEmail(email, tokenResponse.data.password_reset_token, config.public.strapiUrl, emailLocale.value);
       }
 
       toastSuccess(t('auth.forgotPassword.success'));
@@ -268,7 +269,7 @@ export const useAuthentication = () => {
         throw new Error('Failed to get verification token');
       }
 
-      await sendResendVerificationEmail(email, tokenData.email_verification_token, config.public.strapiUrl);
+      await sendResendVerificationEmail(email, tokenData.email_verification_token, config.public.strapiUrl, emailLocale.value);
 
       const successMessage = t('auth.verify.resendSuccess');
       setSuccess?.(successMessage);

@@ -136,9 +136,10 @@
 </template>
 
 <script setup>
-import { computed, ref, reactive, onMounted, watch } from 'vue';
+import { computed, ref, reactive, onMounted, onUnmounted, watch } from 'vue';
 import { useGlobalStore } from '~/stores/global';
 import { useAuthStore } from '~/stores/auth';
+import { useNotificationStore } from '~/stores/notifications';
 import { useToast } from '~/composables/useToast';
 import { useFormValidation } from '~/composables/useFormValidation';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
@@ -147,7 +148,7 @@ import { useLocalization } from '~/composables/useLocalization';
 import { paymentFormSchema, billingAddressSchema, createPaymentFormData } from '~/schemas';
 import { buildOrderPayload, fetchOrderNumber } from '~/logic/utils';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const { error: toastError } = useToast();
 const config = useRuntimeConfig();
 
@@ -161,6 +162,7 @@ useSeoMeta({
 const { create, find } = useStrapi();
 const globalStore = useGlobalStore();
 const authStore = useAuthStore();
+const notificationStore = useNotificationStore();
 const { fetchUserProfile, createAddress, isLoading: isLoadingProfile } = useUserProfile();
 const { isSubmitting, withSubmit, stopSubmitting } = useSubmitStatus();
 const { localizeArray } = useLocalization();
@@ -394,6 +396,7 @@ const handleSubmit = async () => {
       useSameAddressForBilling: useSameAddressForBilling.value,
       orderNumber,
       customerId: authStore.currentUser?.id ?? null,
+      localeCustomer: locale.value,
     });
 
     console.log('Order data:', orderData);
@@ -402,6 +405,24 @@ const handleSubmit = async () => {
     // Create order in Strapi
     const result = await create('orders', orderData);
     console.log('Order created successfully:', result);
+
+    // Send notification to dashboard about new order
+    try {
+      await notificationStore.sendNotification({
+        receiverId: 'lembrace-dashboard',
+        type: 'new_order',
+        payload: {
+          orderId: result.data.id,
+          documentId: result.data.documentId,
+          orderNumber: orderNumber,
+        },
+        appId: config.public.notificationAppId,
+      });
+      console.log('Notification sent for new order');
+    } catch (notificationError) {
+      // Don't fail the order if notification fails
+      console.error('Failed to send notification:', notificationError);
+    }
 
     /*
     const mollieResponse = await $fetch('/api/mollie/create-payment', {
@@ -431,11 +452,19 @@ onMounted(async () => {
   // Fetch delivery options
   fetchDeliveryOptions();
 
+  // Initialize notification socket (for sending notifications)
+  notificationStore.init('lembrace-webshop');
+
   if (authStore.isAuthenticated) {
     await fetchUserProfile();
     prefillUserData();
     isProfileLoaded.value = true;
   }
+});
+
+// Cleanup notification socket on unmount
+onUnmounted(() => {
+  notificationStore.disconnect();
 });
 
 // Watch for auth changes

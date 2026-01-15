@@ -113,7 +113,8 @@
     "logout": "Uitloggen"
   },
   "footer": {
-    "tagline": "Elegantie in elk detail – met de hand gemaakt voor jou."
+    "tagline": "Elegantie in elk detail – met de hand gemaakt voor jou.",
+    "privacy": "Privacybeleid"
   },
   "home": {
     "shopAll": "Bekijk alles"
@@ -303,6 +304,24 @@
     "no": "Nee",
     "delete": "Verwijderen",
     "areYouSure": "Weet je het zeker?"
+  },
+  "error": {
+    "backHome": "Terug naar Home",
+    "browseProducts": "Bekijk Producten",
+    "needHelp": "Hulp nodig?",
+    "contactUs": "Neem contact op",
+    "notFound": {
+      "title": "Pagina Niet Gevonden",
+      "message": "De pagina die je zoekt bestaat niet of is verplaatst. Laten we je weer op weg helpen."
+    },
+    "serverError": {
+      "title": "Server Fout",
+      "message": "Er ging iets mis aan onze kant. Probeer het later opnieuw."
+    },
+    "generic": {
+      "title": "Oeps!",
+      "message": "Er is een onverwachte fout opgetreden. Probeer het opnieuw."
+    }
   },
   "errors": {
     "general": {
@@ -704,6 +723,7 @@
       "total": "Totaal",
       "statusHistory": "Geschiedenis",
       "viewDetails": "Bekijk Details",
+      "markAsSeen": "Markeer als Gezien",
       "backToOrders": "Terug naar bestellingen",
       "time": "Tijd",
       "loadingOrder": "Bestelling laden...",
@@ -751,7 +771,9 @@
         "description": "Deze bestelling is klaar om verzonden te worden. Markeer als verzonden zodra het pakket onderweg is.",
         "button": "Markeer als Verzonden",
         "confirmTitle": "Bestelling Verzenden",
-        "confirmMessage": "Weet je zeker dat je deze bestelling als verzonden wilt markeren? De klant wordt op de hoogte gebracht dat de bestelling onderweg is."
+        "confirmMessage": "Weet je zeker dat je deze bestelling als verzonden wilt markeren? De klant wordt op de hoogte gebracht dat de bestelling onderweg is.",
+        "emailSent": "Verzendnotificatie e-mail naar klant verzonden",
+        "emailFailed": "Verzendnotificatie e-mail kon niet worden verzonden"
       },
       "manualStatus": {
         "title": "Bestelstatus Wijzigen",
@@ -774,6 +796,12 @@
       "title": "Meldingen",
       "subtitle": "Berichten en waarschuwingen die aandacht vereisen",
       "refreshed": "Meldingen vernieuwd",
+      "newOrders": {
+        "title": "Nieuwe Bestellingen",
+        "empty": "Geen nieuwe bestellingen"
+      },
+      "newOrderReceived": "Nieuwe bestelling ontvangen: {orderNumber}",
+      "viewOrder": "Bekijk Bestelling",
       "messages": {
         "title": "Ongelezen Berichten",
         "empty": "Geen ongelezen berichten"
@@ -875,6 +903,98 @@
       "previousPage": "Vorige pagina",
       "nextPage": "Volgende pagina",
       "lastPage": "Laatste pagina"
+    }
+  },
+  "privacy": {
+    "title": "Privacybeleid",
+    "seoDescription": "Ontdek hoe L'embrace uw persoonlijke gegevens verzamelt, gebruikt en beschermt. Ons privacybeleid legt uw rechten onder de AVG uit.",
+    "lastUpdated": "Laatst bijgewerkt",
+    "backHome": "Terug naar Home",
+    "intro": "Bij L'embrace zijn we toegewijd aan het beschermen van uw privacy en het waarborgen van de veiligheid van uw persoonlijke gegevens. Dit privacybeleid legt uit hoe we uw informatie verzamelen, gebruiken en beveiligen in overeenstemming met de Algemene Verordening Gegevensbescherming (AVG).",
+    "whoWeAre": {
+      "title": "Wie Zijn Wij",
+      "content": "L'embrace is een online winkel gespecialiseerd in handgemaakte sieraden en accessoires. Wij zijn de verwerkingsverantwoordelijke voor uw persoonlijke gegevens.",
+      "company": "Bedrijf",
+      "email": "E-mail",
+      "website": "Website"
+    },
+    "dataCollected": {
+      "title": "Welke Gegevens We Verzamelen",
+      "intro": "We verzamelen en verwerken de volgende soorten persoonlijke gegevens:",
+      "identity": "Identiteitsgegevens",
+      "identityDesc": "Voornaam, achternaam",
+      "contact": "Contactgegevens",
+      "contactDesc": "E-mailadres, telefoonnummer, verzend- en factuuradressen",
+      "transaction": "Transactiegegevens",
+      "transactionDesc": "Details over bestellingen, betalingen en leveringsinformatie",
+      "technical": "Technische Gegevens",
+      "technicalDesc": "IP-adres, browsertype, apparaatinformatie en cookies"
+    },
+    "howWeUse": {
+      "title": "Hoe We Uw Gegevens Gebruiken",
+      "intro": "We gebruiken uw persoonlijke gegevens voor de volgende doeleinden:",
+      "purpose1": "Verwerken en uitvoeren van uw bestellingen",
+      "purpose2": "Communiceren met u over uw bestellingen en vragen",
+      "purpose3": "Versturen van orderbevestigingen en verzendmeldingen",
+      "purpose4": "Verbeteren van onze website en klantenervaring",
+      "purpose5": "Voldoen aan wettelijke verplichtingen"
+    },
+    "legalBasis": {
+      "title": "Rechtsgrond voor Verwerking",
+      "intro": "We verwerken uw persoonlijke gegevens op basis van de volgende rechtsgronden:",
+      "contract": "Overeenkomst",
+      "contractDesc": "Verwerking noodzakelijk om onze overeenkomst met u na te komen (bijv. verwerken van bestellingen)",
+      "consent": "Toestemming",
+      "consentDesc": "Wanneer u uitdrukkelijke toestemming heeft gegeven (bijv. marketingcommunicatie)",
+      "legitimate": "Gerechtvaardigd Belang",
+      "legitimateDesc": "Voor onze gerechtvaardigde zakelijke belangen (bijv. verbeteren van onze diensten)",
+      "legal": "Wettelijke Verplichting",
+      "legalDesc": "Wanneer wettelijk vereist (bijv. belasting- en boekhoudkundige vereisten)"
+    },
+    "dataSharing": {
+      "title": "Gegevens Delen",
+      "intro": "We kunnen uw persoonlijke gegevens delen met:",
+      "payment": "Betalingsverwerkers (Mollie) om uw betalingen veilig te verwerken",
+      "shipping": "Bezorgpartners om uw bestellingen te verzenden",
+      "hosting": "Hosting en IT-dienstverleners",
+      "noSell": "We verkopen uw persoonlijke gegevens niet aan derden."
+    },
+    "retention": {
+      "title": "Gegevensbewaring",
+      "content": "We bewaren uw persoonlijke gegevens alleen zolang als nodig is om de doeleinden waarvoor ze zijn verzameld te vervullen, inclusief wettelijke, boekhoudkundige of rapportagevereisten. Bestelgegevens worden doorgaans 7 jaar bewaard voor belastingdoeleinden."
+    },
+    "rights": {
+      "title": "Uw Rechten",
+      "intro": "Onder de AVG heeft u de volgende rechten:",
+      "access": "Recht op Inzage",
+      "accessDesc": "Een kopie van uw persoonlijke gegevens opvragen",
+      "rectification": "Recht op Rectificatie",
+      "rectificationDesc": "Correctie van onjuiste gegevens verzoeken",
+      "erasure": "Recht op Verwijdering",
+      "erasureDesc": "Verwijdering van uw persoonlijke gegevens verzoeken",
+      "restriction": "Recht op Beperking",
+      "restrictionDesc": "Beperking van verwerking verzoeken",
+      "portability": "Recht op Overdraagbaarheid",
+      "portabilityDesc": "Overdracht van uw gegevens naar een andere dienst verzoeken",
+      "objection": "Recht op Bezwaar",
+      "objectionDesc": "Bezwaar maken tegen verwerking op basis van gerechtvaardigde belangen",
+      "contact": "Om een van deze rechten uit te oefenen, neem contact met ons op via info{'@'}lembrace.be."
+    },
+    "cookies": {
+      "title": "Cookies",
+      "content": "Onze website gebruikt cookies om uw surfervaring te verbeteren en websiteverkeer te analyseren. Essentiële cookies zijn noodzakelijk voor het correct functioneren van de website. U kunt uw cookievoorkeuren beheren via uw browserinstellingen."
+    },
+    "security": {
+      "title": "Gegevensbeveiliging",
+      "content": "We implementeren passende technische en organisatorische maatregelen om uw persoonlijke gegevens te beschermen tegen ongeautoriseerde toegang, wijziging, openbaarmaking of vernietiging. Alle betalingstransacties worden versleuteld met SSL-technologie."
+    },
+    "changes": {
+      "title": "Wijzigingen in Dit Beleid",
+      "content": "We kunnen dit privacybeleid van tijd tot tijd bijwerken. Eventuele wijzigingen worden op deze pagina geplaatst met een bijgewerkte revisiedatum. We moedigen u aan dit beleid regelmatig te bekijken."
+    },
+    "contact": {
+      "title": "Contact",
+      "content": "Als u vragen heeft over dit privacybeleid of onze gegevenspraktijken, of als u uw rechten wilt uitoefenen, neem dan contact met ons op:"
     }
   }
 }

@@ -65,6 +65,10 @@
 
                 <!-- Actions Bar -->
                 <div class="details-actions">
+                  <button v-if="showMarkAsRead" class="mark-read-btn" @click.stop="$emit('mark-as-read', order.documentId)">
+                    <IconCheck :size="16" />
+                    {{ $t('admin.orders.markAsSeen') }}
+                  </button>
                   <NuxtLink :to="`/admin/orders/${order.documentId}`" class="view-details-btn" @click.stop>
                     <IconEye :size="16" />
                     {{ $t('admin.orders.viewDetails') }}
@@ -99,8 +103,11 @@ import OrderStatusBadge from '~/components/admin/OrderStatusBadge.vue';
 import IconChevronRight from '~/components/icon/IconChevronRight.vue';
 import IconEye from '~/components/icon/IconEye.vue';
 import IconMail from '~/components/icon/IconMail.vue';
+import IconCheck from '~/components/icon/IconCheck.vue';
 
 const { getLocalizedItem } = useLocalization();
+
+defineEmits(['mark-as-read']);
 
 const props = defineProps({
   orders: {
@@ -110,6 +117,10 @@ const props = defineProps({
   unreadCounts: {
     type: Array,
     default: () => [],
+  },
+  showMarkAsRead: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -407,6 +418,7 @@ const formatTime = (dateString) => {
 .details-actions {
   display: flex;
   justify-content: flex-end;
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
 }
 
@@ -430,6 +442,28 @@ const formatTime = (dateString) => {
 .view-details-btn:hover {
   opacity: 0.9;
   transform: translateY(-1px);
+}
+
+.mark-read-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--admin-text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mark-read-btn:hover {
+  background: var(--admin-surface-alt);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
 }
 
 @media (max-width: 768px) {
