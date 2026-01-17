@@ -1,7 +1,7 @@
 <template>
   <div class="product-card">
     <div class="product-image">
-      <NuxtLink :to="`/products/${product.documentId}`" class="product-link">
+      <NuxtLink :to="localePath(`/products/${product.documentId}`)" class="product-link">
         <NuxtImg :src="product?.image[0]?.formats?.medium?.url" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image main-image" />
         <NuxtImg :src="product?.image_background?.formats?.medium?.url ?? product?.image[0]?.formats?.medium?.url" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image hover-image" />
       </NuxtLink>
@@ -9,7 +9,7 @@
       <div v-if="product?.amount === 0" class="soldout-badge">Sold out</div>
       <div v-if="hasDiscount" class="discount-badge">- {{ discountPercentage }}%</div>
     </div>
-    <NuxtLink :to="`/products/${product.documentId}`" class="product-info">
+    <NuxtLink :to="localePath(`/products/${product.documentId}`)" class="product-info">
       <h3 class="product-name">{{ product?.name }}</h3>
       <div class="price-container">
         <span v-if="hasDiscount" class="original-price">{{ formattedOriginalPrice }}</span>
@@ -25,6 +25,7 @@ import { useGlobalStore } from '~/stores/global';
 import { useToast } from '~/composables/useToast';
 
 const { t } = useI18n();
+const localePath = useLocalePath();
 const { success: toastSuccess } = useToast();
 
 const props = defineProps({

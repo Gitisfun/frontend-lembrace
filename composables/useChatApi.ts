@@ -38,14 +38,6 @@ export interface UnreadCount {
 }
 
 export const useChatApi = () => {
-  const config = useRuntimeConfig();
-  const baseUrl = config.public.chatApiBase || 'http://localhost:3003';
-
-  const getHeaders = () => ({
-    'Content-Type': 'application/json',
-    'X-API-Key': config.public.authApiKey,
-  });
-
   /**
    * Get a room by its name (order number)
    * @param roomName - The room name (e.g., ORD-2601-000044)
@@ -53,15 +45,9 @@ export const useChatApi = () => {
    */
   const getRoomByName = async (roomName: string): Promise<Room | null> => {
     try {
-      const response = await fetch(`${baseUrl}/api/rooms/name/${encodeURIComponent(roomName)}`, {
-        method: 'GET',
-        headers: getHeaders(),
-      });
-      if (response.ok) {
-        const result: ApiResponse<Room> = await response.json();
-        if (result.success && result.data) {
-          return result.data;
-        }
+      const result = await $fetch<ApiResponse<Room>>(`/api/chat/rooms/name/${encodeURIComponent(roomName)}`);
+      if (result.success && result.data) {
+        return result.data;
       }
       return null;
     } catch (error) {
@@ -77,15 +63,8 @@ export const useChatApi = () => {
    */
   const getRoomMessages = async (roomName: string): Promise<Message[]> => {
     try {
-      const response = await fetch(`${baseUrl}/api/rooms/${encodeURIComponent(roomName)}/messages`, {
-        method: 'GET',
-        headers: getHeaders(),
-      });
-      if (response.ok) {
-        const messages = await response.json();
-        return messages;
-      }
-      return [];
+      const messages = await $fetch<Message[]>(`/api/chat/rooms/${encodeURIComponent(roomName)}/messages`);
+      return messages || [];
     } catch (error) {
       console.error('Error fetching room messages:', error);
       return [];
@@ -109,15 +88,9 @@ export const useChatApi = () => {
    */
   const getUnreadCounts = async (userId: string): Promise<UnreadCount[]> => {
     try {
-      const response = await fetch(`${baseUrl}/api/rooms/unread/${encodeURIComponent(userId)}`, {
-        method: 'GET',
-        headers: getHeaders(),
-      });
-      if (response.ok) {
-        const result: ApiResponse<UnreadCount[]> = await response.json();
-        if (result.success && result.data) {
-          return result.data;
-        }
+      const result = await $fetch<ApiResponse<UnreadCount[]>>(`/api/chat/rooms/unread/${encodeURIComponent(userId)}`);
+      if (result.success && result.data) {
+        return result.data;
       }
       return [];
     } catch (error) {
@@ -133,15 +106,9 @@ export const useChatApi = () => {
    */
   const getAdminUnreadCounts = async (adminUserId: string): Promise<UnreadCount[]> => {
     try {
-      const response = await fetch(`${baseUrl}/api/rooms/admin/unread/${encodeURIComponent(adminUserId)}`, {
-        method: 'GET',
-        headers: getHeaders(),
-      });
-      if (response.ok) {
-        const result: ApiResponse<UnreadCount[]> = await response.json();
-        if (result.success && result.data) {
-          return result.data;
-        }
+      const result = await $fetch<ApiResponse<UnreadCount[]>>(`/api/chat/rooms/admin/unread/${encodeURIComponent(adminUserId)}`);
+      if (result.success && result.data) {
+        return result.data;
       }
       return [];
     } catch (error) {

@@ -147,6 +147,7 @@ import { useUserProfile } from '~/composables/useUserProfile';
 import { useLocalization } from '~/composables/useLocalization';
 import { paymentFormSchema, billingAddressSchema, createPaymentFormData } from '~/schemas';
 import { buildOrderPayload, fetchOrderNumber } from '~/logic/utils';
+import { sendOrderConfirmationEmail, sendSellerOrderNotification } from '~/logic/email';
 
 const { t, locale } = useI18n();
 const { error: toastError } = useToast();
@@ -389,7 +390,7 @@ const handleSubmit = async () => {
     }
 
     // Get new order number from order number API
-    const orderNumber = await fetchOrderNumber(config.public.authApiKey, config.public.orderNumberApiUrl);
+    const orderNumber = await fetchOrderNumber();
 
     // Build order payload with order number and user ID
     const orderData = buildOrderPayload(form, cartItems.value, total.value, shippingCost.value, {
@@ -423,7 +424,12 @@ const handleSubmit = async () => {
       // Don't fail the order if notification fails
       console.error('Failed to send notification:', notificationError);
     }
-
+    /*
+    sendOrderConfirmationEmail(orderData, orderNumber, config.public.strapiUrl, locale.value);
+    console.log('Order confirmation email sent successfully');
+    sendSellerOrderNotification(orderData, orderNumber, config.public.strapiUrl, 'info@lembrace.be', 'nl');
+    console.log('Seller notification email sent successfully');
+    */
     /*
     const mollieResponse = await $fetch('/api/mollie/create-payment', {
       method: 'POST',

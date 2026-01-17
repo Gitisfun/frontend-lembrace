@@ -3,7 +3,6 @@ import { useAuthStore, type UserAddress, type UserContact } from '~/stores/auth'
 import { useAuthGuard } from '~/composables/useAuthGuard';
 
 export const useUserProfile = () => {
-  const config = useRuntimeConfig();
   const authStore = useAuthStore();
   const { isAuthError, handleAuthError } = useAuthGuard();
   const isLoading = ref(false);
@@ -11,7 +10,6 @@ export const useUserProfile = () => {
 
   const getApiHeaders = () => ({
     'Content-Type': 'application/json',
-    'X-API-Key': config.public.authApiKey,
     ...(authStore.token ? { Authorization: `Bearer ${authStore.token}` } : {}),
   });
 
@@ -22,8 +20,6 @@ export const useUserProfile = () => {
     return authStore.currentUser.id;
   };
 
-  const API_BASE = 'https://sundrops-api-345f2765b0ea.herokuapp.com';
-
   // ============ ADDRESS API CALLS ============
 
   const fetchAddresses = async (): Promise<UserAddress[]> => {
@@ -32,7 +28,7 @@ export const useUserProfile = () => {
 
     try {
       const userId = getUserId();
-      const response = await $fetch<{ success: boolean; data: UserAddress[] }>(`${API_BASE}/api/users/${userId}/addresses`, {
+      const response = await $fetch<{ success: boolean; data: UserAddress[] }>(`/api/users/${userId}/addresses`, {
         method: 'GET',
         headers: getApiHeaders(),
       });
@@ -61,7 +57,7 @@ export const useUserProfile = () => {
 
     try {
       const userId = getUserId();
-      const response = await $fetch<{ success: boolean; data: UserAddress }>(`${API_BASE}/api/users/${userId}/addresses`, {
+      const response = await $fetch<{ success: boolean; data: UserAddress }>(`/api/users/${userId}/addresses`, {
         method: 'POST',
         headers: getApiHeaders(),
         body: address,
@@ -91,7 +87,7 @@ export const useUserProfile = () => {
 
     try {
       const userId = getUserId();
-      const response = await $fetch<{ success: boolean; data: UserAddress }>(`${API_BASE}/api/users/${userId}/addresses/${addressId}`, {
+      const response = await $fetch<{ success: boolean; data: UserAddress }>(`/api/users/${userId}/addresses/${addressId}`, {
         method: 'PATCH',
         headers: getApiHeaders(),
         body: address,
@@ -121,7 +117,7 @@ export const useUserProfile = () => {
 
     try {
       const userId = getUserId();
-      await $fetch(`${API_BASE}/api/users/${userId}/addresses/${addressId}`, {
+      await $fetch(`/api/users/${userId}/addresses/${addressId}`, {
         method: 'DELETE',
         headers: getApiHeaders(),
       });
@@ -149,7 +145,7 @@ export const useUserProfile = () => {
 
     try {
       const userId = getUserId();
-      const response = await $fetch<{ success: boolean; data: UserContact }>(`${API_BASE}/api/users/${userId}/contact`, {
+      const response = await $fetch<{ success: boolean; data: UserContact }>(`/api/users/${userId}/contact`, {
         method: 'GET',
         headers: getApiHeaders(),
       });
@@ -178,7 +174,7 @@ export const useUserProfile = () => {
 
     try {
       const userId = getUserId();
-      const response = await $fetch<{ success: boolean; data: UserContact }>(`${API_BASE}/api/users/${userId}/contact`, {
+      const response = await $fetch<{ success: boolean; data: UserContact }>(`/api/users/${userId}/contact`, {
         method: 'POST',
         headers: getApiHeaders(),
         body: contact,

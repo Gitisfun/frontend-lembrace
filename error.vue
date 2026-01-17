@@ -2,7 +2,7 @@
   <div class="error-page">
     <div class="error-container">
       <!-- Logo -->
-      <NuxtLink to="/" class="error-logo"> L'embrace </NuxtLink>
+      <NuxtLink :to="localePath('/')" class="error-logo"> L'embrace </NuxtLink>
 
       <!-- Illustration -->
       <div class="error-illustration">
@@ -20,11 +20,11 @@
 
       <!-- Actions -->
       <div class="error-actions">
-        <NuxtLink to="/" class="error-button primary">
+        <NuxtLink :to="localePath('/')" class="error-button primary">
           <span class="button-icon">←</span>
           {{ $t('error.backHome') }}
         </NuxtLink>
-        <NuxtLink to="/products" class="error-button secondary">
+        <NuxtLink :to="localePath('/products')" class="error-button secondary">
           {{ $t('error.browseProducts') }}
         </NuxtLink>
       </div>
@@ -32,7 +32,7 @@
       <!-- Help text -->
       <p class="error-help">
         {{ $t('error.needHelp') }}
-        <NuxtLink to="/contact" class="help-link">{{ $t('error.contactUs') }}</NuxtLink>
+        <NuxtLink :to="localePath('/contact')" class="help-link">{{ $t('error.contactUs') }}</NuxtLink>
       </p>
     </div>
   </div>
@@ -47,6 +47,7 @@ const props = defineProps({
 });
 
 const { t } = useI18n();
+const localePath = useLocalePath();
 
 const errorIcon = computed(() => {
   if (props.error?.statusCode === 404) return '🔍';

@@ -49,7 +49,6 @@ export const useNotificationStore = defineStore('notifications', {
       const config = useRuntimeConfig();
       return {
         apiUrl: config.public.notificationApiUrl as string,
-        apiKey: config.public.authApiKey as string,
       };
     },
 
@@ -84,25 +83,19 @@ export const useNotificationStore = defineStore('notifications', {
     },
 
     async fetchNotifications() {
-      const { apiUrl, apiKey } = this._getConfig();
       try {
-        const res = await fetch(`${apiUrl}/api/notifications/${this._receiverId}`, {
-          headers: { 'x-api-key': apiKey },
-        });
-        const data = await res.json();
-        this.notifications = data.notifications;
-        this.unreadCount = data.unreadCount;
+        const res = await $fetch<{ notifications: Notification[]; unreadCount: number }>(`/api/notifications/${this._receiverId}`);
+        this.notifications = res.notifications;
+        this.unreadCount = res.unreadCount;
       } catch (error) {
         console.error('Failed to fetch notifications:', error);
       }
     },
 
     async markAsRead(notificationId: string) {
-      const { apiUrl, apiKey } = this._getConfig();
       try {
-        await fetch(`${apiUrl}/api/notifications/${notificationId}/read`, {
+        await $fetch(`/api/notifications/${notificationId}/read`, {
           method: 'PATCH',
-          headers: { 'x-api-key': apiKey },
         });
         const notification = this.notifications.find((n) => n._id === notificationId);
         if (notification && !notification.read) {
@@ -115,11 +108,9 @@ export const useNotificationStore = defineStore('notifications', {
     },
 
     async markAllAsRead() {
-      const { apiUrl, apiKey } = this._getConfig();
       try {
-        await fetch(`${apiUrl}/api/notifications/${this._receiverId}/read-all`, {
+        await $fetch(`/api/notifications/${this._receiverId}/read-all`, {
           method: 'PATCH',
-          headers: { 'x-api-key': apiKey },
         });
         this.notifications.forEach((n) => (n.read = true));
         this.unreadCount = 0;
@@ -129,22 +120,13 @@ export const useNotificationStore = defineStore('notifications', {
     },
 
     async sendNotification(notification: SendNotificationPayload) {
-      const { apiUrl, apiKey } = this._getConfig();
       try {
-        const res = await fetch(`${apiUrl}/api/notifications`, {
+        const res = await $fetch('/api/notifications', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': apiKey,
-          },
-          body: JSON.stringify(notification),
+          body: notification,
         });
-        if (!res.ok) {
-          throw new Error(`Failed to send notification: ${res.status}`);
-        }
-        const data = await res.json();
-        console.log('📤 Notification sent:', data);
-        return data;
+        console.log('📤 Notification sent:', res);
+        return res;
       } catch (error) {
         console.error('Failed to send notification:', error);
         throw error;

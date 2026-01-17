@@ -1,8 +1,6 @@
 import { useToast } from '~/composables/useToast';
 import { sendPasswordResetEmail, sendWelcomeVerificationEmail, sendResendVerificationEmail, type EmailLocale } from '~/logic/email';
 
-const API_BASE = 'https://sundrops-api-345f2765b0ea.herokuapp.com/api/auth';
-
 export interface LoginData {
   email: string;
   password: string;
@@ -42,11 +40,6 @@ export const useAuthentication = () => {
   const { success: toastSuccess, error: toastError } = useToast();
   const emailLocale = computed(() => (locale.value === 'nl' ? 'nl' : 'en') as EmailLocale);
 
-  const getHeaders = () => ({
-    'Content-Type': 'application/json',
-    'X-API-Key': config.public.authApiKey,
-  });
-
   /**
    * Check if user has admin role
    */
@@ -63,11 +56,10 @@ export const useAuthentication = () => {
    */
   const login = async (data: LoginData, setError?: AuthErrorHandler): Promise<{ success: boolean; data?: any; token?: string; showResendVerification?: boolean }> => {
     try {
-      const response = await $fetch<LoginResponse>(`${API_BASE}/login`, {
+      const response = await $fetch<LoginResponse>('/api/auth/login', {
         method: 'POST',
-        headers: getHeaders(),
         body: {
-          identifier: data.email,
+          email: data.email,
           password: data.password,
         },
       });
@@ -109,15 +101,13 @@ export const useAuthentication = () => {
    */
   const register = async (data: RegisterData, setError?: AuthErrorHandler): Promise<{ success: boolean; data?: any }> => {
     try {
-      const response = await $fetch(`${API_BASE}/register`, {
+      const response = await $fetch('/api/auth/register', {
         method: 'POST',
-        headers: getHeaders(),
         body: {
           email: data.email,
           password: data.password,
-          first_name: data.firstName,
-          last_name: data.lastName,
-          status: 'active',
+          firstName: data.firstName,
+          lastName: data.lastName,
         },
       });
 
@@ -148,10 +138,9 @@ export const useAuthentication = () => {
    */
   const requestPasswordReset = async (email: string, setError?: AuthErrorHandler): Promise<{ success: boolean }> => {
     try {
-      const tokenResponse = await $fetch<PasswordResetTokenResponse>(`${API_BASE}/password-reset-token`, {
+      const tokenResponse = await $fetch<PasswordResetTokenResponse>('/api/auth/password-reset-token', {
         method: 'POST',
         body: { email },
-        headers: getHeaders(),
       });
 
       if (tokenResponse?.data?.password_reset_token) {
@@ -182,12 +171,11 @@ export const useAuthentication = () => {
    */
   const resetPassword = async (token: string, newPassword: string, setError?: AuthErrorHandler): Promise<{ success: boolean }> => {
     try {
-      await $fetch(`${API_BASE}/reset-password`, {
+      await $fetch('/api/auth/reset-password', {
         method: 'POST',
-        headers: getHeaders(),
         body: {
           token,
-          new_password: newPassword,
+          newPassword,
         },
       });
 
@@ -219,9 +207,8 @@ export const useAuthentication = () => {
     }
 
     try {
-      const response = await $fetch<{ message?: string }>(`${API_BASE}/verify-email`, {
+      const response = await $fetch<{ message?: string }>('/api/auth/verify-email', {
         method: 'POST',
-        headers: getHeaders(),
         body: { token },
       });
 
@@ -246,9 +233,8 @@ export const useAuthentication = () => {
    */
   const getVerificationToken = async (email: string): Promise<{ email_verification_token: string } | null> => {
     try {
-      const response = await $fetch<VerificationTokenResponse>(`${API_BASE}/verification-token/${encodeURIComponent(email)}`, {
+      const response = await $fetch<VerificationTokenResponse>(`/api/auth/verification-token/${encodeURIComponent(email)}`, {
         method: 'GET',
-        headers: getHeaders(),
       });
 
       return response?.data || null;

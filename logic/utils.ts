@@ -16,16 +16,11 @@ export const formatPrice = (price: number) =>
 // ============================================================================
 
 /**
- * Fetches a new unique order number from the order API
- * @param apiKey - The API key for authentication
- * @param apiUrl - The order number API URL (from runtime config)
+ * Fetches a new unique order number from the server API
  */
-export const fetchOrderNumber = async (apiKey: string, apiUrl: string): Promise<string> => {
-  const response = await $fetch<{ order_number: string }>(apiUrl, {
+export const fetchOrderNumber = async (): Promise<string> => {
+  const response = await $fetch<{ order_number: string }>('/api/orders/number', {
     method: 'GET',
-    headers: {
-      'X-API-Key': apiKey,
-    },
   });
   return response.order_number;
 };

@@ -1,7 +1,5 @@
 import { useToast } from '~/composables/useToast';
 
-const API_BASE = 'https://sundrops-api-345f2765b0ea.herokuapp.com/api/auth';
-
 export interface AdminLoginData {
   email: string;
   password: string;
@@ -17,14 +15,8 @@ export interface AdminLoginResponse {
 type AuthErrorHandler = (message: string) => void;
 
 export const useAdminAuthentication = () => {
-  const config = useRuntimeConfig();
   const { t } = useI18n();
   const { success: toastSuccess, error: toastError } = useToast();
-
-  const getHeaders = () => ({
-    'Content-Type': 'application/json',
-    'X-API-Key': config.public.authApiKey,
-  });
 
   /**
    * Check if user has admin role
@@ -42,11 +34,10 @@ export const useAdminAuthentication = () => {
    */
   const adminLogin = async (data: AdminLoginData, setError?: AuthErrorHandler): Promise<{ success: boolean; data?: any; token?: string }> => {
     try {
-      const response = await $fetch<AdminLoginResponse>(`${API_BASE}/login`, {
+      const response = await $fetch<AdminLoginResponse>('/api/auth/login', {
         method: 'POST',
-        headers: getHeaders(),
         body: {
-          identifier: data.email,
+          email: data.email,
           password: data.password,
         },
       });

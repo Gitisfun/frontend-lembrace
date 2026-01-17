@@ -10,11 +10,15 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
+    // Private keys (server-side only)
+    authApiKey: process.env.AUTH_API_KEY || '',
+    authApiBase: process.env.AUTH_API_URL || 'https://sundrops-api-345f2765b0ea.herokuapp.com',
+    chatApiBase: process.env.CHAT_API_URL || 'http://localhost:3003',
+    orderNumberApiUrl: process.env.ORDER_NUMBER_API_URL || 'https://localhost:3002/api/counter',
+    notificationApiUrl: process.env.NOTIFICATION_API_URL || 'http://localhost:3004',
     public: {
-      authApiKey: process.env.AUTH_API_KEY || '',
       strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337',
       chatApiBase: process.env.CHAT_API_URL || 'http://localhost:3003',
-      orderNumberApiUrl: process.env.ORDER_NUMBER_API_URL || 'https://localhost:3002/api/counter',
       notificationApiUrl: process.env.NOTIFICATION_API_URL || 'http://localhost:3004',
       notificationAppId: process.env.NOTIFICATION_APP_ID || 'lembrace-webshop-dev',
     },
