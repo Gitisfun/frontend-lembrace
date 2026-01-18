@@ -129,6 +129,9 @@
 
         <div class="form-actions">
           <UiButtonSubmit :text="$t('payment.placeOrder')" :loading="isSubmitting" :loading-text="$t('payment.processing')" />
+          
+          <!-- Promotion removal warning -->
+          <PromotionRemovedWarning :message="promotionRemovedMessage" />
         </div>
       </form>
     </div>
@@ -145,12 +148,13 @@ import { useFormValidation } from '~/composables/useFormValidation';
 import { useSubmitStatus } from '~/composables/useSubmitStatus';
 import { useUserProfile } from '~/composables/useUserProfile';
 import { useLocalization } from '~/composables/useLocalization';
+import { usePromotionVerification } from '~/composables/usePromotionVerification';
 import { paymentFormSchema, billingAddressSchema, createPaymentFormData } from '~/schemas';
 import { buildOrderPayload, fetchOrderNumber } from '~/logic/utils';
 import { sendOrderConfirmationEmail, sendSellerOrderNotification } from '~/logic/email';
 
 const { t, locale } = useI18n();
-const { error: toastError } = useToast();
+const { error: toastError, warning: toastWarning } = useToast();
 const config = useRuntimeConfig();
 
 // SEO Meta
@@ -167,6 +171,7 @@ const notificationStore = useNotificationStore();
 const { fetchUserProfile, createAddress, isLoading: isLoadingProfile } = useUserProfile();
 const { isSubmitting, withSubmit, stopSubmitting } = useSubmitStatus();
 const { localizeArray } = useLocalization();
+const { promotionRemovedMessage, verifyPromotionCodes, clearPromotionMessage } = usePromotionVerification();
 const forceValidation = ref(false);
 const isProfileLoaded = ref(false);
 
@@ -352,6 +357,9 @@ const selectNewBillingAddress = () => {
 const handleSubmit = async () => {
   if (isSubmitting.value) return;
 
+  // Clear any previous promotion warning when user clicks again
+  clearPromotionMessage();
+
   forceValidation.value = true;
 
   const isShippingValid = validateAll();
@@ -363,6 +371,25 @@ const handleSubmit = async () => {
   }
 
   await withSubmit(async () => {
+    // Verify promotion codes before creating the order
+    // This will remove any invalid/used promotions from cart items
+    // Get email - from form for anonymous users, from auth store for logged-in users
+    const email = authStore.isAuthenticated && authStore.currentUser?.email
+      ? authStore.currentUser.email
+      : form.email;
+    const promotionsWereRemoved = await verifyPromotionCodes(cartItems.value, email);
+    
+    // Show toast warning if promotions were removed
+    if (promotionsWereRemoved) {
+      toastWarning(t('payment.promotion.removedTitle'));
+    }
+    
+    // If promotions were removed, stop the order process
+    // User needs to review the updated cart and click again to confirm
+    if (promotionsWereRemoved) {
+      return;
+    }
+
     // Save new shipping address if requested
     if (isAuthenticated.value && saveNewShippingAddress.value && selectedShippingAddressId.value === 'new') {
       await createAddress({

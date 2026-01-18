@@ -96,6 +96,10 @@
       "customers": {
         "title": "Customers | Admin | L'embrace",
         "description": "View all customers in the L'embrace admin panel."
+      },
+      "promotions": {
+        "title": "Promotions | Admin | L'embrace",
+        "description": "View and manage promotion codes in the L'embrace admin panel."
       }
     }
   },
@@ -175,7 +179,16 @@
     "checkout": "Proceed to Checkout",
     "promocode": {
       "placeholder": "Enter promocode",
-      "apply": "Apply"
+      "apply": "Apply",
+      "applying": "Validating...",
+      "success": "Promotion code applied!",
+      "removed": "Promotion code removed",
+      "discountApplied": "{discount}% discount applied",
+      "error": {
+        "empty": "Please enter a promotion code",
+        "invalid": "Invalid promotion code",
+        "generic": "Could not validate promotion code"
+      }
     },
     "material": {
       "label": "Material"
@@ -226,6 +239,13 @@
     "placeOrder": "Place Order",
     "processing": "Processing...",
     "orderError": "An error occurred while processing your order. Please try again later.",
+    "promotion": {
+      "removedTitle": "Some promotion codes were removed",
+      "warningTitle": "Promotion codes removed",
+      "reconfirmAction": "Please review the updated prices and click 'Place Order' again to confirm.",
+      "invalidCode": "This promotion code is no longer valid",
+      "verificationFailed": "Could not verify promotion code"
+    },
     "continueShopping": "Continue Shopping",
     "printOrder": "Print Order",
     "success": {
@@ -594,6 +614,7 @@
       "notifications": "Notifications",
       "management": "Management",
       "products": "Products",
+      "promotions": "Promotions",
       "orders": "Orders",
       "customers": "Customers",
       "settings": "Settings",
@@ -903,6 +924,50 @@
       "previousPage": "Previous page",
       "nextPage": "Next page",
       "lastPage": "Last page"
+    },
+    "promotions": {
+      "title": "Promotions",
+      "subtitle": "View and manage promotion codes",
+      "refresh": "Refresh",
+      "addPromotion": "Add Promotion",
+      "refreshed": "Promotions refreshed",
+      "emptyTitle": "No promotions yet",
+      "emptyMessage": "Promotion codes added in Strapi will appear here.",
+      "searchPlaceholder": "Search by promotion code...",
+      "promotionsCount": "promotions",
+      "table": {
+        "code": "Code",
+        "discount": "Discount",
+        "status": "Status",
+        "appliesTo": "Applies To",
+        "validity": "Validity"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "appliesTo": {
+        "categories": "Categories",
+        "subcategories": "Subcategories",
+        "products": "Products",
+        "all": "All products"
+      },
+      "validity": {
+        "from": "From",
+        "until": "Until",
+        "unlimited": "No time limit"
+      },
+      "actions": {
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "editInStrapi": "Edit in Strapi"
+      },
+      "statusUpdated": {
+        "activated": "Promotion code activated",
+        "deactivated": "Promotion code deactivated",
+        "error": "Failed to update promotion status"
+      },
+      "noSpecificTargets": "This promotion applies to all products"
     }
   },
   "privacy": {

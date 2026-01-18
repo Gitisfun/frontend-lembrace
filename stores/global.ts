@@ -28,10 +28,13 @@ interface CartItem {
   name: string;
   price: number;
   discount: number;
+  originalProductDiscount: number; // Store the original product discount separately
   amount: number;
   calculatedPrice: number;
   image: string;
   material: Material | null;
+  promotionCode: string | null;
+  promotionDiscount: number;
 }
 
 interface Product {
@@ -52,8 +55,8 @@ const extractImageUrl = (image: StrapiImage[] | StrapiImage | string): string =>
   }
 
   if (Array.isArray(image)) {
-    if (image.length === 0) return '';
     const firstImage = image[0];
+    if (!firstImage) return '';
     return firstImage.formats?.thumbnail?.url || firstImage.formats?.small?.url || firstImage.url || '';
   }
 
@@ -84,7 +87,13 @@ export const useGlobalStore = defineStore('global', {
   },
 
   actions: {
-    addToCart(product: Product, amount = 1, material: Material | null = null): boolean {
+    addToCart(
+      product: Product,
+      amount = 1,
+      material: Material | null = null,
+      promotionCode: string | null = null,
+      promotionDiscount = 0
+    ): boolean {
       const productId = product.documentId || product.id;
       const existingItem = this.cart.find((item) => item.id === productId);
 
@@ -100,25 +109,37 @@ export const useGlobalStore = defineStore('global', {
         amount = maxCanAdd;
       }
 
+      // Store the original product discount
+      const originalProductDiscount = product.discount || 0;
+      // Use promotion discount if provided, otherwise use product discount
+      const effectiveDiscount = promotionDiscount > 0 ? promotionDiscount : originalProductDiscount;
+
       if (existingItem) {
         existingItem.amount += amount;
+        // Update discount if promotion is applied
+        if (promotionDiscount > 0) {
+          existingItem.discount = promotionDiscount;
+          existingItem.promotionCode = promotionCode;
+          existingItem.promotionDiscount = promotionDiscount;
+        }
         existingItem.calculatedPrice = calculatePrice(existingItem.price, existingItem.discount, existingItem.amount);
         // Update material if provided
         if (material) {
           existingItem.material = material;
         }
       } else {
-        const discount = product.discount || 0;
-
         this.cart.push({
           id: productId,
           name: product.name,
           price: product.price,
-          discount,
+          discount: effectiveDiscount,
+          originalProductDiscount, // Store the original product discount
           amount,
-          calculatedPrice: calculatePrice(product.price, discount, amount),
+          calculatedPrice: calculatePrice(product.price, effectiveDiscount, amount),
           image: extractImageUrl(product.image),
           material,
+          promotionCode,
+          promotionDiscount,
         });
       }
 
@@ -135,6 +156,20 @@ export const useGlobalStore = defineStore('global', {
         item.amount = amount;
         item.calculatedPrice = calculatePrice(item.price, item.discount, amount);
       }
+    },
+
+    updateCartItemPromotion(productId: string | number, promotionCode: string | null, promotionDiscount: number) {
+      const item = this.cart.find((item) => item.id === productId);
+      if (item) {
+        item.promotionCode = promotionCode;
+        item.promotionDiscount = promotionDiscount;
+        // Update discount: use promotion discount if provided, otherwise revert to original product discount
+        // Fallback to 0 for backwards compatibility with old cart items
+        item.discount = promotionCode ? promotionDiscount : (item.originalProductDiscount ?? 0);
+        item.calculatedPrice = calculatePrice(item.price, item.discount, item.amount);
+        return true;
+      }
+      return false;
     },
 
     clearCart() {

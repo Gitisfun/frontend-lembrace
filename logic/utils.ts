@@ -65,6 +65,8 @@ interface CartItem {
   discount?: number;
   calculatedPrice: number;
   material?: Material | null;
+  promotionCode?: string | null;
+  promotionDiscount?: number;
 }
 
 interface BuildOrderOptions {
@@ -128,6 +130,8 @@ export const buildOrderPayload = (form: PaymentFormData, cartItems: CartItem[], 
       discount: item.discount || 0,
       calculatedPrice: item.calculatedPrice,
       materialName: item.material?.name,
+      promotionCode: item.promotionCode || null,
+      promotionDiscount: item.promotionDiscount || 0,
     })),
   };
 };

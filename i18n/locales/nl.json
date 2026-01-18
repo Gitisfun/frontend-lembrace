@@ -96,6 +96,10 @@
       "customers": {
         "title": "Klanten | Admin | L'embrace",
         "description": "Bekijk alle klanten in het L'embrace beheerpaneel."
+      },
+      "promotions": {
+        "title": "Promoties | Admin | L'embrace",
+        "description": "Bekijk en beheer promotiecodes in het L'embrace beheerpaneel."
       }
     }
   },
@@ -175,7 +179,16 @@
     "checkout": "Ga naar afrekenen",
     "promocode": {
       "placeholder": "Voer promotiecode in",
-      "apply": "Toepassen"
+      "apply": "Toepassen",
+      "applying": "Valideren...",
+      "success": "Promotiecode toegepast!",
+      "removed": "Promotiecode verwijderd",
+      "discountApplied": "{discount}% korting toegepast",
+      "error": {
+        "empty": "Voer een promotiecode in",
+        "invalid": "Ongeldige promotiecode",
+        "generic": "Kon promotiecode niet valideren"
+      }
     },
     "material": {
       "label": "Materiaal"
@@ -226,6 +239,13 @@
     "placeOrder": "Bestelling plaatsen",
     "processing": "Verwerken...",
     "orderError": "Er is een fout opgetreden bij het verwerken van je bestelling. Probeer het later opnieuw.",
+    "promotion": {
+      "removedTitle": "Sommige promotiecodes zijn verwijderd",
+      "warningTitle": "Promotiecodes verwijderd",
+      "reconfirmAction": "Bekijk de aangepaste prijzen en klik opnieuw op 'Bestelling plaatsen' om te bevestigen.",
+      "invalidCode": "Deze promotiecode is niet meer geldig",
+      "verificationFailed": "Kon promotiecode niet verifiëren"
+    },
     "continueShopping": "Verder winkelen",
     "printOrder": "Bestelling afdrukken",
     "success": {
@@ -594,6 +614,7 @@
       "notifications": "Meldingen",
       "management": "Beheer",
       "products": "Producten",
+      "promotions": "Promoties",
       "orders": "Bestellingen",
       "customers": "Klanten",
       "settings": "Instellingen",
@@ -903,6 +924,50 @@
       "previousPage": "Vorige pagina",
       "nextPage": "Volgende pagina",
       "lastPage": "Laatste pagina"
+    },
+    "promotions": {
+      "title": "Promoties",
+      "subtitle": "Bekijk en beheer promotiecodes",
+      "refresh": "Vernieuwen",
+      "addPromotion": "Promotie Toevoegen",
+      "refreshed": "Promoties vernieuwd",
+      "emptyTitle": "Nog geen promoties",
+      "emptyMessage": "Promotiecodes toegevoegd in Strapi verschijnen hier.",
+      "searchPlaceholder": "Zoek op promotiecode...",
+      "promotionsCount": "promoties",
+      "table": {
+        "code": "Code",
+        "discount": "Korting",
+        "status": "Status",
+        "appliesTo": "Van Toepassing Op",
+        "validity": "Geldigheid"
+      },
+      "status": {
+        "active": "Actief",
+        "inactive": "Inactief"
+      },
+      "appliesTo": {
+        "categories": "Categorieën",
+        "subcategories": "Subcategorieën",
+        "products": "Producten",
+        "all": "Alle producten"
+      },
+      "validity": {
+        "from": "Van",
+        "until": "Tot",
+        "unlimited": "Geen tijdslimiet"
+      },
+      "actions": {
+        "activate": "Activeren",
+        "deactivate": "Deactiveren",
+        "editInStrapi": "Bewerken in Strapi"
+      },
+      "statusUpdated": {
+        "activated": "Promotiecode geactiveerd",
+        "deactivated": "Promotiecode gedeactiveerd",
+        "error": "Kon promotiestatus niet bijwerken"
+      },
+      "noSpecificTargets": "Deze promotie is van toepassing op alle producten"
     }
   },
   "privacy": {

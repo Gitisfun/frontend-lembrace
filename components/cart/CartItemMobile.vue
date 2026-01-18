@@ -9,6 +9,9 @@
         <div v-if="item.material" class="item-material">
           <span class="material-swatch" :style="{ backgroundColor: item.material.color }"></span>
         </div>
+        <div v-if="item.promotionCode" class="item-promotion">
+          <PromotionBadge :code="item.promotionCode" :discount="item.promotionDiscount" size="md" />
+        </div>
         <div class="item-price">€{{ item.calculatedPrice.toFixed(2) }}</div>
       </div>
       <button @click="$emit('remove')" class="remove-btn" aria-label="Remove item">
@@ -107,6 +110,10 @@ const updateQuantity = (newQuantity) => {
 .material-name {
   font-size: 0.85rem;
   color: #666;
+}
+
+.item-promotion {
+  margin-bottom: 0.35rem;
 }
 
 .item-price {

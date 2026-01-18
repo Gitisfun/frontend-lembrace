@@ -6,6 +6,9 @@
       <div v-if="item.material" class="item-material">
         <span class="material-swatch" :style="{ backgroundColor: item.material.color }"></span>
       </div>
+      <div v-if="item.promotionCode" class="item-promotion">
+        <PromotionBadge :code="item.promotionCode" :discount="item.promotionDiscount" size="lg" />
+      </div>
     </div>
     <div class="item-quantity">
       <button @click="updateQuantity(item.amount - 1)" class="quantity-btn" :disabled="item.amount <= 1">−</button>
@@ -91,6 +94,10 @@ const updateQuantity = (newQuantity) => {
 .material-name {
   font-size: 0.9rem;
   color: #666;
+}
+
+.item-promotion {
+  margin-top: 0.25rem;
 }
 
 .item-quantity {

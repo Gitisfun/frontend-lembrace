@@ -8,6 +8,9 @@
           <div v-if="item.material" class="item-material">
             <span class="material-swatch" :style="{ backgroundColor: item.material.color }"></span>
           </div>
+          <div v-if="item.promotionCode" class="item-promotion">
+            <PromotionBadge :code="item.promotionCode" :discount="item.promotionDiscount" size="sm" />
+          </div>
           <span class="item-quantity">x{{ item.amount }}</span>
         </div>
         <span class="item-price">€{{ item.calculatedPrice.toFixed(2) }}</span>
@@ -108,6 +111,10 @@ const total = computed(() => props.subtotal + props.shippingCost);
 .material-name {
   font-size: 0.85rem;
   color: #666;
+}
+
+.item-promotion {
+  margin-top: 0.15rem;
 }
 
 .item-quantity {

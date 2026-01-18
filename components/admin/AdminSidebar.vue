@@ -54,6 +54,12 @@
             </NuxtLink>
           </li>
           <li>
+            <NuxtLink :to="localePath('/admin/promotions')" class="nav-link" :class="{ active: isActive('/admin/promotions') }" :title="isCollapsed ? $t('admin.nav.promotions') : undefined">
+              <IconTag :size="18" />
+              <span class="nav-text">{{ $t('admin.nav.promotions') }}</span>
+            </NuxtLink>
+          </li>
+          <li>
             <NuxtLink :to="localePath('/admin/customers')" class="nav-link" :class="{ active: isActive('/admin/customers') }" :title="isCollapsed ? $t('admin.nav.customers') : undefined">
               <IconUsers :size="18" />
               <span class="nav-text">{{ $t('admin.nav.customers') }}</span>
@@ -126,6 +132,7 @@ import IconChevronRight from '~/components/icon/IconChevronRight.vue';
 import IconDashboard from '~/components/icon/IconDashboard.vue';
 import IconMail from '~/components/icon/IconMail.vue';
 import IconShoppingBag from '~/components/icon/IconShoppingBag.vue';
+import IconTag from '~/components/icon/IconTag.vue';
 import IconDocument from '~/components/icon/IconDocument.vue';
 import IconUsers from '~/components/icon/IconUsers.vue';
 import IconMoon from '~/components/icon/IconMoon.vue';

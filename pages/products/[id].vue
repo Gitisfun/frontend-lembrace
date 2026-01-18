@@ -73,10 +73,13 @@
             <div v-if="showQuantityAdjustedMessage" class="quantity-adjusted-message">{{ $t('product.quantityAdjusted') }}</div>
 
             <!-- Promocode Input -->
-            <div class="promocode-section">
-              <input v-model="promocode" type="text" :placeholder="$t('product.promocode.placeholder')" class="promocode-input" />
-              <UiButton variant="primary" size="sm" :text="$t('product.promocode.apply')" @click="applyPromocode" />
-            </div>
+            <ProductPromocodeInput
+              ref="promocodeInputRef"
+              :product-id="product.documentId || product.id"
+              :is-in-cart="isInCart"
+              @applied="onPromocodeApplied"
+              @removed="onPromocodeRemoved"
+            />
 
             <!-- Divider -->
             <div class="action-divider"></div>
@@ -106,6 +109,7 @@ import InputCounter from '~/components/input/InputCounter.vue';
 import RichcontentViewer from '~/components/richcontent/RichcontentViewer.vue';
 import ProductCard from '~/components/product/ProductCard.vue';
 import ProductMaterialSelector from '~/components/product/MaterialSelector.vue';
+import ProductPromocodeInput from '~/components/product/PromocodeInput.vue';
 import IconCart from '~/components/icon/IconCart.vue';
 import { useGlobalStore } from '~/stores/global';
 
@@ -123,8 +127,12 @@ const { error, handleError } = useApiError();
 const rawProduct = ref(null);
 const rawRelatedProducts = ref([]);
 const selectedImage = ref(null);
-const promocode = ref('');
 const selectedMaterial = ref(null);
+
+// Promocode component ref and state
+const promocodeInputRef = ref(null);
+const appliedPromocode = ref(null);
+const appliedPromocodeDiscount = ref(0);
 
 // Localized product (reacts to both data and locale changes)
 const product = computed(() => {
@@ -235,7 +243,13 @@ const selectImage = (image) => {
 
 const addToCart = () => {
   if (!product.value) return;
-  const success = globalStore.addToCart(product.value, quantity.value, selectedMaterial.value);
+  const success = globalStore.addToCart(
+    product.value,
+    quantity.value,
+    selectedMaterial.value,
+    appliedPromocode.value,
+    appliedPromocodeDiscount.value
+  );
   if (!success) {
     showMaxItemsMessage.value = true;
     setTimeout(() => {
@@ -260,12 +274,26 @@ const removeFromCart = () => {
   toastSuccess(t('toast.removedFromCart'));
 };
 
-const applyPromocode = () => {
-  if (promocode.value.trim()) {
-    // Here you would typically validate the promocode with your backend
-    console.log('Applying promocode:', promocode.value);
-    // You can add logic here to validate and apply the promocode
+const onPromocodeApplied = ({ code, discount }) => {
+  appliedPromocode.value = code;
+  appliedPromocodeDiscount.value = discount;
+  
+  // If product is already in cart, update its promotion
+  if (product.value && isInCart.value) {
+    const productId = product.value.documentId || product.value.id;
+    globalStore.updateCartItemPromotion(productId, code, discount);
   }
+};
+
+const onPromocodeRemoved = () => {
+  // If product is in cart, remove its promotion (reverts to original product discount stored in cart)
+  if (product.value && isInCart.value) {
+    const productId = product.value.documentId || product.value.id;
+    globalStore.updateCartItemPromotion(productId, null, 0);
+  }
+  
+  appliedPromocode.value = null;
+  appliedPromocodeDiscount.value = 0;
 };
 </script>
 
@@ -480,35 +508,6 @@ const applyPromocode = () => {
   color: var(--color-gold, #d4a762);
 }
 
-.promocode-section {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  width: 100%;
-}
-
-.promocode-input {
-  flex: 1;
-  min-width: 0;
-  padding: 0.8rem 1rem;
-  border: 1px solid #e8d8b4;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 1rem;
-  background: white;
-  transition: border-color 0.3s ease;
-  box-sizing: border-box;
-}
-
-.promocode-input:focus {
-  outline: none;
-  border-color: var(--color-gold);
-}
-
-.promocode-input::placeholder {
-  color: #999;
-}
-
 .action-divider {
   height: 1px;
   background: linear-gradient(to right, transparent, #e8d8b4, transparent);
@@ -599,15 +598,6 @@ const applyPromocode = () => {
 
   .image-thumbnails {
     gap: 0.25rem;
-  }
-
-  .promocode-section {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .promocode-input {
-    width: 100%;
   }
 
   .related-products-section {
