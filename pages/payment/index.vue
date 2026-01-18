@@ -415,35 +415,53 @@ const handleSubmit = async () => {
       });
     }
 
-    // Get new order number from order number API
-    const orderNumber = await fetchOrderNumber();
+    // Check if there's already a pending order for this cart (to avoid duplicates)
+    const currentCartHash = JSON.stringify(cartItems.value.map(i => ({ id: i.id, amount: i.amount })));
+    const existingOrderNumber = sessionStorage.getItem('pendingOrderNumber');
+    const existingCartHash = sessionStorage.getItem('pendingCartHash');
+    
+    let orderNumber;
+    let orderData;
 
-    // Build order payload with order number and user ID
-    const orderData = buildOrderPayload(form, cartItems.value, total.value, shippingCost.value, {
-      useSameAddressForBilling: useSameAddressForBilling.value,
-      orderNumber,
-      customerId: authStore.currentUser?.id ?? null,
-      localeCustomer: locale.value,
-    });
+    if (existingOrderNumber && existingCartHash === currentCartHash) {
+      // Reuse existing pending order
+      orderNumber = existingOrderNumber;
+      orderData = JSON.parse(sessionStorage.getItem('pendingOrderData') || '{}');
+    } else {
+      // Create new order
+      orderNumber = await fetchOrderNumber();
 
-    // Create order in Strapi
-    const result = await create('orders', orderData);
-
-    // Send notification to dashboard about new order
-    try {
-      await notificationStore.sendNotification({
-        receiverId: 'lembrace-dashboard',
-        type: 'new_order',
-        payload: {
-          orderId: result.data.id,
-          documentId: result.data.documentId,
-          orderNumber: orderNumber,
-        },
-        appId: config.public.notificationAppId,
+      orderData = buildOrderPayload(form, cartItems.value, total.value, shippingCost.value, {
+        useSameAddressForBilling: useSameAddressForBilling.value,
+        orderNumber,
+        customerId: authStore.currentUser?.id ?? null,
+        localeCustomer: locale.value,
       });
-    } catch (notificationError) {
-      // Don't fail the order if notification fails
-      console.error('Failed to send notification:', notificationError);
+
+      // Create order in Strapi
+      const result = await create('orders', orderData);
+
+      // Store for potential retry (if user goes back from Mollie)
+      sessionStorage.setItem('pendingOrderNumber', orderNumber);
+      sessionStorage.setItem('pendingCartHash', currentCartHash);
+      sessionStorage.setItem('pendingOrderData', JSON.stringify(orderData));
+
+      // Send notification to dashboard about new order
+      try {
+        await notificationStore.sendNotification({
+          receiverId: 'lembrace-dashboard',
+          type: 'new_order',
+          payload: {
+            orderId: result.data.id,
+            documentId: result.data.documentId,
+            orderNumber: orderNumber,
+          },
+          appId: config.public.notificationAppId,
+        });
+      } catch (notificationError) {
+        // Don't fail the order if notification fails
+        console.error('Failed to send notification:', notificationError);
+      }
     }
 
     // Create Mollie payment and redirect to checkout
@@ -454,7 +472,7 @@ const handleSubmit = async () => {
     });
 
     if (mollieResponse.success && mollieResponse.checkoutUrl) {
-      globalStore.clearCart();
+      // Cart is cleared on success page after payment is confirmed
       window.location.href = mollieResponse.checkoutUrl;
     } else {
       throw new Error('Failed to create Mollie payment');

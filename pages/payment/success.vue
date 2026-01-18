@@ -83,6 +83,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { useGlobalStore } from '~/stores/global';
 import { sendOrderConfirmationEmail, sendSellerOrderNotification } from '~/logic/email';
 
 const { t, locale } = useI18n();
@@ -138,6 +139,13 @@ const fetchOrderDetails = async () => {
 
     if (order) {
       paymentSuccess.value = true;
+      
+      // Clear cart and pending order data now that payment is confirmed
+      const globalStore = useGlobalStore();
+      globalStore.clearCart();
+      sessionStorage.removeItem('pendingOrderNumber');
+      sessionStorage.removeItem('pendingCartHash');
+      sessionStorage.removeItem('pendingOrderData');
       
       // Set order date
       orderDate.value = new Date(order.createdAt || Date.now()).toLocaleDateString(
