@@ -23,48 +23,46 @@ export default defineEventHandler(async (event) => {
 
     // Extract order information from metadata
     const metadata = payment.metadata as any;
-    const { orderId, orderNumber } = metadata || {};
+    const { orderNumber, uniqueOrderNumber } = metadata || {};
 
-    // Determine order status based on payment status
-    let orderStatus = 'pending';
+    // Map payment status to order status
+    const statusMap: Record<string, string> = {
+      paid: 'paid',
+      failed: 'failed',
+      expired: 'expired',
+      canceled: 'cancelled',
+    };
+    const orderStatus = statusMap[payment.status] || 'pending';
 
-    switch (payment.status) {
-      case 'paid':
-        orderStatus = 'paid';
-        break;
-      case 'failed':
-        orderStatus = 'failed';
-        break;
-      case 'expired':
-        orderStatus = 'expired';
-        break;
-      case 'canceled':
-        orderStatus = 'cancelled';
-        break;
-      default:
-        orderStatus = 'pending';
-    }
-
-    if (orderId) {
-      // Update order in Strapi using direct fetch
+    // Update order in Strapi if we have the unique order number
+    if (uniqueOrderNumber) {
       const strapiUrl = config.public.strapiUrl;
       const strapiToken = config.strapiToken as string;
 
       if (strapiToken) {
-        await $fetch<any>(`${strapiUrl}/api/orders/${orderId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: {
-            data: {
-              orderStatus: orderStatus,
-              molliePaymentId: paymentId,
-              paymentStatus: payment.status,
-              paidAt: payment.status === 'paid' ? new Date().toISOString() : null,
-            },
+        // Find order by unique_order_number
+        const findResponse = await $fetch<any>(`${strapiUrl}/api/orders`, {
+          method: 'GET',
+          query: {
+            'filters[unique_order_number][$eq]': uniqueOrderNumber,
           },
         });
+
+        const order = findResponse?.data?.[0];
+        if (order) {
+          const orderId = order.documentId || order.id;
+          await $fetch<any>(`${strapiUrl}/api/orders/${orderId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: {
+              data: {
+                orderStatus,
+              },
+            },
+          });
+        }
       }
     }
 
@@ -72,9 +70,8 @@ export default defineEventHandler(async (event) => {
       success: true,
       paymentId: payment.id,
       status: payment.status,
-      orderId,
       orderNumber,
-      orderStatus: orderStatus,
+      orderStatus,
     };
   } catch (error) {
     console.error('Payment status check error:', error);

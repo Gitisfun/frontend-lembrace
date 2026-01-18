@@ -138,6 +138,19 @@ const fetchOrderDetails = async () => {
     const order = orders?.data?.[0];
 
     if (order) {
+      // Verify payment status with Mollie (backup in case webhook didn't work)
+      if (order.molliePaymentId) {
+        try {
+          await $fetch('/api/mollie/check-payment', {
+            method: 'GET',
+            query: { paymentId: order.molliePaymentId },
+          });
+        } catch (checkError) {
+          console.error('Failed to verify payment status:', checkError);
+          // Continue anyway - order exists
+        }
+      }
+
       paymentSuccess.value = true;
       
       // Clear cart and pending order data now that payment is confirmed

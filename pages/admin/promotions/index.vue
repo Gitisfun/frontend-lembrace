@@ -866,6 +866,12 @@ await fetchPromotions();
   --admin-code-bg: rgba(255, 255, 255, 0.08);
 }
 
+/* Dark mode (default) - promotion code badge with black text */
+.admin-dashboard:not(.theme-light) .promotion-code {
+  background: rgba(255, 255, 255, 0.9);
+  color: #0f1419;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .promotions-content {
