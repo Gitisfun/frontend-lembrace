@@ -3,6 +3,7 @@ import { sendOrderConfirmationEmail, sendSellerOrderNotification, type OrderData
 
 export default defineEventHandler(async (event) => {
   try {
+    const config = useRuntimeConfig(event);
     const body = await readBody(event);
     const { id } = body;
 
@@ -10,108 +11,104 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: 'Payment ID is required' });
     }
 
+    const apiKey = config.mollieApiKey as string;
+    if (!apiKey) {
+      throw createError({ statusCode: 500, statusMessage: 'Mollie API key not configured' });
+    }
+
     // Initialize Mollie client
-    const mollieClient = createMollieClient({
-      apiKey: process.env.MOLLIE_API_KEY || 'test_rqn9NtT4qEDrfj4cfNg5KGvG7NyVAr',
-    });
+    const mollieClient = createMollieClient({ apiKey });
 
     // Get payment details from Mollie
     const payment = await mollieClient.payments.get(id);
 
     // Extract order information from metadata
     const metadata = payment.metadata as any;
-    const { orderId, orderNumber, uniqueOrderNumber } = metadata || {};
+    const { orderNumber, uniqueOrderNumber } = metadata || {};
 
-    if (uniqueOrderNumber) {
-      // Update order status in Strapi based on payment status
-      let orderStatus = 'pending';
+    if (!uniqueOrderNumber) {
+      console.warn('Webhook received without uniqueOrderNumber in metadata');
+      return { success: true };
+    }
 
-      switch (payment.status) {
-        case 'paid':
-          orderStatus = 'paid';
-          break;
-        case 'failed':
-          orderStatus = 'failed';
-          break;
-        case 'expired':
-          orderStatus = 'expired';
-          break;
-        case 'canceled':
-          orderStatus = 'cancelled';
-          break;
-        default:
-          orderStatus = 'pending';
-      }
+    // Map Mollie payment status to order status
+    const statusMap: Record<string, string> = {
+      paid: 'paid',
+      failed: 'failed',
+      expired: 'expired',
+      canceled: 'cancelled',
+    };
+    const orderStatus = statusMap[payment.status] || 'pending';
 
-      // First find the order by unique_order_number
-      const strapiUrl = process.env.STRAPI_URL || 'http://localhost:1337';
-      const strapiToken = process.env.STRAPI_TOKEN;
+    // Strapi configuration
+    const strapiUrl = config.public.strapiUrl;
+    const strapiToken = config.strapiToken as string;
 
-      // Find order by unique_order_number
-      const findResponse = await $fetch<any>(`${strapiUrl}/api/orders`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${strapiToken}`,
-          'Content-Type': 'application/json',
+    if (!strapiToken) {
+      throw createError({ statusCode: 500, statusMessage: 'Strapi token not configured' });
+    }
+
+    // Find order by unique_order_number
+    const findResponse = await $fetch<any>(`${strapiUrl}/api/orders`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${strapiToken}`,
+        'Content-Type': 'application/json',
+      },
+      query: {
+        'filters[unique_order_number][$eq]': uniqueOrderNumber,
+        populate: 'customerInfo,shippingAddress,items',
+      },
+    });
+
+    const order = findResponse?.data?.[0];
+
+    if (!order) {
+      console.warn(`Order not found for unique_order_number: ${uniqueOrderNumber}`);
+      return { success: true };
+    }
+
+    // Update order in Strapi (use documentId for Strapi v4/v5)
+    const orderId = order.documentId || order.id;
+    const updateResponse = await $fetch<any>(`${strapiUrl}/api/orders/${orderId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: {
+        data: {
+          orderStatus,
+          molliePaymentId: id,
+          paidAt: payment.status === 'paid' ? new Date().toISOString() : null,
         },
-        query: {
-          'filters[unique_order_number][$eq]': uniqueOrderNumber,
-          populate: 'customerInfo,shippingAddress,items',
-        },
-      });
+      },
+    });
 
-      const order = findResponse?.data?.[0];
+    // Send confirmation email if payment was successful
+    if (payment.status === 'paid' && updateResponse?.data) {
+      try {
+        const orderData = updateResponse.data;
+        const customerLocale = (orderData.localeCustomer === 'nl' ? 'nl' : 'en') as EmailLocale;
 
-      if (order) {
-        // Update order in Strapi
-        const updateResponse = await $fetch<any>(`${strapiUrl}/api/orders/${order.id}`, {
-          method: 'PUT',
-          headers: {
-            Authorization: `Bearer ${strapiToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: {
-            data: {
-              orderStatus: orderStatus,
-              molliePaymentId: id,
-              paymentStatus: payment.status,
-              paidAt: payment.status === 'paid' ? new Date().toISOString() : null,
-            },
-          },
-        });
+        if (orderData.customerInfo?.email) {
+          const config = useRuntimeConfig(event);
+          const emailOrderData: OrderData = {
+            totalPrice: orderData.totalPrice,
+            shippingCost: orderData.shippingCost,
+            customerInfo: orderData.customerInfo,
+            address: orderData.shippingAddress,
+            items: orderData.items,
+          };
 
-        // Send confirmation email if payment was successful
-        if (payment.status === 'paid' && updateResponse?.data) {
-          try {
-            const orderData = updateResponse.data;
-            const customerLocale = (orderData.localeCustomer === 'nl' ? 'nl' : 'en') as EmailLocale;
+          // Send order confirmation email to customer
+          await sendOrderConfirmationEmail(emailOrderData, orderNumber, config.public.strapiUrl, customerLocale);
 
-            if (orderData.customerInfo?.email) {
-              // Send order confirmation email
-              const config = useRuntimeConfig(event);
-              const emailOrderData: OrderData = {
-                deliveryMethod: orderData.deliveryMethod,
-                totalPrice: orderData.totalPrice,
-                shippingCost: orderData.shippingCost,
-                customerInfo: orderData.customerInfo,
-                address: orderData.shippingAddress,
-                items: orderData.items,
-              };
-              await sendOrderConfirmationEmail(emailOrderData, orderNumber, config.public.strapiUrl, customerLocale);
-              console.log(`Order confirmation email sent to ${orderData.customerInfo.email}`);
-
-              // Send seller notification email (always in Dutch)
-              await sendSellerOrderNotification(emailOrderData, orderNumber, config.public.strapiUrl, 'info@lembrace.be', 'nl');
-              console.log('Seller notification email sent');
-            }
-          } catch (emailError) {
-            console.error('Failed to send order confirmation email:', emailError);
-            // Don't throw error here as the payment was successful
-          }
+          // Send seller notification email (always in Dutch)
+          await sendSellerOrderNotification(emailOrderData, orderNumber, config.public.strapiUrl, 'info@lembrace.be', 'nl');
         }
-        //}
-
-        console.log(`Order ${orderNumber} updated to status: ${orderStatus}`);
+      } catch (emailError) {
+        console.error('Failed to send order confirmation email:', emailError);
+        // Don't throw - payment was successful, email is secondary
       }
     }
 

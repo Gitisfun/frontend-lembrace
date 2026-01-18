@@ -2,6 +2,7 @@ import { createMollieClient } from '@mollie/api-client';
 
 export default defineEventHandler(async (event) => {
   try {
+    const config = useRuntimeConfig(event);
     const query = getQuery(event);
     const { paymentId } = query;
 
@@ -9,10 +10,13 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: 'Payment ID is required' });
     }
 
+    const apiKey = config.mollieApiKey as string;
+    if (!apiKey) {
+      throw createError({ statusCode: 500, statusMessage: 'Mollie API key not configured' });
+    }
+
     // Initialize Mollie client
-    const mollieClient = createMollieClient({
-      apiKey: process.env.MOLLIE_API_KEY || 'test_rqn9NtT4qEDrfj4cfNg5KGvG7NyVAr',
-    });
+    const mollieClient = createMollieClient({ apiKey });
 
     // Get payment details from Mollie
     const payment = await mollieClient.payments.get(paymentId as string);
@@ -43,14 +47,13 @@ export default defineEventHandler(async (event) => {
 
     if (orderId) {
       // Update order in Strapi using direct fetch
-      const strapiUrl = process.env.STRAPI_URL || 'http://localhost:1337';
-      const strapiToken = process.env.STRAPI_TOKEN;
+      const strapiUrl = config.public.strapiUrl;
+      const strapiToken = config.strapiToken as string;
 
       if (strapiToken) {
-        await $fetch(`${strapiUrl}/api/orders/${orderId}`, {
+        await $fetch<any>(`${strapiUrl}/api/orders/${orderId}`, {
           method: 'PUT',
           headers: {
-            Authorization: `Bearer ${strapiToken}`,
             'Content-Type': 'application/json',
           },
           body: {
@@ -63,8 +66,6 @@ export default defineEventHandler(async (event) => {
           },
         });
       }
-
-      console.log(`Order ${orderNumber} updated to status: ${orderStatus}`);
     }
 
     return {

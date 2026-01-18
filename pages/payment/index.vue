@@ -151,7 +151,6 @@ import { useLocalization } from '~/composables/useLocalization';
 import { usePromotionVerification } from '~/composables/usePromotionVerification';
 import { paymentFormSchema, billingAddressSchema, createPaymentFormData } from '~/schemas';
 import { buildOrderPayload, fetchOrderNumber } from '~/logic/utils';
-import { sendOrderConfirmationEmail, sendSellerOrderNotification } from '~/logic/email';
 
 const { t, locale } = useI18n();
 const { error: toastError, warning: toastWarning } = useToast();
@@ -427,12 +426,8 @@ const handleSubmit = async () => {
       localeCustomer: locale.value,
     });
 
-    console.log('Order data:', orderData);
-
-    console.log('Sending order data to Strapi:', orderData);
     // Create order in Strapi
     const result = await create('orders', orderData);
-    console.log('Order created successfully:', result);
 
     // Send notification to dashboard about new order
     try {
@@ -446,18 +441,13 @@ const handleSubmit = async () => {
         },
         appId: config.public.notificationAppId,
       });
-      console.log('Notification sent for new order');
     } catch (notificationError) {
       // Don't fail the order if notification fails
       console.error('Failed to send notification:', notificationError);
     }
-    /*
-    sendOrderConfirmationEmail(orderData, orderNumber, config.public.strapiUrl, locale.value);
-    console.log('Order confirmation email sent successfully');
-    sendSellerOrderNotification(orderData, orderNumber, config.public.strapiUrl, 'info@lembrace.be', 'nl');
-    console.log('Seller notification email sent successfully');
-    */
-    /*
+
+    // Create Mollie payment and redirect to checkout
+    // Note: Emails are sent by the webhook after payment is confirmed
     const mollieResponse = await $fetch('/api/mollie/create-payment', {
       method: 'POST',
       body: orderData,
@@ -469,7 +459,6 @@ const handleSubmit = async () => {
     } else {
       throw new Error('Failed to create Mollie payment');
     }
-      */
   })
     .catch((error) => {
       console.error('Payment failed:', error);

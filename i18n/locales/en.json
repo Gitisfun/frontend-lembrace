@@ -251,6 +251,8 @@
     "success": {
       "title": "Thank you for your order!",
       "message": "Your order has been successfully received and is being processed.",
+      "loading": "Loading order details...",
+      "standardDelivery": "Standard delivery",
       "orderDetails": "Order Details",
       "orderNumber": "Order number",
       "date": "Date",

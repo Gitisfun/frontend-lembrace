@@ -1,16 +1,23 @@
 <template>
   <div class="success-page">
     <div class="success-container">
-      <div class="success-header">
-        <div class="success-icon" :class="{ 'success-icon--error': !paymentSuccess }">
-          <IconCheckCircle v-if="paymentSuccess" :size="48" />
-          <IconXCircle v-else :size="48" />
-        </div>
-        <h1>{{ paymentSuccess ? $t('payment.success.title') : $t('payment.failed.title') }}</h1>
-        <p class="success-message">{{ paymentSuccess ? $t('payment.success.message') : $t('payment.failed.message') }}</p>
+      <!-- Loading State -->
+      <div v-if="isLoading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>{{ $t('payment.success.loading') }}</p>
       </div>
 
-      <template v-if="paymentSuccess">
+      <template v-else>
+        <div class="success-header">
+          <div class="success-icon" :class="{ 'success-icon--error': !paymentSuccess }">
+            <IconCheckCircle v-if="paymentSuccess" :size="48" />
+            <IconXCircle v-else :size="48" />
+          </div>
+          <h1>{{ paymentSuccess ? $t('payment.success.title') : $t('payment.failed.title') }}</h1>
+          <p class="success-message">{{ paymentSuccess ? $t('payment.success.message') : $t('payment.failed.message') }}</p>
+        </div>
+
+        <template v-if="paymentSuccess">
         <div class="order-details">
           <h2>{{ $t('payment.success.orderDetails') }}</h2>
           <div class="details-grid">
@@ -61,13 +68,14 @@
         </div>
       </template>
 
-      <div class="action-buttons">
-        <NuxtLink :to="localePath('/products')" class="continue-btn">{{ $t('payment.continueShopping') }}</NuxtLink>
-        <button v-if="paymentSuccess" class="print-btn" @click="printOrder">
-          <IconPrint :size="20" />
-          {{ $t('payment.printOrder') }}
-        </button>
-      </div>
+        <div class="action-buttons">
+          <NuxtLink :to="localePath('/products')" class="continue-btn">{{ $t('payment.continueShopping') }}</NuxtLink>
+          <button v-if="paymentSuccess" class="print-btn" @click="printOrder">
+            <IconPrint :size="20" />
+            {{ $t('payment.printOrder') }}
+          </button>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -79,7 +87,6 @@ import { sendOrderConfirmationEmail, sendSellerOrderNotification } from '~/logic
 
 const { t, locale } = useI18n();
 const localePath = useLocalePath();
-const emailLocale = computed(() => (locale.value === 'nl' ? 'nl' : 'en'));
 
 // SEO Meta
 useSeoMeta({
@@ -91,71 +98,90 @@ useSeoMeta({
 const route = useRoute();
 const paymentSuccess = ref(true);
 const orderNumber = ref('');
-const uniqueOrderNumber = ref('');
+const orderLocale = ref('en');
 const orderDate = ref('');
 const deliveryMethod = ref('');
 const expectedDelivery = ref('');
 const emailSent = ref(false);
+const isLoading = ref(true);
+
+// Email locale based on order's locale (from URL param)
+const emailLocale = computed(() => (orderLocale.value === 'nl' ? 'nl' : 'en'));
 
 onMounted(async () => {
   // Get order data from route query parameters
-  const orderData = route.query;
+  const queryParams = route.query;
 
-  if (orderData) {
-    // Check if payment was successful (Mollie redirects here after payment)
-    paymentSuccess.value = true; // Assume success since user reached this page
-    orderNumber.value = orderData.orderNumber || '';
-    uniqueOrderNumber.value = orderData.uniqueOrderNumber || '';
-    orderDate.value = new Date().toLocaleDateString('nl-NL', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-    deliveryMethod.value = orderData.deliveryMethod === 'express' ? 'Express levering' : 'Standaard levering';
-
-    // Calculate expected delivery date based on delivery method
-    const deliveryDate = new Date();
-    if (orderData.deliveryMethod === 'express') {
-      deliveryDate.setDate(deliveryDate.getDate() + 1);
-    } else {
-      deliveryDate.setDate(deliveryDate.getDate() + 3);
-    }
-
-    expectedDelivery.value = deliveryDate.toLocaleDateString('nl-NL', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-
-    // Try to send confirmation email as backup (in case webhook didn't work)
-    if (uniqueOrderNumber.value && !emailSent.value) {
-      await sendConfirmationEmail();
-      await sendSellerNotificationEmailFn();
-    }
+  if (queryParams.orderNumber) {
+    orderNumber.value = queryParams.orderNumber;
+    orderLocale.value = queryParams.locale || 'en';
+    
+    // Fetch order details from Strapi
+    await fetchOrderDetails();
+  } else {
+    paymentSuccess.value = false;
+    isLoading.value = false;
   }
 });
 
-const sendConfirmationEmail = async () => {
+const fetchOrderDetails = async () => {
   try {
-    // Get order details from Strapi using the unique_order_number
     const { find } = useStrapi();
     const orders = await find('orders', {
       filters: {
-        unique_order_number: uniqueOrderNumber.value,
+        orderNumber: orderNumber.value,
       },
-      populate: ['customerInfo', 'address', 'items'],
+      populate: ['customerInfo', 'shippingAddress', 'items'],
     });
 
     const order = orders?.data?.[0];
 
-    if (order && order.customerInfo?.email) {
+    if (order) {
+      paymentSuccess.value = true;
+      
+      // Set order date
+      orderDate.value = new Date(order.createdAt || Date.now()).toLocaleDateString(
+        orderLocale.value === 'nl' ? 'nl-NL' : 'en-US',
+        { day: 'numeric', month: 'long', year: 'numeric' }
+      );
+
+      // Set delivery method from order
+      deliveryMethod.value = order.deliveryMethod || t('payment.success.standardDelivery');
+
+      // Calculate expected delivery (3-5 business days)
+      const deliveryDate = new Date();
+      deliveryDate.setDate(deliveryDate.getDate() + 5);
+      expectedDelivery.value = deliveryDate.toLocaleDateString(
+        orderLocale.value === 'nl' ? 'nl-NL' : 'en-US',
+        { day: 'numeric', month: 'long', year: 'numeric' }
+      );
+
+      // Try to send confirmation email as backup (in case webhook didn't work)
+      if (!emailSent.value) {
+        await sendConfirmationEmail(order);
+        await sendSellerNotificationEmailFn(order);
+      }
+    } else {
+      paymentSuccess.value = false;
+    }
+  } catch (error) {
+    console.error('Failed to fetch order details:', error);
+    paymentSuccess.value = false;
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const sendConfirmationEmail = async (order) => {
+  try {
+    if (order.customerInfo?.email) {
       const config = useRuntimeConfig();
       const orderDataForEmail = {
         deliveryMethod: order.deliveryMethod,
         totalPrice: order.totalPrice,
         shippingCost: order.shippingCost,
         customerInfo: order.customerInfo,
-        address: order.address,
+        address: order.shippingAddress,
         items: order.items,
       };
 
@@ -169,34 +195,21 @@ const sendConfirmationEmail = async () => {
   }
 };
 
-const sendSellerNotificationEmailFn = async () => {
+const sendSellerNotificationEmailFn = async (order) => {
   try {
-    // Get order details from Strapi using the unique_order_number
-    const { find } = useStrapi();
-    const orders = await find('orders', {
-      filters: {
-        unique_order_number: uniqueOrderNumber.value,
-      },
-      populate: ['customerInfo', 'address', 'items'],
-    });
+    const config = useRuntimeConfig();
+    const orderDataForEmail = {
+      deliveryMethod: order.deliveryMethod,
+      totalPrice: order.totalPrice,
+      shippingCost: order.shippingCost,
+      customerInfo: order.customerInfo,
+      address: order.shippingAddress,
+      items: order.items,
+    };
 
-    const order = orders?.data?.[0];
-
-    if (order) {
-      const config = useRuntimeConfig();
-      const orderDataForEmail = {
-        deliveryMethod: order.deliveryMethod,
-        totalPrice: order.totalPrice,
-        shippingCost: order.shippingCost,
-        customerInfo: order.customerInfo,
-        address: order.address,
-        items: order.items,
-      };
-
-      // Seller notification always in Dutch (admin's preferred language)
-      await sendSellerOrderNotification(orderDataForEmail, orderNumber.value, config.public.strapiUrl, 'info@lembrace.be', 'nl');
-      console.log('Seller notification email sent successfully');
-    }
+    // Seller notification always in Dutch (admin's preferred language)
+    await sendSellerOrderNotification(orderDataForEmail, orderNumber.value, config.public.strapiUrl, 'info@lembrace.be', 'nl');
+    console.log('Seller notification email sent successfully');
   } catch (error) {
     console.error('Failed to send seller notification email:', error);
     // Don't show error to user as this is a notification mechanism
@@ -389,6 +402,34 @@ const printOrder = () => {
 .success-icon--error {
   background: #ffebee;
   color: #f44336;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1.5rem;
+}
+
+.loading-state p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--color-gold);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @media (max-width: 768px) {

@@ -251,6 +251,8 @@
     "success": {
       "title": "Bedankt voor je bestelling!",
       "message": "Je bestelling is succesvol ontvangen en wordt verwerkt.",
+      "loading": "Bestellingsgegevens laden...",
+      "standardDelivery": "Standaard levering",
       "orderDetails": "Bestelling details",
       "orderNumber": "Bestelnummer",
       "date": "Datum",

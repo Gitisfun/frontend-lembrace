@@ -11,12 +11,15 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     // Private keys (server-side only)
+    mollieApiKey: process.env.MOLLIE_API_KEY || '',
+    strapiToken: process.env.STRAPI_TOKEN || '',
     authApiKey: process.env.AUTH_API_KEY || '',
     authApiBase: process.env.AUTH_API_URL || 'https://sundrops-api-345f2765b0ea.herokuapp.com',
     chatApiBase: process.env.CHAT_API_URL || 'http://localhost:3003',
     orderNumberApiUrl: process.env.ORDER_NUMBER_API_URL || 'https://localhost:3002/api/counter',
     notificationApiUrl: process.env.NOTIFICATION_API_URL || 'http://localhost:3004',
     public: {
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
       strapiUrl: process.env.STRAPI_URL || 'http://localhost:1337',
       chatApiBase: process.env.CHAT_API_URL || 'http://localhost:3003',
       notificationApiUrl: process.env.NOTIFICATION_API_URL || 'http://localhost:3004',
