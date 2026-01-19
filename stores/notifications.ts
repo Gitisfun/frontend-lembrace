@@ -49,6 +49,7 @@ export const useNotificationStore = defineStore('notifications', {
       const config = useRuntimeConfig();
       return {
         apiUrl: config.public.notificationApiUrl as string,
+        appId: config.public.notificationAppId as string,
       };
     },
 
@@ -56,13 +57,13 @@ export const useNotificationStore = defineStore('notifications', {
     init(receiverId: string) {
       if (this._socket) return; // Already initialized
 
-      const { apiUrl } = this._getConfig();
+      const { apiUrl, appId } = this._getConfig();
       this._receiverId = receiverId;
       this._socket = io(apiUrl);
 
       this._socket.on('connect', () => {
         this.isConnected = true;
-        this._socket?.emit('subscribe', receiverId);
+        this._socket?.emit('subscribe', { receiverId, appId });
         console.log('✅ Connected to notification server');
       });
 
@@ -136,7 +137,8 @@ export const useNotificationStore = defineStore('notifications', {
     // Call when user logs out
     disconnect() {
       if (this._socket) {
-        this._socket.emit('unsubscribe', this._receiverId);
+        const { appId } = this._getConfig();
+        this._socket.emit('unsubscribe', { receiverId: this._receiverId, appId });
         this._socket.disconnect();
         this._socket = null;
         this._receiverId = null;

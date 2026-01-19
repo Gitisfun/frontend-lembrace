@@ -9,8 +9,10 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const appId = config.public.notificationAppId;
+
   try {
-    const response = await fetch(`${config.notificationApiUrl}/api/notifications/${notificationId}/read`, {
+    const response = await fetch(`${config.notificationApiUrl}/api/notifications/${notificationId}/read?appId=${encodeURIComponent(appId)}`, {
       method: 'PATCH',
       headers: {
         'x-api-key': config.authApiKey,
