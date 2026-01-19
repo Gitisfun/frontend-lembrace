@@ -27,6 +27,7 @@ interface Message {
 
 export const useChat = () => {
   const { socket } = useSocket();
+  const config = useRuntimeConfig();
 
   const rooms = ref<Room[]>([]);
   const currentRoom = ref<Room | null>(null);
@@ -135,11 +136,13 @@ export const useChat = () => {
 
   const sendMessage = (content: string) => {
     if (!content.trim()) return;
-    socket()?.emit('message:send', { content });
+    const applicationId = config.public.chatAppId;
+    socket()?.emit('message:send', { content, applicationId });
   };
 
   const createRoom = (name: string, description: string = '') => {
-    socket()?.emit('room:create', { name, description, isPrivate: false });
+    const applicationId = config.public.chatAppId;
+    socket()?.emit('room:create', { name, description, isPrivate: false, applicationId });
   };
 
   const startTyping = () => {

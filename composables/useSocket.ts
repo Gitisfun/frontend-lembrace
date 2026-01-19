@@ -14,13 +14,15 @@ export const useSocket = () => {
     username.value = user;
     senderId.value = id;
 
+    const applicationId = config.public.chatAppId;
+
     socket = io(config.public.chatApiBase || 'http://localhost:3003', {
       autoConnect: true,
     });
 
     socket.on('connect', () => {
       isConnected.value = true;
-      socket?.emit('user:connect', { username: user, senderId: id });
+      socket?.emit('user:connect', { username: user, senderId: id, applicationId });
     });
 
     socket.on('disconnect', () => {

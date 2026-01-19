@@ -9,8 +9,10 @@ export default defineEventHandler(async (event) => {
     });
   }
 
+  const applicationId = config.public.chatAppId;
+
   try {
-    const response = await fetch(`${config.chatApiBase}/api/rooms/name/${encodeURIComponent(roomName)}`, {
+    const response = await fetch(`${config.chatApiBase}/api/rooms/name/${encodeURIComponent(roomName)}?applicationId=${encodeURIComponent(applicationId)}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

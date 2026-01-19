@@ -27,6 +27,7 @@ export default defineNuxtConfig({
       chatApiBase: '',
       notificationApiUrl: '',
       notificationAppId: '',
+      chatAppId: '',
     },
   },
 
