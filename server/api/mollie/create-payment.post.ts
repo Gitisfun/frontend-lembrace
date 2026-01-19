@@ -2,6 +2,7 @@ import { createMollieClient } from '@mollie/api-client';
 
 export default defineEventHandler(async (event) => {
   try {
+    const config = useRuntimeConfig(event);
     const orderData = await readBody(event);
 
     // Validate required fields
@@ -13,14 +14,12 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, statusMessage: 'Invalid order data: unique_order_number is required' });
     }
 
-    const apiKey = process.env.MOLLIE_API_KEY;
+    const apiKey = config.mollieApiKey as string;
     if (!apiKey) {
       throw createError({ statusCode: 500, statusMessage: 'Mollie API key not configured' });
     }
 
     const mollieClient = createMollieClient({ apiKey });
-
-    const config = useRuntimeConfig(event);
     const siteUrl = config.public.siteUrl as string;
 
     if (!siteUrl) {
