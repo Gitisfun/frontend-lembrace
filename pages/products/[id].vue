@@ -15,14 +15,20 @@
       <div class="product-gallery">
         <!-- Main Image -->
         <div class="product-image">
-          <NuxtImg :src="selectedImage?.formats?.large?.url || product?.image?.[0]?.formats?.large?.url" :alt="product?.name" width="800" height="800" format="webp" provider="strapi" class="image" />
+          <NuxtImg v-if="mainProductImageUrl" :src="mainProductImageUrl" :alt="product?.name" width="800" height="800" format="webp" provider="strapi" class="image" />
+          <div v-else class="image-placeholder">
+            <span>{{ product?.name }}</span>
+          </div>
           <UiFavoriteButton :is-active="isFavorite" class="favorite-btn-position" @toggle="toggleFavorite" />
         </div>
 
         <!-- Thumbnail Gallery -->
         <div v-if="product?.image && product.image.length > 1" class="image-thumbnails">
           <div v-for="(image, index) in product.image" :key="index" class="thumbnail" :class="{ active: selectedImage === image }" @click="selectImage(image)">
-            <NuxtImg :src="image.formats?.thumbnail?.url || image.formats?.small?.url" :alt="`${product?.name} - Image ${index + 1}`" width="100" height="100" format="webp" provider="strapi" class="thumbnail-image" />
+            <NuxtImg v-if="getThumbnailUrl(image)" :src="getThumbnailUrl(image)" :alt="`${product?.name} - Image ${index + 1}`" width="100" height="100" format="webp" provider="strapi" class="thumbnail-image" />
+            <div v-else class="thumbnail-placeholder">
+              <span>{{ index + 1 }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -103,6 +109,7 @@
 
 <script setup>
 import { useProductPrice } from '~/composables/useProductPrice';
+import { useProductImage, getProductImageUrl } from '~/composables/useProductImage';
 import { useApiError } from '~/composables/useApiError';
 import { useLocalization } from '~/composables/useLocalization';
 import InputCounter from '~/components/input/InputCounter.vue';
@@ -152,6 +159,22 @@ const showQuantityAdjustedMessage = ref(false);
 
 // Use composable for price calculations
 const { formattedPrice, formattedOriginalPrice, hasDiscount, discountPercentage } = useProductPrice(product);
+
+// Use composable for image handling with fallbacks
+const { getMainImage, getThumbnailImage } = useProductImage(product);
+
+// Computed property for main product image with fallback
+const mainProductImageUrl = computed(() => {
+  if (selectedImage.value) {
+    return getProductImageUrl(selectedImage.value, 'large') || getProductImageUrl(selectedImage.value, 'medium') || getProductImageUrl(selectedImage.value, 'small') || getProductImageUrl(selectedImage.value, 'thumbnail');
+  }
+  return getMainImage('large') || getMainImage('medium') || getMainImage('small') || getMainImage('thumbnail');
+});
+
+// Computed property for thumbnail images with fallback
+const getThumbnailUrl = (image) => {
+  return getThumbnailImage(image) || getProductImageUrl(image, 'small') || getProductImageUrl(image, 'medium') || getProductImageUrl(image, 'large');
+};
 
 const isInCart = computed(() => {
   if (!product.value) return false;
@@ -227,12 +250,17 @@ const fetchProduct = async () => {
 await fetchProduct();
 
 // SEO Meta - dynamic based on product
+const ogImageUrl = computed(() => {
+  const imageUrl = getMainImage('large') || getMainImage('medium') || getMainImage('small') || getMainImage('thumbnail');
+  return imageUrl || '/logo-lembrace.png';
+});
+
 useSeoMeta({
   title: () => (product.value?.name ? `${product.value.name}${t('seo.product.titleSuffix')}` : t('seo.products.title')),
   description: () => product.value?.description_short || product.value?.name || t('seo.products.description'),
   ogTitle: () => (product.value?.name ? `${product.value.name}${t('seo.product.titleSuffix')}` : t('seo.products.title')),
   ogDescription: () => product.value?.description_short || product.value?.name || t('seo.products.description'),
-  ogImage: () => product.value?.image?.[0]?.formats?.large?.url || '/logo-lembrace.png',
+  ogImage: () => ogImageUrl.value,
   twitterTitle: () => (product.value?.name ? `${product.value.name}${t('seo.product.titleSuffix')}` : t('seo.products.title')),
   twitterDescription: () => product.value?.description_short || product.value?.name || t('seo.products.description'),
 });
@@ -382,6 +410,31 @@ const onPromocodeRemoved = () => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  color: #999;
+  font-size: 1rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+.thumbnail-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  color: #999;
+  font-size: 0.7rem;
+  text-align: center;
 }
 
 .product-info {

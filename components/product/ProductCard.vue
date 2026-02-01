@@ -1,10 +1,13 @@
 <template>
   <div class="product-card">
     <div class="product-image">
-      <NuxtLink :to="localePath(`/products/${product.documentId}`)" class="product-link">
-        <NuxtImg :src="product?.image[0]?.formats?.medium?.url" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image main-image" />
-        <NuxtImg :src="product?.image_background?.formats?.medium?.url ?? product?.image[0]?.formats?.medium?.url" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image hover-image" />
+      <NuxtLink v-if="mainImageUrl" :to="localePath(`/products/${product.documentId}`)" class="product-link">
+        <NuxtImg :src="mainImageUrl" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image main-image" />
+        <NuxtImg v-if="hoverImageUrl" :src="hoverImageUrl" :alt="product?.name" width="400" height="400" format="webp" provider="strapi" class="image hover-image" />
       </NuxtLink>
+      <div v-else class="image-placeholder">
+        <span>{{ product?.name }}</span>
+      </div>
       <UiFavoriteButton :is-active="isFavorite" class="favorite-btn-position" @toggle="toggleFavorite" />
       <div v-if="product?.amount === 0" class="soldout-badge">Sold out</div>
       <div v-if="hasDiscount" class="discount-badge">- {{ discountPercentage }}%</div>
@@ -21,6 +24,7 @@
 
 <script setup>
 import { useProductPrice } from '~/composables/useProductPrice';
+import { useProductImage } from '~/composables/useProductImage';
 import { useGlobalStore } from '~/stores/global';
 import { useToast } from '~/composables/useToast';
 
@@ -39,6 +43,11 @@ const globalStore = useGlobalStore();
 
 // Use composable for price calculations
 const { formattedPrice, formattedOriginalPrice, hasDiscount, discountPercentage } = useProductPrice(computed(() => props.product));
+
+// Use composable for image handling with fallbacks
+const { getMainImage, getHoverImage } = useProductImage(props.product);
+const mainImageUrl = computed(() => getMainImage('medium'));
+const hoverImageUrl = computed(() => getHoverImage('medium'));
 
 const isFavorite = computed(() => {
   return globalStore.isFavorite(props.product.documentId);
@@ -81,10 +90,17 @@ const toggleFavorite = () => {
   position: relative;
 }
 
+.product-link {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: relative;
+}
+
 .image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   background: #fff;
   display: block;
   transition: opacity 0.3s ease;
@@ -181,5 +197,18 @@ const toggleFavorite = () => {
   font-weight: 400;
   letter-spacing: 0.01em;
   margin: 0;
+}
+
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  color: #999;
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 1rem;
 }
 </style>
